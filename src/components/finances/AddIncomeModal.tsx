@@ -1,61 +1,105 @@
 import { useState } from "react";
-import { X } from "lucide-react";
 
-import type { Income } from "../../types/Cashflow";
+import {
+  AlertCircle,
+  X,
+} from "lucide-react";
+
+import type {
+  Income,
+} from "../../types/Cashflow";
 
 type AddIncomeModalProps = {
   onClose: () => void;
-  onAdd: (income: Income) => void;
+
+  onAdd: (
+    income: Income
+  ) => void;
 };
 
 export function AddIncomeModal({
   onClose,
   onAdd,
 }: AddIncomeModalProps) {
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [recurring, setRecurring] = useState(true);
+  const [name, setName] =
+    useState("");
+
+  const [amount, setAmount] =
+    useState("");
+
+  const [
+    recurring,
+    setRecurring,
+  ] = useState(true);
+
+  const [date, setDate] =
+    useState(
+      getTodayDate()
+    );
+
+  const [error, setError] =
+    useState("");
 
   function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
 
-    const numericAmount = Number(amount);
+    setError("");
 
-    if (!name.trim() || numericAmount <= 0) {
+    const numericAmount =
+      Number(amount);
+
+    if (!name.trim()) {
+      setError(
+        "Podaj nazwę przychodu."
+      );
+
+      return;
+    }
+
+    if (
+      !Number.isFinite(
+        numericAmount
+      ) ||
+      numericAmount <= 0
+    ) {
+      setError(
+        "Kwota musi być większa od 0."
+      );
+
+      return;
+    }
+
+    if (!date) {
+      setError(
+        "Wybierz datę przychodu."
+      );
+
       return;
     }
 
     onAdd({
       id: Date.now(),
-      name: name.trim(),
-      amount: numericAmount,
+
+      name:
+        name.trim(),
+
+      amount:
+        numericAmount,
+
       recurring,
+
+      date,
     });
 
     onClose();
   }
 
   return (
-    <div
-      className="
-        fixed inset-0 z-50
-        flex items-center justify-center
-        bg-black/70
-        backdrop-blur-sm
-      "
-    >
-      <div
-        className="
-          w-full max-w-md
-          rounded-2xl
-          border border-slate-700
-          bg-slate-900
-          p-6
-          shadow-2xl
-        "
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
+
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold">
@@ -63,18 +107,15 @@ export function AddIncomeModal({
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Dodaj nowe źródło dochodu.
+              Dodaj nowe źródło
+              dochodu.
             </p>
           </div>
 
           <button
+            type="button"
             onClick={onClose}
-            className="
-              rounded-lg p-2
-              text-slate-400
-              hover:bg-slate-800
-              hover:text-white
-            "
+            className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"
           >
             <X size={20} />
           </button>
@@ -84,6 +125,17 @@ export function AddIncomeModal({
           onSubmit={handleSubmit}
           className="mt-6 space-y-5"
         >
+          {error && (
+            <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300">
+              <AlertCircle
+                size={18}
+                className="mt-0.5 shrink-0"
+              />
+
+              {error}
+            </div>
+          )}
+
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-300">
               Nazwa
@@ -92,19 +144,13 @@ export function AddIncomeModal({
             <input
               value={name}
               onChange={(event) =>
-                setName(event.target.value)
+                setName(
+                  event.target.value
+                )
               }
-              placeholder="np. Side business"
+              placeholder="np. Wynagrodzenie"
               autoFocus
-              className="
-                w-full rounded-xl
-                border border-slate-700
-                bg-slate-950
-                px-4 py-3
-                outline-none
-                placeholder:text-slate-600
-                focus:border-emerald-500
-              "
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 outline-none placeholder:text-slate-600 focus:border-emerald-500"
             />
           </div>
 
@@ -120,48 +166,53 @@ export function AddIncomeModal({
                 step="0.01"
                 value={amount}
                 onChange={(event) =>
-                  setAmount(event.target.value)
+                  setAmount(
+                    event.target.value
+                  )
                 }
-                placeholder="3000"
-                className="
-                  w-full rounded-xl
-                  border border-slate-700
-                  bg-slate-950
-                  px-4 py-3 pr-12
-                  outline-none
-                  placeholder:text-slate-600
-                  focus:border-emerald-500
-                "
+                placeholder="15000"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 pr-12 outline-none placeholder:text-slate-600 focus:border-emerald-500"
               />
 
-              <span
-                className="
-                  absolute
-                  right-4 top-1/2
-                  -translate-y-1/2
-                  text-sm text-slate-500
-                "
-              >
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500">
                 zł
               </span>
             </div>
           </div>
 
-          <label
-            className="
-              flex cursor-pointer
-              items-center gap-3
-              rounded-xl
-              border border-slate-800
-              bg-slate-950/50
-              p-4
-            "
-          >
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-300">
+              Data pierwszego
+              przychodu
+            </label>
+
+            <input
+              type="date"
+              value={date}
+              onChange={(event) =>
+                setDate(
+                  event.target.value
+                )
+              }
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 outline-none focus:border-emerald-500"
+            />
+
+            <p className="mt-1 text-xs text-slate-600">
+              Przy transakcji
+              cyklicznej ta data
+              określa również dzień
+              comiesięcznej reguły.
+            </p>
+          </div>
+
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/50 p-4">
             <input
               type="checkbox"
               checked={recurring}
               onChange={(event) =>
-                setRecurring(event.target.checked)
+                setRecurring(
+                  event.target.checked
+                )
               }
             />
 
@@ -171,7 +222,8 @@ export function AddIncomeModal({
               </div>
 
               <div className="text-xs text-slate-500">
-                Stałe źródło dochodu
+                Utworzy regułę
+                cykliczną.
               </div>
             </div>
           </label>
@@ -180,27 +232,14 @@ export function AddIncomeModal({
             <button
               type="button"
               onClick={onClose}
-              className="
-                rounded-xl
-                px-5 py-3
-                text-sm font-semibold
-                text-slate-400
-                hover:bg-slate-800
-                hover:text-white
-              "
+              className="rounded-xl px-5 py-3 text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-white"
             >
               Anuluj
             </button>
 
             <button
               type="submit"
-              className="
-                rounded-xl
-                bg-emerald-600
-                px-5 py-3
-                text-sm font-semibold
-                hover:bg-emerald-500
-              "
+              className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold hover:bg-emerald-500"
             >
               Dodaj przychód
             </button>
@@ -209,4 +248,11 @@ export function AddIncomeModal({
       </div>
     </div>
   );
+}
+
+function getTodayDate() {
+  return new Date()
+    .toLocaleDateString(
+      "sv-SE"
+    );
 }
