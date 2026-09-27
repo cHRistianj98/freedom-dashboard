@@ -5,7 +5,7 @@ import {
   X,
 } from "lucide-react";
 
-import type { Liability } from "../../types/Liability";
+import type { Liability, LiabilityType } from "../../types/Liability";
 
 type AddLiabilityModalProps = {
   onClose: () => void;
@@ -18,6 +18,9 @@ export function AddLiabilityModal({
   onClose,
   onAdd,
 }: AddLiabilityModalProps) {
+  const [liabilityType, setLiabilityType] =
+    useState<LiabilityType>("OTHER");
+
   const [name, setName] =
     useState("");
 
@@ -208,6 +211,8 @@ export function AddLiabilityModal({
 
       name: name.trim(),
 
+      type: liabilityType,
+
       originalAmount:
         original,
 
@@ -283,6 +288,30 @@ export function AddLiabilityModal({
             placeholder="np. Kredyt hipoteczny"
             type="text"
           />
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-300">
+              Typ zobowiązania
+            </label>
+
+            <select
+              value={liabilityType}
+              onChange={(event) =>
+                setLiabilityType(
+                  event.target.value as LiabilityType
+                )
+              }
+              className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+            >
+              <option value="MORTGAGE">Kredyt hipoteczny</option>
+              <option value="CASH_LOAN">Kredyt gotówkowy</option>
+              <option value="CAR_LOAN">Kredyt samochodowy</option>
+              <option value="LEASING">Leasing</option>
+              <option value="INSTALLMENTS">Raty</option>
+              <option value="CREDIT_CARD">Karta kredytowa</option>
+              <option value="OTHER">Inne</option>
+            </select>
+          </div>
 
           {/* DEBT */}
 
