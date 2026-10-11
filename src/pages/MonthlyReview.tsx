@@ -428,7 +428,7 @@ export function MonthlyReview({
                   Miesiąc zamknięty
                 </div>
                 <p className="mt-1 text-sm font-black">
-                  Snapshot zamrożony
+                  Zapis stanu zamrożony
                 </p>
                 <p className="mt-1 text-[10px] text-emerald-400/70">
                   {formatClosedAt(frozenSnapshot.closedAt)}
@@ -443,7 +443,7 @@ export function MonthlyReview({
                 title={
                   canCloseMonth
                     ? "Zamroź pełny stan tego miesiąca"
-                    : "Historycznych Goals/Debt/XP nie da się odtworzyć bez wcześniejszego snapshotu"
+                    : "Historycznych celów/długu/XP nie da się odtworzyć bez wcześniejszego zapisu stanu"
                 }
               >
                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em]">
@@ -461,7 +461,7 @@ export function MonthlyReview({
         {!frozenSnapshot && !isLatestMonth && (
           <div className="mt-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-4 text-sm text-amber-200">
             Ten miesiąc pochodzi ze starszej historii. Przepływy pieniężne i majątek netto są historyczne,
-            ale Goals, Debt i Progression nie były wtedy snapshotowane — dlatego pokazujemy ich aktualny stan.
+            ale cele, dług i progresja nie były wtedy zapisywane — dlatego pokazujemy ich aktualny stan.
           </div>
         )}
 
@@ -490,7 +490,7 @@ export function MonthlyReview({
             positive={surplus >= 0}
           />
           <MetricCard
-            label="Savings rate"
+            label="Stopa oszczędności"
             value={`${savingsRate.toFixed(1)}%`}
             icon={<Gauge size={20} />}
             detail="dochód → nadwyżka"
@@ -499,7 +499,7 @@ export function MonthlyReview({
         </section>
 
         <section className="mt-6 grid grid-cols-1 gap-5 xl:grid-cols-3">
-          <Panel title="Wealth" icon={<ArrowUpRight size={19} />} badge={frozenSnapshot ? "FROZEN" : undefined}>
+          <Panel title="Majątek" icon={<ArrowUpRight size={19} />} badge={frozenSnapshot ? "ZAMROŻONY" : undefined}>
             <BigValue
               label="Majątek netto"
               value={
@@ -548,14 +548,14 @@ export function MonthlyReview({
           </Panel>
 
           <Panel
-            title="Debt"
+            title="Dług"
             icon={<Landmark size={19} />}
             badge={
               frozenSnapshot
                 ? "FROZEN"
                 : isLatestMonth
                 ? undefined
-                : "CURRENT"
+                : "BIEŻĄCY"
             }
           >
             <BigValue
@@ -594,14 +594,14 @@ export function MonthlyReview({
           </Panel>
 
           <Panel
-            title="Progression"
+            title="Progresja"
             icon={<Trophy size={19} />}
             badge={
               frozenSnapshot
                 ? "FROZEN"
                 : isLatestMonth
                 ? undefined
-                : "CURRENT"
+                : "BIEŻĄCY"
             }
           >
             <div className="flex items-end justify-between gap-4">
@@ -660,7 +660,7 @@ export function MonthlyReview({
                   </div>
 
                   <p className="text-xs text-slate-500">
-                    Porównanie dwóch zamrożonych snapshotów — bez CURRENT i bez zgadywania historii.
+                    Porównanie dwóch zamrożonych zapisów stanu — bez danych bieżących i bez zgadywania historii.
                   </p>
                 </div>
 
@@ -680,7 +680,7 @@ export function MonthlyReview({
                     goodWhen="UP"
                   />
                   <ComparisonMetric
-                    label="Debt"
+                    label="Dług"
                     previous={previousClosedSnapshot.wealth.liabilities}
                     current={frozenSnapshot.wealth.liabilities}
                     delta={debtDelta ?? 0}
@@ -719,7 +719,7 @@ export function MonthlyReview({
                         goodWhen="UP"
                       />
                       <MovementRow
-                        label="Savings rate"
+                        label="Stopa oszczędności"
                         value={savingsRateDelta ?? 0}
                         goodWhen="UP"
                         percentage
@@ -729,7 +729,7 @@ export function MonthlyReview({
 
                   <div className="rounded-2xl border border-slate-800 bg-[#08111f] p-5">
                     <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">
-                      Wealth movement
+                      Zmiana majątku
                     </p>
 
                     <div className="mt-4 space-y-3">
@@ -770,7 +770,7 @@ export function MonthlyReview({
                 <div className="mt-5 rounded-2xl border border-slate-800 bg-[#08111f] p-5">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">
-                      Goals movement
+                      Zmiana celów
                     </p>
                     <span className="text-xs text-slate-600">
                       {goalComparisons.length} celów
@@ -833,14 +833,14 @@ export function MonthlyReview({
 
         <section className="mt-6 grid grid-cols-1 gap-5 xl:grid-cols-[1.35fr_0.65fr]">
           <Panel
-            title="Goals Snapshot"
+            title="Migawka celów"
             icon={<Target size={19} />}
             badge={
               frozenSnapshot
                 ? "FROZEN"
                 : isLatestMonth
                 ? undefined
-                : "CURRENT"
+                : "BIEŻĄCY"
             }
           >
             {activeGoals.length === 0 ? (
@@ -902,7 +902,7 @@ export function MonthlyReview({
               />
             </Panel>
 
-            <Panel title="Next Month" icon={<CheckCircle2 size={19} />}>
+            <Panel title="Następny miesiąc" icon={<CheckCircle2 size={19} />}>
               <div className="space-y-3">
                 {buildNextMonthActions({
                   savingsRate,
@@ -1365,7 +1365,7 @@ function buildNextMonthActions({
 
   if (expensiveDebt) {
     actions.push(
-      `Utrzymaj „${expensiveDebt.name}” w Debt Intelligence — oprocentowanie ${expensiveDebt.interestRate.toLocaleString(
+      `Utrzymaj „${expensiveDebt.name}” w Analiza zadłużenia — oprocentowanie ${expensiveDebt.interestRate.toLocaleString(
         "pl-PL"
       )}%.`
     );

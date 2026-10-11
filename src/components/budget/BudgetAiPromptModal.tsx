@@ -108,7 +108,7 @@ export function BudgetAiPromptModal({
             <div className="min-w-0">
               <p className="text-[10px] font-black uppercase tracking-[.2em] text-emerald-400">Budget AI</p>
               <h2 className="mt-0.5 text-xl font-black text-white sm:text-2xl">
-                Prompt do zaprojektowania budżetu
+                Polecenie do zaprojektowania budżetu
               </h2>
               <p className="mt-1 text-xs leading-5 text-slate-500">
                 Freedom przygotuje historię wydatków i wymusi trzy gotowe warianty limitów kategorii.
@@ -215,7 +215,7 @@ export function BudgetAiPromptModal({
                 </div>
               ) : (
                 <p className="mt-2 text-[10px] leading-4 text-violet-300/80">
-                  Prompt używa wyłącznie udziałów procentowych, dynamiki i relacji między kategoriami.
+                  Polecenie używa wyłącznie udziałów procentowych, dynamiki i relacji między kategoriami.
                 </p>
               )}
             </div>
@@ -235,7 +235,7 @@ export function BudgetAiPromptModal({
           <section className="flex min-h-0 flex-col p-5 sm:p-6">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-black text-slate-100">Gotowy prompt budżetowy</p>
+                <p className="text-sm font-black text-slate-100">Gotowe polecenie budżetowe</p>
                 <p className="mt-1 text-[10px] text-slate-600">
                   AI ma zwrócić limity z dokładnymi nazwami kategorii Freedom, gotowe do przepisania do planu.
                 </p>
@@ -251,7 +251,7 @@ export function BudgetAiPromptModal({
                 }`}
               >
                 {copied ? <Check size={15} /> : <ClipboardCopy size={15} />}
-                {copied ? "Skopiowano" : "Skopiuj prompt"}
+                {copied ? "Skopiowano" : "Skopiuj polecenie"}
               </button>
             </div>
 

@@ -37,7 +37,7 @@ export function AddLiabilityModal({ onClose, onAdd }: Props) {
     onClose();
   }
 
-  return <ModalShell title="Dodaj zobowiązanie" subtitle="Dług też może wyglądać jak produkt premium." onClose={onClose}>
+  return <ModalShell title="Dodaj zobowiązanie" subtitle="Dług też może wyglądać jak produkt z wyższej półki." onClose={onClose}>
     <form onSubmit={handleSubmit} className="space-y-5 p-6">
       {error && <div className="flex gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300"><AlertCircle size={18}/>{error}</div>}
       <LiabilityVisualFields name={name} imageUrl={imageUrl} setImageUrl={setImageUrl} imagePosition={imagePosition} setImagePosition={setImagePosition} iconKey={iconKey} setIconKey={setIconKey}/>

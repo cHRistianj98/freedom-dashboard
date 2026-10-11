@@ -119,7 +119,7 @@ export function MyFinanceImportModal({ open, onClose, onImported }: Props) {
           {loading && (
             <div className="flex items-center gap-3 rounded-2xl border border-blue-500/20 bg-blue-500/5 px-5 py-4 text-sm text-blue-200">
               <LoaderCircle className="animate-spin" size={18} />
-              Analizuję backup…
+              Analizuję kopię zapasową…
             </div>
           )}
 

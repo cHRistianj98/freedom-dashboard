@@ -450,9 +450,9 @@ export function TransferForm({ assets, wallets, allocated, sourceId, onClose, on
           <div><span>Wartość po kursie rynku</span><strong>{fxMarketValue != null ? money(fxMarketValue) : "—"}</strong><small>{numericQuantity > 0 ? `${formatUnits(numericQuantity)} ${fxCurrency}` : "Wpisz otrzymaną walutę"}</small></div>
           <div className={fxSpreadLoss > 0 ? "loss" : "ok"}><span>Ukryty koszt kursowy</span><strong>{fxMarketValue != null ? money(Math.max(0, fxSpreadLoss)) : "—"}</strong><small>{fxMarketValue != null ? `${fxSpreadPercent.toLocaleString("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}% ponad benchmarkiem rynkowym` : "Policzymy automatycznie"}</small></div>
         </div>}
-        {fxQuoteError && <p className="transfer-fx-error">Nie udało się pobrać bieżącego benchmarku FX: {fxQuoteError}</p>}
+        {fxQuoteError && <p className="transfer-fx-error">Nie udało się pobrać bieżącego kursu odniesienia FX: {fxQuoteError}</p>}
         {fxQuote && <div className="transfer-fx-source-line">
-          <span>Źródło benchmarku: {fxQuote.source}</span>
+          <span>Źródło kursu odniesienia: {fxQuote.source}</span>
           <span>{fxQuote.fallback ? "Kurs dzienny — fallback" : "Publiczne notowanie intraday może być opóźnione"}</span>
         </div>}
         {fxSpreadLoss > 0 && <div className="transfer-fx-expense-note"><ReceiptText size={16}/><p><strong>{money(fxSpreadLoss)} zostanie automatycznie zapisane jako wydatek.</strong><br/>Inwestycje → Spread walutowy · źródło: {source?.name ?? "konto źródłowe"}.</p></div>}

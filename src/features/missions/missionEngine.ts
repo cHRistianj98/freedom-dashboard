@@ -206,7 +206,7 @@ function clamp(value: number) {
 }
 
 function formatMoney(value: number, language: AppLanguage) {
-  return new Intl.NumberFormat(language === "pl" ? "pl-PL" : "en-US", {
+  return new Intl.NumberFormat(language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US", {
     style: "currency",
     currency: "PLN",
     maximumFractionDigits: 0,
@@ -218,7 +218,7 @@ function formatSignedMoney(value: number, language: AppLanguage) {
 }
 
 function formatDate(value: string, language: AppLanguage) {
-  return new Intl.DateTimeFormat(language === "pl" ? "pl-PL" : "en-US", {
+  return new Intl.DateTimeFormat(language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",

@@ -73,7 +73,7 @@ function DashboardGoalCard({
   onClick: () => void;
 }) {
   const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
-  const locale = language === "pl" ? "pl-PL" : "en-US";
+  const locale = language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US";
 
   const progress = goal.targetAmount > 0
     ? Math.min((goal.currentAmount / goal.targetAmount) * 100, 100)

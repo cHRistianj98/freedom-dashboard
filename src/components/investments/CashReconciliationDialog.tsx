@@ -142,7 +142,7 @@ export function CashReconciliationDialog({ onClose, onReconciled, onAddCashAsset
         <div className={previewAdjustment > .005 ? "positive" : previewAdjustment < -.005 ? "negative" : "neutral"}>
           <span>Korekta majątku</span><strong>{signedMoney(previewAdjustment)}</strong>
         </div>
-        <p><TriangleAlert size={15}/>Korekta jest technicznym ruchem ledgerowym <b>RECONCILIATION_ADJUSTMENT</b>. Nie pojawi się w przychodach, wydatkach ani analizie cashflow.</p>
+        <p><TriangleAlert size={15}/>Korekta jest technicznym ruchem ledgerowym <b>RECONCILIATION_ADJUSTMENT</b>. Nie pojawi się w przychodach, wydatkach ani analizie przepływów pieniężnych.</p>
       </section>
 
       {error && <p className="investment-error" role="alert">{error}</p>}

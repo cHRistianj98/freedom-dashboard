@@ -286,7 +286,7 @@ export function Simulator({
 
         <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 px-5 py-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-400">
-            Cel FREEDOM
+            Cel WOLNOŚĆ
           </p>
 
           <p className="mt-1 text-xl font-black text-white">
@@ -318,7 +318,7 @@ export function Simulator({
           <div className="w-full max-w-2xl">
             <div className="flex justify-between text-xs">
               <span className="text-slate-500">
-                Droga do FREE
+                Droga do WOLNOŚCI
               </span>
 
               <span className="font-bold text-blue-400">
@@ -365,7 +365,7 @@ export function Simulator({
               </p>
 
               <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-400">
-                Live data · rolling 3M
+                Dane na żywo · kroczące 3M
               </span>
             </div>
 
@@ -382,7 +382,7 @@ export function Simulator({
               </span>
 
               <span className="text-slate-500">
-                Rolling cashflow 3M:{" "}
+                Kroczące przepływy pieniężne 3M:{" "}
                 <strong
                   className={
                     hasLiveTrajectory
@@ -420,7 +420,7 @@ export function Simulator({
               ? "✓ Używasz aktualnego tempa"
               : hasLiveTrajectory
                 ? "⚡ Użyj mojego aktualnego tempa"
-                : "Brak dodatniego rolling cashflow"}
+                : "Brak dodatnich kroczących przepływów pieniężnych"}
           </button>
         </div>
       </section>
@@ -492,7 +492,7 @@ export function Simulator({
 
             {isUsingLiveTrajectory && (
               <div className="-mt-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-400">
-                ⚡ Miesięczna inwestycja pochodzi z rolling cashflow 3M.
+                ⚡ Miesięczna inwestycja pochodzi z kroczących przepływów pieniężnych 3M.
               </div>
             )}
 
@@ -610,7 +610,7 @@ export function Simulator({
             />
 
             <ResultMetric
-              label="Cel FREE"
+              label="Cel WOLNOŚĆ"
               value={
                 freedomMilestone?.reached
                   ? `rok ${freedomMilestone.reached.calendarYear}`
@@ -673,11 +673,11 @@ export function Simulator({
             </div>
 
             <h2 className="mt-2 text-xl font-black">
-              Trzy drogi do FREE
+              Trzy drogi do WOLNOŚCI
             </h2>
 
             <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-500">
-              Porównanie używa tego samego kapitału startowego i aktualnego rolling cashflow 3M. Różnią się stopą zwrotu, udziałem nadwyżki inwestowanej oraz tempem wzrostu wpłat.
+              Porównanie używa tego samego kapitału startowego i aktualnych kroczących przepływów pieniężnych 3M. Różnią się stopą zwrotu, udziałem nadwyżki inwestowanej oraz tempem wzrostu wpłat.
             </p>
           </div>
 
@@ -741,7 +741,7 @@ export function Simulator({
                 <div className="mt-5 grid grid-cols-2 gap-3">
                   <ScenarioMetric
                     label="Inwestujesz"
-                    value={`${scenario.cashflowShare}% cashflow`}
+                    value={`${scenario.cashflowShare}% przepływów pieniężnych`}
                   />
                   <ScenarioMetric
                     label="Wpłata"
@@ -754,7 +754,7 @@ export function Simulator({
                     )}
                   />
                   <ScenarioMetric
-                    label="FREE"
+                    label="WOLNOŚĆ"
                     value={
                       scenario.free
                         ? scenario.free.year ===
@@ -1232,7 +1232,7 @@ function ScenarioComparisonChart({
         <div className="flex items-center gap-2">
           <span className="h-px w-5 border-t border-dashed border-emerald-500" />
           <span className="text-emerald-400">
-            FREE · 3 mln
+            WOLNOŚĆ · 3 mln
           </span>
         </div>
       </div>

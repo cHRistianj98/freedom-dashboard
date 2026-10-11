@@ -22,6 +22,7 @@ import type { Liability } from "../types/Liability";
 import type { MonthlySnapshot } from "../types/MonthlySnapshot";
 import type { PortfolioWallet } from "../types/Portfolio";
 import { portfolioApi } from "../api/portfolioApi";
+import { useLanguage } from "../i18n/LanguageContext";
 
 type AnalyticsProps = {
   monthlyBudget: MonthlyBudget;
@@ -69,6 +70,7 @@ const categoryColors: Record<ExpenseCategory, string> = {
 };
 
 export function Analytics({ monthlyBudget, netWorthHistory, netWorth, portfolio, goals, liabilities, monthlySnapshots }: AnalyticsProps) {
+  const { locale } = useLanguage();
   const [period, setPeriod] = useState<Period>(12);
   const [wallets, setWallets] = useState<PortfolioWallet[]>([]);
   const [walletsError, setWalletsError] = useState("");
@@ -85,8 +87,8 @@ export function Analytics({ monthlyBudget, netWorthHistory, netWorth, portfolio,
   }, [portfolio]);
 
   const months = useMemo(
-    () => buildMonthlyAnalytics(monthlyBudget, period),
-    [monthlyBudget, period]
+    () => buildMonthlyAnalytics(monthlyBudget, period, locale),
+    [monthlyBudget, period, locale]
   );
 
   const monthKeys = useMemo(() => months.map((item) => item.month), [months]);
@@ -114,22 +116,22 @@ export function Analytics({ monthlyBudget, netWorthHistory, netWorth, portfolio,
   const categoryTotals = calculateCategoryTotals(periodExpenses);
   const biggestCategory = getBiggestCategory(categoryTotals);
   const netWorthPoints = useMemo(
-    () => buildNetWorthPoints(netWorthHistory, netWorth, months),
-    [netWorthHistory, netWorth, months]
+    () => buildNetWorthPoints(netWorthHistory, netWorth, months, locale),
+    [netWorthHistory, netWorth, months, locale]
   );
   const netWorthChange = calculateNetWorthChange(netWorthPoints);
   const incomeAnomalies = useMemo(() => detectIncomeAnomalies(periodIncomes), [periodIncomes]);
 
   const portfolioTrend = useMemo(
-    () => buildPortfolioTrend(monthKeys, monthlySnapshots, portfolio, wallets),
+    () => buildPortfolioTrend(monthKeys, monthlySnapshots, portfolio, wallets, locale),
     [monthKeys, monthlySnapshots, portfolio, wallets]
   );
   const goalTrend = useMemo(
-    () => buildGoalTrend(monthKeys, monthlySnapshots, goals),
+    () => buildGoalTrend(monthKeys, monthlySnapshots, goals, locale),
     [monthKeys, monthlySnapshots, goals]
   );
   const liabilityTrend = useMemo(
-    () => buildLiabilityTrend(monthKeys, monthlySnapshots, liabilities),
+    () => buildLiabilityTrend(monthKeys, monthlySnapshots, liabilities, locale),
     [monthKeys, monthlySnapshots, liabilities]
   );
 
@@ -150,7 +152,7 @@ export function Analytics({ monthlyBudget, netWorthHistory, netWorth, portfolio,
           </div>
           <h1 className="mt-3 text-3xl font-black tracking-tight">Twoje finanse w czasie</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
-            Terminal Twojej finansowej gry: majątek, cashflow, momentum i tempo budowania wolności.
+            Terminal Twojej finansowej gry: majątek, przepływy pieniężne, dynamika i tempo budowania wolności.
           </p>
         </div>
         <PeriodSelector period={period} onChange={setPeriod} />
@@ -162,7 +164,7 @@ export function Analytics({ monthlyBudget, netWorthHistory, netWorth, portfolio,
         <Metric label="Średni przychód" value={formatMoney(averageIncome)} subtitle={`Średnia z ${monthsWithIncome.length} mies.`} icon={<TrendingUp size={19} />} tone="emerald" />
         <Metric label="Średnie wydatki" value={formatMoney(averageExpenses)} subtitle={`Średnia z ${monthsWithExpenses.length} mies.`} icon={<WalletCards size={19} />} tone="red" />
         <Metric label="Łączna nadwyżka" value={formatSignedMoney(totalSurplus)} subtitle={`Ostatnie ${period} miesięcy`} icon={<PiggyBank size={19} />} tone={totalSurplus >= 0 ? "blue" : "red"} />
-        <Metric label="Savings rate" value={`${averageSavingsRate.toFixed(1)}%`} subtitle="Dla całego okresu" icon={<Gauge size={19} />} tone={averageSavingsRate >= 50 ? "emerald" : averageSavingsRate >= 20 ? "amber" : "red"} />
+        <Metric label="Stopa oszczędności" value={`${averageSavingsRate.toFixed(1)}%`} subtitle="Dla całego okresu" icon={<Gauge size={19} />} tone={averageSavingsRate >= 50 ? "emerald" : averageSavingsRate >= 20 ? "amber" : "red"} />
       </section>
 
       <Panel className="mt-5">
@@ -203,7 +205,7 @@ export function Analytics({ monthlyBudget, netWorthHistory, netWorth, portfolio,
         </div>
         <TrendSummaryCards series={portfolioTrend.series} points={portfolioTrend.points} hidden={hiddenPortfolioSeries} mode="money" />
         <p className="mt-4 text-[10px] leading-5 text-slate-600">
-          Historia portfeli jest odtwarzana ze snapshotów aktywów według ich obecnego przypisania do portfeli. Po przeniesieniu aktywa między portfelami starsze punkty mogą zostać przypisane do jego obecnego portfela.
+          Historia portfeli jest odtwarzana z zapisów stanu aktywów według ich obecnego przypisania do portfeli. Po przeniesieniu aktywa między portfelami starsze punkty mogą zostać przypisane do jego obecnego portfela.
         </p>
       </Panel>
 
@@ -294,8 +296,8 @@ export function Analytics({ monthlyBudget, netWorthHistory, netWorth, portfolio,
       </section>
 
       <section className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <InsightCard eyebrow="Najlepszy miesiąc" title={bestMonth ? formatMonthLong(bestMonth.month) : "Brak danych"} value={bestMonth ? formatSignedMoney(bestMonth.surplus) : "—"} description="Najwyższa miesięczna nadwyżka." icon={<ArrowUpRight size={20} />} tone="emerald" />
-        <InsightCard eyebrow="Najsłabszy miesiąc" title={worstMonth ? formatMonthLong(worstMonth.month) : "Brak danych"} value={worstMonth ? formatSignedMoney(worstMonth.surplus) : "—"} description="Najniższy miesięczny bilans." icon={<ArrowDownRight size={20} />} tone="red" />
+        <InsightCard eyebrow="Najlepszy miesiąc" title={bestMonth ? formatMonthLong(bestMonth.month, locale) : "Brak danych"} value={bestMonth ? formatSignedMoney(bestMonth.surplus) : "—"} description="Najwyższa miesięczna nadwyżka." icon={<ArrowUpRight size={20} />} tone="emerald" />
+        <InsightCard eyebrow="Najsłabszy miesiąc" title={worstMonth ? formatMonthLong(worstMonth.month, locale) : "Brak danych"} value={worstMonth ? formatSignedMoney(worstMonth.surplus) : "—"} description="Najniższy miesięczny bilans." icon={<ArrowDownRight size={20} />} tone="red" />
         <InsightCard eyebrow="Największy koszt" title={biggestCategory ? categoryLabels[biggestCategory.category] : "Brak danych"} value={biggestCategory ? formatMoney(biggestCategory.value) : "—"} description="Największa kategoria wydatków w okresie." icon={<CircleDollarSign size={20} />} tone="violet" />
       </section>
 
@@ -304,7 +306,7 @@ export function Analytics({ monthlyBudget, netWorthHistory, netWorth, portfolio,
         <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
           <Signal label="Kapitał" value={netWorthChange == null ? "Za mało historii" : netWorthChange >= 0 ? `Majątek urósł o ${formatMoney(netWorthChange)}` : `Majątek spadł o ${formatMoney(Math.abs(netWorthChange))}`} positive={netWorthChange != null ? netWorthChange >= 0 : null} />
           <Signal label="Efektywność" value={averageSavingsRate >= 50 ? `Savings rate ${averageSavingsRate.toFixed(1)}% — mocne tempo` : `Savings rate ${averageSavingsRate.toFixed(1)}% — jest przestrzeń do poprawy`} positive={averageSavingsRate >= 50} />
-          <Signal label="Cashflow" value={currentMonth ? `${formatMonthLong(currentMonth.month)}: ${formatSignedMoney(currentMonth.surplus)}` : "Brak danych"} positive={currentMonth ? currentMonth.surplus >= 0 : null} />
+          <Signal label="Cashflow" value={currentMonth ? `${formatMonthLong(currentMonth.month, locale)}: ${formatSignedMoney(currentMonth.surplus)}` : "Brak danych"} positive={currentMonth ? currentMonth.surplus >= 0 : null} />
         </div>
       </Panel>
     </main>
@@ -534,7 +536,7 @@ function Signal({label,value,positive}:{label:string;value:string;positive:boole
 
 function AnomalyBanner({ anomalies }: { anomalies: IncomeAnomaly[] }) {
   const first=anomalies[0];
-  return <section className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5"><div className="flex items-start gap-4"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400"><AlertTriangle size={20}/></div><div><p className="font-bold text-amber-300">Wykryto nietypową wartość</p><p className="mt-1 text-sm leading-6 text-slate-400">„<span className="font-semibold text-slate-200">{first.transaction.name}</span>” z {formatDate(first.transaction.date)}: <span className="font-bold text-amber-300">{formatMoney(first.transaction.amount)}</span>. {first.reason}</p>{anomalies.length>1&&<p className="mt-2 text-xs text-amber-400/80">+ {anomalies.length-1} kolejna/e nietypowa/e transakcja/e.</p>}<p className="mt-2 text-xs text-slate-600">Analytics niczego nie zmienia — tylko sygnalizuje dane do sprawdzenia w Finansach.</p></div></div></section>;
+  return <section className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5"><div className="flex items-start gap-4"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400"><AlertTriangle size={20}/></div><div><p className="font-bold text-amber-300">Wykryto nietypową wartość</p><p className="mt-1 text-sm leading-6 text-slate-400">„<span className="font-semibold text-slate-200">{first.transaction.name}</span>” z {formatDate(first.transaction.date, locale)}: <span className="font-bold text-amber-300">{formatMoney(first.transaction.amount)}</span>. {first.reason}</p>{anomalies.length>1&&<p className="mt-2 text-xs text-amber-400/80">+ {anomalies.length-1} kolejna/e nietypowa/e transakcja/e.</p>}<p className="mt-2 text-xs text-slate-600">Analytics niczego nie zmienia — tylko sygnalizuje dane do sprawdzenia w Finansach.</p></div></div></section>;
 }
 
 function EmptyState({text}:{text:string}) { return <div className="rounded-xl border border-dashed border-slate-700 p-8 text-center text-sm text-slate-500">{text}</div>; }
@@ -546,7 +548,7 @@ function toggleSet(current: Set<string>, id: string) {
   return next;
 }
 
-function buildPortfolioTrend(monthKeys: string[], snapshots: MonthlySnapshot[], assets: Asset[], wallets: PortfolioWallet[]) {
+function buildPortfolioTrend(monthKeys: string[], snapshots: MonthlySnapshot[], assets: Asset[], wallets: PortfolioWallet[], locale: string) {
   const currentMonth = getCurrentMonth();
   const visibleWallets = wallets.filter((wallet) => wallet.type !== "GOALS");
   const assetsByWallet = new Map<number, Asset[]>();
@@ -589,13 +591,13 @@ function buildPortfolioTrend(monthKeys: string[], snapshots: MonthlySnapshot[], 
         values[key] = (values[key] ?? 0) + asset.value;
       });
     }
-    return { month, label: formatMonthShort(month), values };
+    return { month, label: formatMonthShort(month, locale), values };
   });
 
   return { series, points };
 }
 
-function buildGoalTrend(monthKeys: string[], snapshots: MonthlySnapshot[], goals: Goal[]) {
+function buildGoalTrend(monthKeys: string[], snapshots: MonthlySnapshot[], goals: Goal[], locale: string) {
   const currentMonth = getCurrentMonth();
   const snapshotsByMonth = new Map(snapshots.map((snapshot) => [snapshot.month, snapshot]));
   const historical = snapshots
@@ -636,13 +638,13 @@ function buildGoalTrend(monthKeys: string[], snapshots: MonthlySnapshot[], goals
           : null;
       });
     }
-    return { month, label: formatMonthShort(month), values };
+    return { month, label: formatMonthShort(month, locale), values };
   });
 
   return { series, points };
 }
 
-function buildLiabilityTrend(monthKeys: string[], snapshots: MonthlySnapshot[], liabilities: Liability[]) {
+function buildLiabilityTrend(monthKeys: string[], snapshots: MonthlySnapshot[], liabilities: Liability[], locale: string) {
   const currentMonth = getCurrentMonth();
   const snapshotsByMonth = new Map(snapshots.map((snapshot) => [snapshot.month, snapshot]));
   const historical = snapshots
@@ -680,20 +682,20 @@ function buildLiabilityTrend(monthKeys: string[], snapshots: MonthlySnapshot[], 
         values[item.id] = liability?.remainingAmount ?? null;
       });
     }
-    return { month, label: formatMonthShort(month), values };
+    return { month, label: formatMonthShort(month, locale), values };
   });
 
   return { series, points };
 }
 
-function buildMonthlyAnalytics(budget: MonthlyBudget, period: number): MonthData[] {
+function buildMonthlyAnalytics(budget: MonthlyBudget, period: number, locale: string): MonthData[] {
   const currentMonth=getCurrentMonth();
   const keys=Array.from({length:period},(_,i)=>getMonthWithOffset(currentMonth,i-(period-1)));
   const base=keys.map(month=>{
     const income=sumAmounts(budget.incomes.filter(x=>x.date?.startsWith(month)));
     const expenses=sumAmounts(budget.expenses.filter(x=>x.date?.startsWith(month)));
     const surplus=income-expenses;
-    return {month,label:formatMonthShort(month),income,expenses,surplus,savingsRate:income>0?(surplus/income)*100:0,rollingSurplus3M:null as number|null};
+    return {month,label:formatMonthShort(month, locale),income,expenses,surplus,savingsRate:income>0?(surplus/income)*100:0,rollingSurplus3M:null as number|null};
   });
   return base.map((item,index)=>{
     if(index<2) return item;
@@ -711,12 +713,12 @@ function getWorstMonth(months:MonthData[]){const x=months.filter(m=>m.income>0||
 function calculateCategoryTotals(expenses:Expense[]):Record<ExpenseCategory,number>{const t={fixed:0,living:0,investment:0,goal:0};expenses.forEach(x=>t[x.category]+=x.amount);return t;}
 function getBiggestCategory(totals:Record<ExpenseCategory,number>){const x=(Object.entries(totals) as [ExpenseCategory,number][]).sort((a,b)=>b[1]-a[1])[0];return !x||x[1]<=0?null:{category:x[0],value:x[1]};}
 
-function buildNetWorthPoints(history:NetWorthSnapshot[],current:number,months:MonthData[]):NetWorthPoint[]{
+function buildNetWorthPoints(history:NetWorthSnapshot[],current:number,months:MonthData[],locale:string):NetWorthPoint[]{
   if(!months.length)return[];
   const start=`${months[0].month}-01`;
-  const points=[...history].filter(x=>x.date>=start).sort((a,b)=>a.date.localeCompare(b.date)).map(x=>({date:x.date,label:formatDateShort(x.date),value:x.value}));
+  const points=[...history].filter(x=>x.date>=start).sort((a,b)=>a.date.localeCompare(b.date)).map(x=>({date:x.date,label:formatDateShort(x.date, locale),value:x.value}));
   const today=getTodayIso(),last=points[points.length-1];
-  if(!last||last.date!==today||last.value!==current)points.push({date:today,label:formatDateShort(today),value:current});
+  if(!last||last.date!==today||last.value!==current)points.push({date:today,label:formatDateShort(today, locale),value:current});
   const map=new Map<string,NetWorthPoint>();points.forEach(p=>map.set(p.date,p));return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date));
 }
 function calculateNetWorthChange(points:NetWorthPoint[]){return points.length<2?null:points[points.length-1].value-points[0].value;}
@@ -731,10 +733,10 @@ function getMedian(values:number[]){if(!values.length)return 0;const m=Math.floo
 function getCurrentMonth(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;}
 function getTodayIso(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
 function getMonthWithOffset(month:string,offset:number){const [y,m]=month.split("-").map(Number);const d=new Date(y,m-1+offset,1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;}
-function formatMonthShort(month:string){const[y,m]=month.split("-").map(Number);return new Intl.DateTimeFormat("pl-PL",{month:"short"}).format(new Date(y,m-1,1)).replace(".","");}
-function formatMonthLong(month:string){const[y,m]=month.split("-").map(Number);const s=new Intl.DateTimeFormat("pl-PL",{month:"long",year:"numeric"}).format(new Date(y,m-1,1));return s.charAt(0).toUpperCase()+s.slice(1);}
-function formatDate(date:string){return new Intl.DateTimeFormat("pl-PL",{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(`${date}T12:00:00`));}
-function formatDateShort(date:string){return new Intl.DateTimeFormat("pl-PL",{day:"2-digit",month:"short"}).format(new Date(`${date}T12:00:00`)).replace(".","");}
+function formatMonthShort(month:string,locale:string){const[y,m]=month.split("-").map(Number);return new Intl.DateTimeFormat(locale,{month:"short"}).format(new Date(y,m-1,1)).replace(".","");}
+function formatMonthLong(month:string,locale:string){const[y,m]=month.split("-").map(Number);const s=new Intl.DateTimeFormat(locale,{month:"long",year:"numeric"}).format(new Date(y,m-1,1));return s.charAt(0).toUpperCase()+s.slice(1);}
+function formatDate(date:string,locale:string){return new Intl.DateTimeFormat(locale,{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(`${date}T12:00:00`));}
+function formatDateShort(date:string,locale:string){return new Intl.DateTimeFormat(locale,{day:"2-digit",month:"short"}).format(new Date(`${date}T12:00:00`)).replace(".","");}
 function formatMoney(value:number){return `${Math.round(value).toLocaleString("pl-PL")} zł`;}
 function formatSignedMoney(value:number){return `${value>=0?"+":"−"}${Math.round(Math.abs(value)).toLocaleString("pl-PL")} zł`;}
 function formatCompactMoney(value:number){const abs=Math.abs(value);if(abs>=1_000_000)return `${(value/1_000_000).toFixed(abs>=10_000_000?1:2)} mln zł`;if(abs>=1000)return `${(value/1000).toFixed(abs>=100_000?0:1)} tys. zł`;return formatMoney(value);}

@@ -37,7 +37,7 @@ export function CashflowSection({ budget, onAddExpenseClick }: Props) {
         <FlowMetric label="Wpływy" value={money(income)} icon={<ArrowUpRight size={18} />} tone="emerald" />
         <FlowMetric label="Wydatki" value={money(expenses)} icon={<ArrowDownRight size={18} />} tone="red" />
         <FlowMetric label="Wolne środki" value={money(surplus)} icon={<CircleDollarSign size={18} />} tone={surplus >= 0 ? "blue" : "red"} />
-        <FlowMetric label="Savings rate" value={`${savingsRate.toFixed(1)}%`} icon={<PiggyBank size={18} />} tone="violet" />
+        <FlowMetric label="Stopa oszczędności" value={`${savingsRate.toFixed(1)}%`} icon={<PiggyBank size={18} />} tone="violet" />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[1.05fr_.95fr]">

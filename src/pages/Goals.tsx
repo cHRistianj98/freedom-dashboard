@@ -1206,7 +1206,7 @@ function GoalFundingModal({
               </h2>
               <p className="mt-2 text-xs text-slate-400">
                 Cel nie tworzy nowych pieniędzy. Wskazuje,
-                jaka część Twojego portfolio pracuje na ten cel.
+                jaka część Twojego portfela pracuje na ten cel.
               </p>
             </div>
 

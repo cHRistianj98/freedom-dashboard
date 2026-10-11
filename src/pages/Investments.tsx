@@ -242,7 +242,7 @@ export function Investments({ portfolio, goals, monthlySnapshots, onAddAsset, on
     <section className="investment-panel portfolios-panel">
       <div className="investment-panel-heading">
         <div className="investment-section-title"><span className="investment-section-icon"><WalletCards size={20}/></span><div><h2>Portfele</h2><p>Twoje strategie inwestycyjne w jednym miejscu.</p></div></div>
-        <div className="investment-toolbar"><div className="performance-period-switch" role="group" aria-label="Okres wyniku aktywów i portfeli" title="Wynik aktywów i portfeli w wybranym okresie. Gotówka PLN jest neutralna (0%)."><span>Wynik</span><button type="button" className={performancePeriod === "24H" ? "active" : ""} aria-pressed={performancePeriod === "24H"} onClick={() => setPerformancePeriod("24H")}>24h</button><button type="button" className={performancePeriod === "1M" ? "active" : ""} aria-pressed={performancePeriod === "1M"} onClick={() => setPerformancePeriod("1M")}>1M</button></div><button type="button" className="investment-button secondary ai-prompt-toolbar" onClick={openAnalysisPrompt} disabled={!known || !realWallets.length || !portfolio.length} title="Wygeneruj lokalnie prompt do analizy portfeli, celów i zobowiązań — bez wysyłania danych do API"><Sparkles size={15}/>Generuj prompt</button><button type="button" className="investment-button secondary" onClick={() => setCashReconciliationOpen(true)}><Landmark size={15}/>Uzgodnij gotówkę</button><button type="button" className="investment-button secondary transfer-toolbar" onClick={() => setTransfer({})} disabled={!known || portfolio.length < 1}><ArrowRightLeft size={15}/>Transfer</button>{addPortfolio}</div>
+        <div className="investment-toolbar"><div className="performance-period-switch" role="group" aria-label="Okres wyniku aktywów i portfeli" title="Wynik aktywów i portfeli w wybranym okresie. Gotówka PLN jest neutralna (0%)."><span>Wynik</span><button type="button" className={performancePeriod === "24H" ? "active" : ""} aria-pressed={performancePeriod === "24H"} onClick={() => setPerformancePeriod("24H")}>24h</button><button type="button" className={performancePeriod === "1M" ? "active" : ""} aria-pressed={performancePeriod === "1M"} onClick={() => setPerformancePeriod("1M")}>1M</button></div><button type="button" className="investment-button secondary ai-prompt-toolbar" onClick={openAnalysisPrompt} disabled={!known || !realWallets.length || !portfolio.length} title="Wygeneruj lokalnie polecenie do analizy portfeli, celów i zobowiązań — bez wysyłania danych do API"><Sparkles size={15}/>Generuj polecenie</button><button type="button" className="investment-button secondary" onClick={() => setCashReconciliationOpen(true)}><Landmark size={15}/>Uzgodnij gotówkę</button><button type="button" className="investment-button secondary transfer-toolbar" onClick={() => setTransfer({})} disabled={!known || portfolio.length < 1}><ArrowRightLeft size={15}/>Transfer</button>{addPortfolio}</div>
       </div>
       {loading ? <div className="investment-empty"><LoaderCircle size={20} className="animate-spin"/>Pobieranie portfeli…</div> : !realWallets.length ? <div className="investment-empty">Dodaj pierwszy portfel i nadaj swoim inwestycjom kierunek.</div> :
         <div className="portfolio-cards">{realWallets.map(wallet => {
@@ -382,7 +382,7 @@ export function Investments({ portfolio, goals, monthlySnapshots, onAddAsset, on
     {analysisPrompt && <PortfolioDialog
       wide
       className="portfolio-ai-prompt-dialog"
-      title="Prompt do analizy finansów"
+      title="Polecenie do analizy finansów"
       subtitle={analysisPromptMode === "PERCENT"
         ? "Wersja prywatna: portfele, cele i zobowiązania opisane wyłącznie procentami — bez kwot."
         : "Wersja pełna: rzeczywiste kwoty PLN, aby AI mogło zaproponować dokładny plan alokacji kapitału."}
@@ -390,7 +390,7 @@ export function Investments({ portfolio, goals, monthlySnapshots, onAddAsset, on
       onClose={() => { setAnalysisPrompt(null); setPromptCopied(false); }}
     >
       <div className="portfolio-ai-prompt">
-        <div className="portfolio-ai-mode-switch" role="group" aria-label="Wersja promptu">
+        <div className="portfolio-ai-mode-switch" role="group" aria-label="Wersja polecenia">
           <button
             type="button"
             className={analysisPromptMode === "PERCENT" ? "active" : ""}
@@ -408,7 +408,7 @@ export function Investments({ portfolio, goals, monthlySnapshots, onAddAsset, on
             <small>konkretny plan PLN</small>
           </button>
         </div>
-        <div className="portfolio-ai-prompt-badges" aria-label="Właściwości promptu">
+        <div className="portfolio-ai-prompt-badges" aria-label="Właściwości polecenia">
           <span><Sparkles size={12}/>Bez API</span>
           <span>{analysisPromptMode === "PERCENT" ? "Wyłącznie %" : "Rzeczywiste PLN"}</span>
           <span>Cele + zobowiązania</span>
@@ -425,14 +425,14 @@ export function Investments({ portfolio, goals, monthlySnapshots, onAddAsset, on
           readOnly
           spellCheck={false}
           value={analysisPrompt}
-          aria-label="Wygenerowany prompt do analizy portfeli"
+          aria-label="Wygenerowane polecenie do analizy portfeli"
           onFocus={event => event.currentTarget.select()}
         />
         <footer className="portfolio-ai-prompt-actions">
           <button type="button" className="investment-button secondary" onClick={() => { setAnalysisPrompt(null); setPromptCopied(false); }}>Zamknij</button>
           <button type="button" className={`investment-button portfolio-ai-copy ${promptCopied ? "copied" : ""}`} onClick={() => void copyAnalysisPrompt()}>
             {promptCopied ? <Check size={16}/> : <ClipboardCopy size={16}/>}
-            {promptCopied ? "Skopiowano" : "Skopiuj prompt"}
+            {promptCopied ? "Skopiowano" : "Skopiuj polecenie"}
           </button>
         </footer>
       </div>
@@ -954,7 +954,7 @@ async function copyTextToClipboard(text: string): Promise<void> {
   textarea.select();
   const copied = document.execCommand("copy");
   document.body.removeChild(textarea);
-  if (!copied) throw new Error("Nie udało się skopiować promptu.");
+  if (!copied) throw new Error("Nie udało się skopiować polecenia.");
 }
 
 type PerformancePeriod = "24H" | "1M";

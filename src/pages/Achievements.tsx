@@ -106,7 +106,7 @@ export function Achievements(props: AchievementsProps) {
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            Buduj majątek, utrzymuj dodatni cashflow i odblokowuj
+            Buduj majątek, utrzymuj dodatnie przepływy pieniężne i odblokowuj
             kolejne osiągnięcia.
           </p>
         </div>
@@ -283,7 +283,7 @@ export function Achievements(props: AchievementsProps) {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">
           Wealth milestones
         </p>
-        <h2 className="mt-2 text-xl font-black">Droga do FREE</h2>
+        <h2 className="mt-2 text-xl font-black">Droga do wolności</h2>
 
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-7">
           {achievements

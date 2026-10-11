@@ -13,6 +13,7 @@ import {
 import type { MonthlyBudget } from "../types/Cashflow";
 import type { MonthlySnapshot } from "../types/MonthlySnapshot";
 import type { NetWorthSnapshot } from "../types/NetWorthHistory";
+import { useLanguage } from "../i18n/LanguageContext";
 
 type FinancialTimelineProps = {
   netWorth: number;
@@ -42,6 +43,7 @@ export function FinancialTimeline({
   netWorthHistory,
   monthlySnapshots,
 }: FinancialTimelineProps) {
+  const { locale } = useLanguage();
   const [expandedMonth, setExpandedMonth] = useState<string | null>(null);
 
   const months = useMemo<TimelineMonth[]>(() => {
@@ -135,8 +137,8 @@ export function FinancialTimeline({
               Financial Timeline
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              Twój finansowy save game — miesiąc po miesiącu. Zamknięte miesiące
-              korzystają z immutable snapshotów, a bieżący miesiąc pokazuje dane live.
+              Twój finansowy zapis gry — miesiąc po miesiącu. Zamknięte miesiące
+              korzystają z niezmiennych zapisów stanu, a bieżący miesiąc pokazuje dane na żywo.
             </p>
           </div>
 
@@ -154,7 +156,7 @@ export function FinancialTimeline({
           <SummaryCard
             label="Bieżący majątek netto"
             value={formatMoney(newest?.netWorth ?? netWorth)}
-            detail={newest ? formatMonth(newest.month) : "Teraz"}
+            detail={newest ? formatMonth(newest.month, locale) : "Teraz"}
             icon={<WalletCards size={18} />}
           />
           <SummaryCard
@@ -166,7 +168,7 @@ export function FinancialTimeline({
           <SummaryCard
             label="Closed Months"
             value={`${closedMonths}`}
-            detail="immutable snapshots"
+            detail="niezmienne zapisy stanu"
             icon={<LockKeyhole size={18} />}
           />
         </section>
@@ -213,7 +215,7 @@ export function FinancialTimeline({
                     <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
                       <div className="min-w-[180px]">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-xl font-black">{formatMonth(item.month)}</h3>
+                          <h3 className="text-xl font-black">{formatMonth(item.month, locale)}</h3>
                           <StatusBadge item={item} />
                         </div>
                         <p className="mt-1 text-xs text-slate-600">
@@ -425,9 +427,9 @@ function WealthChart({
                 fontSize="11"
                 fontWeight="900"
               >
-                {shortMonth(point.month).toUpperCase()}
+                {shortMonth(point.month, locale).toUpperCase()}
               </text>
-              <title>{`${formatMonth(point.month)} · ${formatMoney(point.value)}`}</title>
+              <title>{`${formatMonth(point.month, locale)} · ${formatMoney(point.value)}`}</title>
             </g>
           ))}
 
@@ -556,17 +558,17 @@ function signedMoney(value: number) {
   return `${sign}${Math.round(value).toLocaleString("pl-PL")} PLN`;
 }
 
-function formatMonth(month: string) {
+function formatMonth(month: string, locale: string) {
   const [year, monthNumber] = month.split("-").map(Number);
-  return new Intl.DateTimeFormat("pl-PL", {
+  return new Intl.DateTimeFormat(locale, {
     month: "long",
     year: "numeric",
   }).format(new Date(year, monthNumber - 1, 1));
 }
 
-function shortMonth(month: string) {
+function shortMonth(month: string, locale: string) {
   const [year, monthNumber] = month.split("-").map(Number);
-  return new Intl.DateTimeFormat("pl-PL", { month: "short" })
+  return new Intl.DateTimeFormat(locale, { month: "short" })
     .format(new Date(year, monthNumber - 1, 1))
     .replace(".", "");
 }

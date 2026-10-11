@@ -6,7 +6,7 @@ import { getAssetCategory, getAssetIconKey } from "../../types/Asset";
 import type { PortfolioWallet } from "../../types/Portfolio";
 import { AssetIcon } from "../investments/assetIcons";
 import { WalletIcon } from "../investments/PortfolioDialogs";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { useLanguage, type AppLanguage } from "../../i18n/LanguageContext";
 
 type CashSourcePickerProps = {
   assets: Asset[];
@@ -299,24 +299,24 @@ function AssetVisual({ asset, compact = false }: { asset?: Asset; compact?: bool
   );
 }
 
-function assetDisplayName(asset: Asset, language: "pl" | "en"): string {
-  return asset.systemCash ? (language === "pl" ? "Środki nierozdzielone" : "Unallocated funds") : asset.name;
+function assetDisplayName(asset: Asset, language: AppLanguage): string {
+  return asset.systemCash ? (language === "pl" ? "Środki nierozdzielone" : language === "de" ? "Nicht zugewiesene Mittel" : "Unallocated funds") : asset.name;
 }
 
-function assetTypeLabel(asset: Asset, language: "pl" | "en"): string {
-  if (asset.systemCash) return language === "pl" ? "Clearing systemowy" : "System clearing";
+function assetTypeLabel(asset: Asset, language: AppLanguage): string {
+  if (asset.systemCash) return language === "pl" ? "Clearing systemowy" : language === "de" ? "Systemausgleich" : "System clearing";
   if (asset.fxPriced && asset.cashCurrency) return `${language === "pl" ? "Gotówka" : "Cash"} · ${asset.cashCurrency}`;
-  return language === "pl" ? "Gotówka / konto" : "Cash / account";
+  return language === "pl" ? "Gotówka / konto" : language === "de" ? "Bargeld / Konto" : "Cash / account";
 }
 
-function money(value: number, locale: "pl-PL" | "en-US", language: "pl" | "en"): string {
+function money(value: number, locale: "pl-PL" | "en-US" | "de-DE", language: AppLanguage): string {
   return `${value.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${language === "pl" ? "zł" : "PLN"}`;
 }
 
-function walletDisplayName(name: string | undefined, language: "pl" | "en") {
+function walletDisplayName(name: string | undefined, language: AppLanguage) {
   if (!name) return language === "pl" ? "Portfel" : "Portfolio";
   const normalized = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  if (normalized === "glowny" || normalized === "main") return language === "pl" ? "Główny" : "Main";
+  if (normalized === "glowny" || normalized === "main") return language === "pl" ? "Główny" : language === "de" ? "Hauptkonto" : "Main";
   return name;
 }
 

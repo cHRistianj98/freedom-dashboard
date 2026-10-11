@@ -245,7 +245,7 @@ export function Login({
                     text-slate-500
                   "
                 >
-                  Wealth Operating System
+                  System budowania majątku
                 </p>
               </div>
             </div>
@@ -305,7 +305,7 @@ export function Login({
                 xl:text-6xl
               "
             >
-              Build wealth.
+              Buduj majątek.
               <br />
 
               <span
@@ -318,7 +318,7 @@ export function Login({
                   text-transparent
                 "
               >
-                Buy freedom.
+                Kupuj wolność.
               </span>
             </h1>
 
@@ -332,7 +332,7 @@ export function Login({
               "
             >
               Jedno miejsce do kontroli
-              majątku, cashflow, celów
+              majątku, przepływów pieniężnych, celów
               i drogi do finansowej
               niezależności.
             </p>
@@ -348,20 +348,20 @@ export function Login({
             >
               <Feature
                 icon={WalletCards}
-                title="Capital"
-                description="Control"
+                title="Kapitał"
+                description="Kontrola"
               />
 
               <Feature
                 icon={TrendingUp}
-                title="Wealth"
-                description="Growth"
+                title="Majątek"
+                description="Wzrost"
               />
 
               <Feature
                 icon={ShieldCheck}
-                title="Freedom"
-                description="Mission"
+                title="Wolność"
+                description="Misja"
               />
             </div>
           </div>
@@ -372,8 +372,8 @@ export function Login({
               text-slate-600
             "
           >
-            Your capital. Your strategy.
-            Your freedom.
+            Twój kapitał. Twoja strategia.
+            Twoja wolność.
           </p>
         </section>
 
@@ -538,7 +538,7 @@ export function Login({
                   "
                 >
                   {mode === "login"
-                    ? "Zaloguj się do swojego finansowego command center."
+                    ? "Zaloguj się do swojego finansowego centrum dowodzenia."
                     : "Załóż konto i rozpocznij budowę swojego finansowego systemu."}
                 </p>
               </div>

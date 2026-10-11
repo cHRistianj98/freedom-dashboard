@@ -113,7 +113,7 @@ export function RealEstateValuationPanel({
                 Zakotwiczona w cenie zakupu
               </div>
               <div className="mt-1 text-[10px] leading-relaxed text-slate-500">
-                Zachowuje realny premium/discount Twojego lokalu względem rynku z dnia zakupu.
+                Zachowuje rzeczywistą premię/dyskonto Twojego lokalu względem rynku z dnia zakupu.
               </div>
             </button>
           </div>
@@ -271,7 +271,7 @@ export function RealEstateValuationPanel({
                     </div>
                   </div>
                   <div>
-                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-600">Twój premium / discount</span>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-600">Twoja premia / dyskonto</span>
                     <div className={`mt-1 text-sm font-black ${factorPercent != null && factorPercent >= 0 ? "text-emerald-300" : "text-amber-300"}`}>
                       {factorPercent == null ? "—" : `${factorPercent >= 0 ? "+" : ""}${factorPercent.toLocaleString("pl-PL", { maximumFractionDigits: 1 })}%`}
                     </div>

@@ -83,10 +83,10 @@ export function CashflowAiPromptModal({ budget, anchorMonth, onClose }: Cashflow
             <div className="min-w-0">
               <p className="text-[10px] font-black uppercase tracking-[.2em] text-blue-400">Cashflow AI</p>
               <h2 className="mt-0.5 text-xl font-black text-white sm:text-2xl">
-                Prompt do analizy przychodów i wydatków
+                Polecenie do analizy przychodów i wydatków
               </h2>
               <p className="mt-1 text-xs leading-5 text-slate-500">
-                Freedom niczego nie wysyła do AI. Generuje gotowy prompt do skopiowania.
+                Freedom niczego nie wysyła do AI. Generuje gotowe polecenie do skopiowania.
               </p>
             </div>
           </div>
@@ -229,7 +229,7 @@ export function CashflowAiPromptModal({ budget, anchorMonth, onClose }: Cashflow
                 </div>
               ) : (
                 <p className="mt-2 text-[10px] leading-4 text-violet-300/80">
-                  Z promptu usuwane są wszystkie kwoty. Zostają udziały procentowe i relacje.
+                  Z polecenia usuwane są wszystkie kwoty. Zostają udziały procentowe i relacje.
                 </p>
               )}
             </div>
@@ -238,7 +238,7 @@ export function CashflowAiPromptModal({ budget, anchorMonth, onClose }: Cashflow
           <section className="flex min-h-0 flex-col p-5 sm:p-6">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-black text-slate-100">Gotowy prompt</p>
+                <p className="text-sm font-black text-slate-100">Gotowe polecenie</p>
                 <p className="mt-1 text-[10px] text-slate-600">
                   {mode === "AMOUNT"
                     ? "Pełna analiza z konkretnym potencjałem oszczędności w PLN."
@@ -256,7 +256,7 @@ export function CashflowAiPromptModal({ budget, anchorMonth, onClose }: Cashflow
                 }`}
               >
                 {copied ? <Check size={15} /> : <ClipboardCopy size={15} />}
-                {copied ? "Skopiowano" : "Skopiuj prompt"}
+                {copied ? "Skopiowano" : "Skopiuj polecenie"}
               </button>
             </div>
 

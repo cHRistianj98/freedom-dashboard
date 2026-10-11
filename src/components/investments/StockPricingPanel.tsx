@@ -114,7 +114,7 @@ export function StockPricingPanel({
         <div>
           <div className="text-sm font-black text-white">Live pricing akcji / ETF</div>
           <div className="mt-1 text-xs text-slate-500">
-            Yahoo Finance + bieżący kurs FX (NBP jako fallback). Wartość aktywa pokazujemy jako szacowaną wartość likwidacyjną netto: cena rynkowa minus 19% od dodatniego niezrealizowanego zysku.
+            Yahoo Finance + bieżący kurs FX (NBP jako źródło awaryjne). Wartość aktywa pokazujemy jako szacowaną wartość likwidacyjną netto: cena rynkowa minus 19% od dodatniego niezrealizowanego zysku.
           </div>
         </div>
         <button
@@ -129,7 +129,7 @@ export function StockPricingPanel({
 
       {!enabled ? (
         <div className="rounded-xl border border-slate-800 bg-slate-950/40 px-4 py-3 text-xs text-slate-500">
-          Wartość wpisujesz ręcznie. Włącz live pricing, aby podać ticker, ilość i średnią cenę zakupu.
+          Wartość wpisujesz ręcznie. Włącz notowania na żywo, aby podać symbol, ilość i średnią cenę zakupu.
         </div>
       ) : (
         <>
@@ -292,7 +292,7 @@ export function StockPricingPanel({
           </div>
 
           <div className="text-[10px] leading-relaxed text-slate-600">
-            Źródło ceny: Yahoo Finance (nieoficjalny endpoint chart, notowania mogą być opóźnione). Dla instrumentów w walucie obcej przeliczenie do PLN korzysta z bieżącego kursu FX z Yahoo Finance; NBP jest fallbackiem. Notowania mogą być opóźnione zależnie od rynku. Podatek 19% jest tylko konserwatywną estymacją wartości netto pozycji; faktyczny podatek rozliczasz od zrealizowanych wyników i z uwzględnieniem całego roku podatkowego.
+            Źródło ceny: Yahoo Finance (nieoficjalny punkt końcowy wykresu, notowania mogą być opóźnione). Dla instrumentów w walucie obcej przeliczenie do PLN korzysta z bieżącego kursu FX z Yahoo Finance; NBP jest źródłem awaryjnym. Notowania mogą być opóźnione zależnie od rynku. Podatek 19% jest tylko konserwatywną estymacją wartości netto pozycji; faktyczny podatek rozliczasz od zrealizowanych wyników i z uwzględnieniem całego roku podatkowego.
           </div>
         </>
       )}

@@ -28,7 +28,7 @@ export function Settings() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
             <LanguageCard
               value="pl"
               selected={language === "pl"}
@@ -43,6 +43,14 @@ export function Settings() {
               title={t("english")}
               description={t("englishDescription")}
               flag="🇬🇧"
+              onSelect={setLanguage}
+            />
+            <LanguageCard
+              value="de"
+              selected={language === "de"}
+              title={t("german")}
+              description={t("germanDescription")}
+              flag="🇩🇪"
               onSelect={setLanguage}
             />
           </div>

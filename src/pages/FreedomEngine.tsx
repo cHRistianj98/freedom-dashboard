@@ -725,7 +725,7 @@ export function FreedomEngine(props: FreedomEngineProps) {
 
 
 
-          sub={`${engine.savingsRate.toFixed(1)}% rolling savings rate`}
+          sub={`${engine.savingsRate.toFixed(1)}% krocząca stopa oszczędności`}
 
 
 
@@ -833,7 +833,7 @@ export function FreedomEngine(props: FreedomEngineProps) {
 
 
 
-            {engine.progressToFreedom.toFixed(2)}% FREE
+            {engine.progressToFreedom.toFixed(2)}% WOLNOŚCI
 
 
 
@@ -1164,7 +1164,7 @@ export function FreedomEngine(props: FreedomEngineProps) {
             {routerMode === "MONTHLY" ? (
               <div className="mt-3 rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4">
                 <p className="text-[10px] font-black uppercase tracking-[0.16em] text-cyan-400">
-                  Rolling cashflow {engine.rollingMonths}M
+                  Kroczące przepływy pieniężne {engine.rollingMonths}M
                 </p>
 
                 <div className="mt-1 flex items-end justify-between gap-4">
@@ -1251,7 +1251,7 @@ export function FreedomEngine(props: FreedomEngineProps) {
 
           {routerMode === "MONTHLY" && (
             <div className="text-xs text-slate-500">
-              {ui("Źródło", "Source")}: rolling cashflow {engine.rollingMonths}M
+              {ui("Źródło", "Source")}: kroczące przepływy pieniężne {engine.rollingMonths}M
             </div>
           )}
         </div>
@@ -1393,7 +1393,7 @@ export function FreedomEngine(props: FreedomEngineProps) {
 
 
 
-              Przy rolling cashflow
+              Przy kroczących przepływach pieniężnych
 
 
 
@@ -1417,7 +1417,7 @@ export function FreedomEngine(props: FreedomEngineProps) {
 
 
 
-                  ? "FREE"
+                  ? "WOLNOŚĆ"
 
 
 
@@ -1441,7 +1441,7 @@ export function FreedomEngine(props: FreedomEngineProps) {
 
 
 
-                : "Potrzebny dodatni rolling cashflow"}
+                : "Potrzebne dodatnie kroczące przepływy pieniężne"}
 
 
 
@@ -1513,7 +1513,7 @@ export function FreedomEngine(props: FreedomEngineProps) {
 
 
 
-              label="Savings rate"
+              label="Stopa oszczędności"
 
 
 

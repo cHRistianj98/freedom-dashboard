@@ -38,7 +38,7 @@ export function ModalCloseButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      aria-label={language === "pl" ? "Zamknij" : "Close"}
+      aria-label={language === "pl" ? "Zamknij" : language === "de" ? "Schließen" : "Close"}
       className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-slate-700/80 bg-slate-900/70 text-slate-400 transition hover:border-slate-500 hover:bg-slate-800 hover:text-white"
     >
       <X size={18} />
@@ -139,7 +139,7 @@ export function DateInput({
         aria-expanded={open}
         className={`${modalInputClass} flex cursor-pointer items-center justify-between gap-3 text-left font-medium ${theme.border}`}
       >
-        <span>{parsedValue ? formatDisplayDate(parsedValue, locale) : language === "pl" ? "Wybierz datę" : "Choose date"}</span>
+        <span>{parsedValue ? formatDisplayDate(parsedValue, locale) : language === "pl" ? "Wybierz datę" : language === "de" ? "Datum auswählen" : "Choose date"}</span>
         <span
           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${theme.badge}`}
         >
@@ -150,12 +150,12 @@ export function DateInput({
       {open && (
         <div
           role="dialog"
-          aria-label={language === "pl" ? "Wybierz datę" : "Choose date"}
+          aria-label={language === "pl" ? "Wybierz datę" : language === "de" ? "Datum auswählen" : "Choose date"}
           className="absolute left-0 top-[calc(100%+8px)] z-50 w-[340px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[20px] border border-slate-700/80 bg-[#091321] p-3 shadow-2xl shadow-black/50 sm:w-[360px]"
         >
           <div className="flex items-center justify-between gap-3 px-1 pb-2.5">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-600">{language === "pl" ? "Data transakcji" : "Transaction date"}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-600">{language === "pl" ? "Data transakcji" : language === "de" ? "Transaktionsdatum" : "Transaction date"}</p>
               <p className="mt-0.5 text-[15px] font-black capitalize text-slate-100">
                 {new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(visibleMonth)}
               </p>
@@ -165,7 +165,7 @@ export function DateInput({
                 type="button"
                 onClick={() => setVisibleMonth(addMonths(visibleMonth, -1))}
                 className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-800 bg-slate-950/60 text-slate-400 transition hover:border-slate-600 hover:bg-slate-900 hover:text-white"
-                aria-label={language === "pl" ? "Poprzedni miesiąc" : "Previous month"}
+                aria-label={language === "pl" ? "Poprzedni miesiąc" : language === "de" ? "Vorheriger Monat" : "Previous month"}
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -173,7 +173,7 @@ export function DateInput({
                 type="button"
                 onClick={() => setVisibleMonth(addMonths(visibleMonth, 1))}
                 className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-slate-800 bg-slate-950/60 text-slate-400 transition hover:border-slate-600 hover:bg-slate-900 hover:text-white"
-                aria-label={language === "pl" ? "Następny miesiąc" : "Next month"}
+                aria-label={language === "pl" ? "Następny miesiąc" : language === "de" ? "Nächster Monat" : "Next month"}
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -224,7 +224,7 @@ export function DateInput({
               onClick={() => setOpen(false)}
               className="cursor-pointer rounded-xl px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-900 hover:text-slate-300"
             >
-              {language === "pl" ? "Anuluj" : "Cancel"}
+              {language === "pl" ? "Anuluj" : language === "de" ? "Abbrechen" : "Cancel"}
             </button>
             <div className="flex items-center gap-2">
               <button
@@ -232,14 +232,14 @@ export function DateInput({
                 onClick={() => chooseDate(addDays(today, -1))}
                 className="cursor-pointer rounded-xl border border-slate-800 bg-slate-950/50 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-slate-600 hover:bg-slate-900"
               >
-                {language === "pl" ? "Wczoraj" : "Yesterday"}
+                {language === "pl" ? "Wczoraj" : language === "de" ? "Gestern" : "Yesterday"}
               </button>
               <button
                 type="button"
                 onClick={() => chooseDate(today)}
                 className={`cursor-pointer rounded-xl border px-3 py-2 text-xs font-black transition ${theme.badge}`}
               >
-                {language === "pl" ? "Dzisiaj" : "Today"}
+                {language === "pl" ? "Dzisiaj" : language === "de" ? "Heute" : "Today"}
               </button>
             </div>
           </div>
@@ -346,7 +346,7 @@ function formatDateOnly(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-function weekdayLabels(locale: "pl-PL" | "en-US") {
+function weekdayLabels(locale: "pl-PL" | "en-US" | "de-DE") {
   const monday = new Date(2026, 0, 5, 12, 0, 0, 0);
   return Array.from({ length: 7 }, (_, index) =>
     new Intl.DateTimeFormat(locale, { weekday: "short" })
@@ -356,7 +356,7 @@ function weekdayLabels(locale: "pl-PL" | "en-US") {
   );
 }
 
-function formatDisplayDate(date: Date, locale: "pl-PL" | "en-US") {
+function formatDisplayDate(date: Date, locale: "pl-PL" | "en-US" | "de-DE") {
   return new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "2-digit",

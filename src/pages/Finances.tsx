@@ -53,7 +53,7 @@ import { getAssetCategory } from "../types/Asset";
 import type { PortfolioWallet } from "../types/Portfolio";
 import type { Goal } from "../types/Goal";
 import { portfolioApi } from "../api/portfolioApi";
-import { useLanguage } from "../i18n/LanguageContext";
+import { useLanguage, type AppLanguage } from "../i18n/LanguageContext";
 import { localizedCategoryName } from "../i18n/categoryNames";
 
 type FinancesProps = {
@@ -1164,7 +1164,7 @@ function TransactionVisualRow({
   );
 }
 
-function formatTransactionDate(date: string | undefined, locale: "pl-PL" | "en-US", language: "pl" | "en") {
+function formatTransactionDate(date: string | undefined, locale: "pl-PL" | "en-US" | "de-DE", language: AppLanguage) {
   if (!date) return language === "pl" ? "Brak daty" : "No date";
 
   const [year, month, day] = date.split("-");

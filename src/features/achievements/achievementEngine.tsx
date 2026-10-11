@@ -296,7 +296,7 @@ function buildAchievements({
     createAchievement({
       id: "positive-3",
       name: "Consistency",
-      description: "Zakończ 3 miesiące z dodatnim cashflow.",
+      description: "Zakończ 3 miesiące z dodatnimi przepływami pieniężnymi.",
       category: "cashflow",
       rarity: "rare",
       xp: 200,
@@ -345,7 +345,7 @@ function buildAchievements({
     }),
     createAchievement({
       id: "debt-1",
-      name: "Debt Destroyer",
+      name: "Pogromca długu",
       description: "Spłać pierwsze zobowiązanie.",
       category: "debt",
       rarity: "epic",
