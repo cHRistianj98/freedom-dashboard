@@ -9,7 +9,8 @@ import {
 } from "recharts";
 
 import type { NetWorthSnapshot } from "../../types/NetWorthHistory";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
 type NetWorthChartProps = {
   history: NetWorthSnapshot[];
@@ -17,13 +18,9 @@ type NetWorthChartProps = {
 
 export function NetWorthChart({ history }: NetWorthChartProps) {
   const { language, locale } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
-  const money = (value: number) =>
-    new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: "PLN",
-      maximumFractionDigits: 2,
-    }).format(value);
+  const { formatMoney, convertFromPln } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const money = (value: number) => formatMoney(value, { maximumFractionDigits: 2 });
 
   const firstValue = history.length > 0 ? history[0].value : 0;
   const lastValue = history.length > 0 ? history[history.length - 1].value : 0;
@@ -76,7 +73,7 @@ export function NetWorthChart({ history }: NetWorthChartProps) {
               tickLine={false}
               axisLine={false}
               fontSize={12}
-              tickFormatter={(value) => `${Math.round(value / 1000)}k`}
+              tickFormatter={(value) => Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 }).format(convertFromPln(Number(value)))}
             />
             <Tooltip
               formatter={(value) => [money(Number(value)), ui("Majątek", "Net worth")]}

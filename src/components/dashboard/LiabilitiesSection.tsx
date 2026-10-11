@@ -2,7 +2,8 @@ import { Car, CreditCard, Home, Landmark, Percent, ReceiptText, WalletCards } fr
 import { useNavigate } from "react-router-dom";
 import type { Liability, LiabilityType } from "../../types/Liability";
 import { DashboardSectionLink } from "./DashboardSectionLink";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
 type Props = { liabilities: Liability[] };
 
@@ -19,8 +20,9 @@ const typeMeta: Record<LiabilityType, { label: string; icon: typeof Landmark; im
 
 export function LiabilitiesSection({ liabilities }: Props) {
   const navigate = useNavigate();
-  const { t, locale, language } = useLanguage();
-  const money = (value: number) => `${value.toLocaleString(locale, { maximumFractionDigits: 2 })} zł`;
+  const { t, language } = useLanguage();
+  const { formatMoney } = useCurrency();
+  const money = (value: number) => formatMoney(value, { maximumFractionDigits: 2 });
   const total = liabilities.reduce((sum, item) => sum + item.remainingAmount, 0);
   const monthly = liabilities.reduce((sum, item) => sum + item.monthlyPayment, 0);
   const interest = liabilities.reduce((sum, item) => sum + (item.interestPayment ?? 0), 0);
@@ -32,7 +34,7 @@ export function LiabilitiesSection({ liabilities }: Props) {
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400">{t("debtControl")}</p>
           <h2 className="mt-2 text-lg font-black text-white">{t("liabilities")}</h2>
-          <p className="mt-1 text-xs text-slate-500">{language === "pl" ? "Najważniejsze długi, koszt rat i postęp spłaty." : "Key debts, payment costs and repayment progress."}</p>
+          <p className="mt-1 text-xs text-slate-500">{localize(language, "Najważniejsze długi, koszt rat i postęp spłaty.", "Key debts, payment costs and repayment progress.", "Wichtigste Schulden, Ratenkosten und Tilgungsfortschritt.")}</p>
         </div>
         <DashboardSectionLink onClick={() => navigate("/liabilities")}>{t("seeAll")}</DashboardSectionLink>
       </div>

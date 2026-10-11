@@ -25,6 +25,7 @@ import { MonthlyReview } from "./pages/MonthlyReview";
 import { FinancialTimeline } from "./pages/FinancialTimeline";
 import { Settings } from "./pages/Settings";
 import { AchievementUnlockManager } from "./features/achievements/AchievementUnlockManager";
+import { useCurrency } from "./i18n/CurrencyContext";
 
 
 import { calculateNetWorth } from "./utils/portfolio";
@@ -60,6 +61,10 @@ import type {
 } from "./types/RecurringTransaction";
 
 function App() {
+  // Subscribe the app shell to display-currency changes so every legacy view rerenders immediately.
+  const { displayCurrency } = useCurrency();
+  void displayCurrency;
+
   /*
    * =========================================================
    * AUTH

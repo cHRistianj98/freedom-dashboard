@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AlertCircle, ChevronDown, CalendarClock, WalletCards, CreditCard } from "lucide-react";
 import type { ExpenseCategory } from "../../types/Cashflow";
 import type { RecurringTransaction, RecurringTransactionType } from "../../types/RecurringTransaction";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
 import { DateInput, modalInputClass, ModalCloseButton, MoneyInput } from "./ModalFieldKit";
 
 type AddRecurringTransactionModalProps = {
@@ -12,7 +12,7 @@ type AddRecurringTransactionModalProps = {
 
 export function AddRecurringTransactionModal({ onClose, onAdd }: AddRecurringTransactionModalProps) {
   const { language } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const [type, setType] = useState<RecurringTransactionType>("expense");
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");

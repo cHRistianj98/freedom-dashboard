@@ -96,14 +96,11 @@ import type { Liability } from "../types/Liability";
 
 
 import type { MonthlyBudget } from "../types/Cashflow";
-import { useLanguage } from "../i18n/LanguageContext";
+import { localize, useLanguage } from "../i18n/LanguageContext";
 
 
 
 import {
-
-
-
   calculateFreedomEngine,
 
 
@@ -117,6 +114,7 @@ import {
 
 
 } from "../features/freedom/freedomEngine";
+import { formatDisplayMoney, formatDisplayMoneyCompact } from "../utils/displayMoney";
 
 
 
@@ -158,7 +156,7 @@ type FreedomEngineProps = {
 
 export function FreedomEngine(props: FreedomEngineProps) {
   const { language } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const engine = calculateFreedomEngine(props, language);
   const missions = getFreedomMissions(props, language);
 
@@ -2363,7 +2361,7 @@ function MissionCard({
   onFocus: () => void;
 }) {
   const { language } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const style = missionAccentStyles[mission.accent];
   const complete = mission.status === "COMPLETE";
 
@@ -2569,13 +2567,7 @@ function formatMissionValue(value: number, unit: FreedomMission["unit"]) {
 
 
 function formatMoney(value: number) {
-
-
-
-  return `${Math.round(value).toLocaleString("pl-PL")} zł`;
-
-
-
+  return formatDisplayMoney(value, { maximumFractionDigits: 0 });
 }
 
 
@@ -2585,17 +2577,7 @@ function formatMoney(value: number) {
 
 
 function formatSignedMoney(value: number) {
-
-
-
-  const prefix = value >= 0 ? "+" : "";
-
-
-
-  return `${prefix}${Math.round(value).toLocaleString("pl-PL")} zł`;
-
-
-
+  return formatDisplayMoney(value, { maximumFractionDigits: 0, signDisplay: "always" });
 }
 
 
@@ -2605,37 +2587,7 @@ function formatSignedMoney(value: number) {
 
 
 function formatCompactMoney(value: number) {
-
-
-
-  if (value >= 1_000_000) {
-
-
-
-    return `${(value / 1_000_000).toLocaleString("pl-PL", {
-
-
-
-      maximumFractionDigits: 1,
-
-
-
-    })}M`;
-
-
-
-  }
-
-
-
-  if (value >= 1_000) return `${Math.round(value / 1_000)}K`;
-
-
-
-  return `${value}`;
-
-
-
+  return formatDisplayMoneyCompact(value);
 }
 
 

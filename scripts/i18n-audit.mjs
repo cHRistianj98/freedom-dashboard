@@ -30,12 +30,13 @@ function collectFiles(dir, out = []) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       if (!["node_modules", "dist"].includes(entry.name)) collectFiles(full, out);
-    } else if (entry.isFile() && entry.name.endsWith(".tsx")) out.push(full);
+    } else if (entry.isFile() && (entry.name.endsWith(".tsx") || entry.name.endsWith(".ts"))) out.push(full);
   }
   return out;
 }
 
 const findings = [];
+const selectorFindings = [];
 function check(value, file, node, sourceFile) {
   const text = normalize(value);
   if (!text || text.length < 2 || /^[-+]?\d[\d\s.,%/:-]*(?:zł|PLN)?$/i.test(text)) return;
@@ -56,7 +57,24 @@ function check(value, file, node, sourceFile) {
 for (const file of collectFiles(ROOT)) {
   if (file === catalogPath) continue;
   const source = fs.readFileSync(file, "utf8");
-  const sf = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const sf = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, file.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+
+  // A direct PL/EN ternary is a common source of German leaks. Inspect a local
+  // source window and require either an explicit German branch or shared localize().
+  for (const match of source.matchAll(/language\s*===\s*["']pl["']\s*\?/g)) {
+    const index = match.index ?? 0;
+    const window = source.slice(index, index + 360);
+    if (!window.includes("?") || window.includes('language === "de"') || window.includes("language === 'de'")) continue;
+    const lineEnd = source.indexOf("\n", index);
+    const snippet = source.slice(index, lineEnd === -1 ? index + 180 : Math.min(lineEnd, index + 180));
+    const prefix = source.slice(0, index);
+    selectorFindings.push({
+      file: path.relative(process.cwd(), file),
+      line: prefix.split("\n").length,
+      text: snippet.trim(),
+    });
+  }
+
 
   function visit(node) {
     if (ts.isJsxText(node)) check(node.getText(sf), file, node, sf);
@@ -72,10 +90,17 @@ for (const file of collectFiles(ROOT)) {
 }
 
 const unique = [...new Map(findings.map((item) => [`${item.file}:${item.line}:${item.text}`, item])).values()];
-if (unique.length) {
-  console.error(`i18n audit: ${unique.length} visible strings are not covered by the PL/EN/DE catalogue:\n`);
-  for (const item of unique) console.error(`${item.file}:${item.line} [${item.lang}] ${item.text}`);
+const uniqueSelectors = [...new Map(selectorFindings.map((item) => [`${item.file}:${item.line}:${item.text}`, item])).values()];
+if (unique.length || uniqueSelectors.length) {
+  if (unique.length) {
+    console.error(`i18n audit: ${unique.length} visible strings are not covered by the PL/EN/DE catalogue:\n`);
+    for (const item of unique) console.error(`${item.file}:${item.line} [${item.lang}] ${item.text}`);
+  }
+  if (uniqueSelectors.length) {
+    console.error(`\ni18n audit: ${uniqueSelectors.length} direct PL/EN selectors have no German branch. Use localize(language, pl, en, de) or add language === "de":\n`);
+    for (const item of uniqueSelectors) console.error(`${item.file}:${item.line} ${item.text}`);
+  }
   process.exit(1);
 }
 
-console.log("i18n audit OK: visible PL/EN JSX strings are covered by the multilingual catalogue (PL/EN/DE).");
+console.log("i18n audit OK: visible PL/EN strings are catalogued and no direct PL/EN selector skips German.");

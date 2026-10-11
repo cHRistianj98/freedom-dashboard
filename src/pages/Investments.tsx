@@ -22,6 +22,7 @@ import { Donut, HistoryChart, WealthChart } from "../components/investments/Port
 import { GoalCapitalDialog, PortfolioDialog, PortfolioForm, TransferForm, WalletIcon, errorMessage } from "../components/investments/PortfolioDialogs";
 import { fundedGoals, money, percent, reservationsByAsset, type FundedGoal } from "../components/investments/portfolioView";
 import "./Investments.css";
+import { formatDisplayMoney } from "../utils/displayMoney";
 
 type InvestmentsProps = {
   portfolio: Asset[];
@@ -931,7 +932,7 @@ function goalPriorityRank(priority?: Goal["priority"]): number {
 
 function formatPromptMoney(value: number): string {
   if (!Number.isFinite(value)) return "0 PLN";
-  return `${value.toLocaleString("pl-PL", { minimumFractionDigits: 0, maximumFractionDigits: 2 })} PLN`;
+  return formatDisplayMoney(value, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
 
 function formatPromptPercent(value: number, total: number): string {

@@ -1,122 +1,16 @@
-import {
-  CalendarDays,
-  Pencil,
-  Repeat2,
-  Trash2,
-} from "lucide-react";
-
+import { CalendarDays, Pencil, Repeat2, Trash2 } from "lucide-react";
 import type { Income } from "../../types/Cashflow";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
-type IncomeRowProps = {
-  income: Income;
-  onEdit: () => void;
-  onDelete: () => void;
-};
-
-export function IncomeRow({
-  income,
-  onEdit,
-  onDelete,
-}: IncomeRowProps) {
-  return (
-    <div
-      className="
-        flex
-        items-center
-        justify-between
-        border-b
-        border-slate-800/60
-        px-5 py-4
-        last:border-b-0
-        transition
-        hover:bg-slate-800/40
-      "
-    >
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="font-medium">
-            {income.name}
-          </span>
-
-          {income.recurring && (
-            <Repeat2
-              size={14}
-              className="text-slate-500"
-            />
-          )}
-        </div>
-
-        <div className="mt-1 flex items-center gap-2 text-xs text-slate-600">
-          <CalendarDays size={13} />
-
-          <span>
-            {income.date
-              ? formatDate(income.date)
-              : "Brak daty"}
-          </span>
-
-          <span>•</span>
-
-          <span>
-            {income.recurring
-              ? "Powtarzalny"
-              : "Jednorazowy"}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-5">
-        <span className="font-semibold text-emerald-400">
-          +
-          {income.amount.toLocaleString(
-            "pl-PL"
-          )}{" "}
-          zł
-        </span>
-
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={onEdit}
-            title="Edytuj"
-            className="
-              rounded-lg
-              p-2
-              text-slate-500
-              transition
-              hover:bg-blue-500/10
-              hover:text-blue-400
-            "
-          >
-            <Pencil size={17} />
-          </button>
-
-          <button
-            type="button"
-            onClick={onDelete}
-            title="Usuń"
-            className="
-              rounded-lg
-              p-2
-              text-slate-500
-              transition
-              hover:bg-red-500/10
-              hover:text-red-400
-            "
-          >
-            <Trash2 size={17} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+export function IncomeRow({ income, onEdit, onDelete }: { income: Income; onEdit: () => void; onDelete: () => void }) {
+  const { language, locale } = useLanguage();
+  const { formatMoney } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  return <div className="flex items-center justify-between border-b border-slate-800/60 px-5 py-4 transition last:border-b-0 hover:bg-slate-800/40">
+    <div><div className="flex items-center gap-2"><span className="font-medium">{income.name}</span>{income.recurring && <Repeat2 size={14} className="text-slate-500" />}</div>
+      <div className="mt-1 flex items-center gap-2 text-xs text-slate-600"><CalendarDays size={13}/><span>{income.date ? formatDate(income.date, locale) : ui("Brak daty", "No date", "Kein Datum")}</span><span>•</span><span>{income.recurring ? ui("Powtarzalny", "Recurring", "Wiederkehrend") : ui("Jednorazowy", "One-off", "Einmalig")}</span></div></div>
+    <div className="flex items-center gap-5"><span className="font-semibold text-emerald-400">{formatMoney(income.amount, { maximumFractionDigits: 2, signDisplay: "always" })}</span><div className="flex items-center gap-1"><button type="button" onClick={onEdit} title={ui("Edytuj", "Edit", "Bearbeiten")} className="cursor-pointer rounded-lg p-2 text-slate-500 transition hover:bg-blue-500/10 hover:text-blue-400"><Pencil size={17}/></button><button type="button" onClick={onDelete} title={ui("Usuń", "Delete", "Löschen")} className="cursor-pointer rounded-lg p-2 text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"><Trash2 size={17}/></button></div></div>
+  </div>;
 }
-
-function formatDate(
-  date: string
-) {
-  const [year, month, day] =
-    date.split("-");
-
-  return `${day}.${month}.${year}`;
-}
+function formatDate(date: string, locale: string) { const [year, month, day] = date.split("-"); return new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(Number(year), Number(month)-1, Number(day), 12)); }

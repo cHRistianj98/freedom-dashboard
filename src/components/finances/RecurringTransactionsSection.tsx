@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 
 import { CategoryIcon } from "../categories/CategoryIcon";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 import { localizedCategoryName } from "../../i18n/categoryNames";
 
 import type {
@@ -45,8 +46,9 @@ export function RecurringTransactionsSection({
   onToggleRule,
   onDeleteRule,
 }: RecurringTransactionsSectionProps) {
-  const { language, locale } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const { language } = useLanguage();
+  const { formatMoney } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const activeCount =
     rules.filter((rule) => rule.active).length;
 
@@ -64,7 +66,7 @@ export function RecurringTransactionsSection({
             </h2>
 
             <span className="text-xs text-slate-500">
-              {activeCount} {language === "pl" ? polishRuleCount(activeCount) : activeCount === 1 ? "active rule" : "active rules"}
+              {activeCount} {language === "pl" ? polishRuleCount(activeCount) : language === "de" ? (activeCount === 1 ? "aktive Regel" : "aktive Regeln") : activeCount === 1 ? "active rule" : "active rules"}
             </span>
           </div>
         </div>
@@ -173,7 +175,7 @@ export function RecurringTransactionsSection({
                     }`}
                   >
                     {rule.type === "income" ? "+" : "-"}
-                    {rule.amount.toLocaleString(locale)} {language === "pl" ? "zł" : "PLN"}
+                    {formatMoney(rule.amount, { maximumFractionDigits: 2 })}
                   </div>
 
                   {booked ? (

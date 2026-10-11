@@ -32,6 +32,7 @@ import type { Liability } from "../types/Liability";
 import type { MonthlyBudget } from "../types/Cashflow";
 import type { NetWorthSnapshot } from "../types/NetWorthHistory";
 import type { MonthlySnapshot } from "../types/MonthlySnapshot";
+import { formatDisplayMoney } from "../utils/displayMoney";
 
 type MonthlyReviewProps = {
   netWorth: number;
@@ -1396,10 +1397,9 @@ function sum(values: number[]) {
 }
 
 function formatMoney(value: number) {
-  return `${Math.round(value).toLocaleString("pl-PL")} zł`;
+  return formatDisplayMoney(value, { maximumFractionDigits: 0 });
 }
 
 function formatSignedMoney(value: number) {
-  const prefix = value > 0 ? "+" : "";
-  return `${prefix}${Math.round(value).toLocaleString("pl-PL")} zł`;
+  return formatDisplayMoney(value, { maximumFractionDigits: 0, signDisplay: "always" });
 }

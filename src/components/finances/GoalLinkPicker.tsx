@@ -1,6 +1,7 @@
 import { CheckCircle2, LoaderCircle, Target } from "lucide-react";
 import type { SpendableGoal } from "../../types/GoalSpending";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
 export function GoalLinkPicker({
   goals,
@@ -17,16 +18,16 @@ export function GoalLinkPicker({
   amount?: number;
   mode: "create" | "edit";
 }) {
-  const { language, locale } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const { language } = useLanguage();
+  const { formatMoney } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const selectedGoal = goals.find((goal) => goal.goalId === selectedGoalId);
   const uncoveredAmount =
     selectedGoal && typeof amount === "number" && Number.isFinite(amount)
       ? Math.max(0, amount - selectedGoal.reservedOnAsset)
       : 0;
 
-  const money = (value: number) =>
-    `${value.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${language === "pl" ? "zł" : "PLN"}`;
+  const money = (value: number) => formatMoney(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <div className="rounded-2xl border border-violet-500/20 bg-violet-500/5 p-4">

@@ -5,7 +5,8 @@ import { portfolioApi } from "../../api/portfolioApi";
 import type { Asset } from "../../types/Asset";
 import type { PortfolioWallet } from "../../types/Portfolio";
 import { DashboardSectionLink } from "./DashboardSectionLink";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
 type Props = {
   assets: Asset[];
@@ -14,8 +15,10 @@ type Props = {
 
 export function PortfolioOverviewSection({ assets }: Props) {
   const navigate = useNavigate();
-  const { t, locale } = useLanguage();
-  const money = (value: number) => `${value.toLocaleString(locale, { maximumFractionDigits: 2 })} zł`;
+  const { t, language } = useLanguage();
+  const { formatMoney } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const money = (value: number) => formatMoney(value, { maximumFractionDigits: 2 });
   const [wallets, setWallets] = useState<PortfolioWallet[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,8 +49,8 @@ export function PortfolioOverviewSection({ assets }: Props) {
             <WalletCards size={19} />
             <p className="text-[10px] font-black uppercase tracking-[0.2em]">{t("portfolioStructure")}</p>
           </div>
-          <h2 className="mt-2 text-xl font-black text-white">{t("managePortfolios") === "Manage portfolios" ? "Portfolios" : "Portfele"}</h2>
-          <p className="mt-1 text-xs text-slate-500">{t("managePortfolios") === "Manage portfolios" ? "All investment strategies and their current value." : "Wszystkie strategie inwestycyjne i ich aktualna wartość."}</p>
+          <h2 className="mt-2 text-xl font-black text-white">{ui("Portfele", "Portfolios", "Portfolios")}</h2>
+          <p className="mt-1 text-xs text-slate-500">{ui("Wszystkie strategie inwestycyjne i ich aktualna wartość.", "All investment strategies and their current value.", "Alle Anlagestrategien und ihr aktueller Wert.")}</p>
         </div>
         <DashboardSectionLink onClick={() => navigate("/investments")}>
           {t("managePortfolios")}
@@ -56,7 +59,7 @@ export function PortfolioOverviewSection({ assets }: Props) {
 
       {loading ? (
         <div className="mt-5 flex min-h-40 items-center justify-center gap-2 rounded-2xl border border-slate-800 bg-slate-950/30 text-sm text-slate-500">
-          <LoaderCircle size={18} className="animate-spin"/> {t("managePortfolios") === "Manage portfolios" ? "Loading portfolios…" : "Pobieranie portfeli…"}
+          <LoaderCircle size={18} className="animate-spin"/> {ui("Pobieranie portfeli…", "Loading portfolios…", "Portfolios werden geladen…")}
         </div>
       ) : visible.length ? (
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-4">
@@ -88,7 +91,7 @@ export function PortfolioOverviewSection({ assets }: Props) {
                   <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
                     <div className="min-w-0">
                       <p className="truncate text-base font-black text-white drop-shadow-lg">{wallet.name}</p>
-                      <p className="mt-0.5 text-[10px] font-bold text-slate-300/80">{walletAssets.length} {t("managePortfolios") === "Manage portfolios" ? "assets" : "aktywów"}</p>
+                      <p className="mt-0.5 text-[10px] font-bold text-slate-300/80">{walletAssets.length} {ui("aktywów", "assets", "Anlagen")}</p>
                     </div>
                     <span className="rounded-lg border border-white/10 bg-black/35 px-2 py-1 text-[10px] font-black text-cyan-200 backdrop-blur">{share.toFixed(1)}%</span>
                   </div>
@@ -97,12 +100,12 @@ export function PortfolioOverviewSection({ assets }: Props) {
                 <div className="p-4">
                   <div className="flex items-end justify-between gap-3">
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-wider text-slate-600">{t("managePortfolios") === "Manage portfolios" ? "Value" : "Wartość"}</p>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-slate-600">{ui("Wartość", "Value", "Wert")}</p>
                       <p className="mt-1 text-xl font-black text-white">{money(wallet.grossValue)}</p>
                     </div>
                     {wallet.allocatedOut > 0 && (
                       <div className="text-right">
-                        <p className="text-[9px] font-black uppercase tracking-wider text-violet-400">{t("managePortfolios") === "Manage portfolios" ? "Reserve" : "Rezerwa"}</p>
+                        <p className="text-[9px] font-black uppercase tracking-wider text-violet-400">{ui("Rezerwa", "Reserve", "Reserve")}</p>
                         <p className="mt-1 text-xs font-black text-violet-300">{money(wallet.allocatedOut)}</p>
                       </div>
                     )}
@@ -115,7 +118,7 @@ export function PortfolioOverviewSection({ assets }: Props) {
                     />
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-2 text-[10px] font-semibold text-slate-600">
-                    <span>{wallet.targetAmount ? `Cel ${money(wallet.targetAmount)}` : "Bez kwoty docelowej"}</span>
+                    <span>{wallet.targetAmount ? `${ui("Cel", "Target", "Ziel")} ${money(wallet.targetAmount)}` : ui("Bez kwoty docelowej", "No target amount", "Kein Zielbetrag")}</span>
                     <span className="inline-flex items-center gap-1 text-slate-500"><PieChart size={11}/>{progress == null ? "—" : `${progress.toFixed(0)}%`}</span>
                   </div>
                 </div>
@@ -124,9 +127,7 @@ export function PortfolioOverviewSection({ assets }: Props) {
           })}
         </div>
       ) : (
-        <button type="button" onClick={() => navigate("/investments")} className="mt-5 w-full rounded-2xl border border-dashed border-cyan-500/20 bg-cyan-500/5 p-8 text-center text-sm font-semibold text-cyan-300">
-          Dodaj pierwszy portfel →
-        </button>
+        <button type="button" onClick={() => navigate("/investments")} className="mt-5 w-full rounded-2xl border border-dashed border-cyan-500/20 bg-cyan-500/5 p-8 text-center text-sm font-semibold text-cyan-300">{ui("Dodaj pierwszy portfel →", "Add your first portfolio →", "Erstes Portfolio hinzufügen →")}</button>
       )}
     </section>
   );

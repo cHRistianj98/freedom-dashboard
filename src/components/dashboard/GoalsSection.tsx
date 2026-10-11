@@ -2,8 +2,10 @@ import { ArrowRight, CalendarDays, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import type { Goal } from "../../types/Goal";
+import { getGoalVisual } from "../goals/goalCatalog";
 import { DashboardSectionLink } from "./DashboardSectionLink";
-import { useLanguage, type AppLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage, type AppLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
 type GoalsSectionProps = {
   goals: Goal[];
@@ -12,7 +14,8 @@ type GoalsSectionProps = {
 export function GoalsSection({ goals }: GoalsSectionProps) {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const { formatMoney } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
 
   const visibleGoals = goals
     .filter((goal) => goal.status !== "COMPLETED")
@@ -38,6 +41,7 @@ export function GoalsSection({ goals }: GoalsSectionProps) {
               key={goal.id}
               goal={goal}
               language={language}
+              formatMoney={formatMoney}
               onClick={() => navigate("/goals")}
             />
           ))}
@@ -66,13 +70,15 @@ export function GoalsSection({ goals }: GoalsSectionProps) {
 function DashboardGoalCard({
   goal,
   language,
+  formatMoney,
   onClick,
 }: {
   goal: Goal;
   language: AppLanguage;
+  formatMoney: (value: number, options?: any) => string;
   onClick: () => void;
 }) {
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const locale = language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US";
 
   const progress = goal.targetAmount > 0
@@ -86,18 +92,16 @@ function DashboardGoalCard({
       ? 0
       : null;
 
-  const imageUrl = "imageUrl" in goal && typeof goal.imageUrl === "string" ? goal.imageUrl : undefined;
+  const presetVisual = getGoalVisual(goal.type);
+  const imageUrl = "imageUrl" in goal && typeof goal.imageUrl === "string" && goal.imageUrl
+    ? goal.imageUrl
+    : presetVisual.image;
   const imagePosition =
     "imagePosition" in goal && typeof goal.imagePosition === "string"
       ? goal.imagePosition
-      : "center";
+      : presetVisual.imagePosition;
 
-  const money = (value: number) =>
-    new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: "PLN",
-      maximumFractionDigits: 0,
-    }).format(Math.round(value));
+  const money = (value: number) => formatMoney(value, { maximumFractionDigits: 0 });
 
   return (
     <button
@@ -110,10 +114,10 @@ function DashboardGoalCard({
           <img
             src={imageUrl}
             alt=""
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]"
-            style={{ objectPosition: imagePosition }}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.06]"
+            style={{ objectPosition: imagePosition, transform: `scale(${presetVisual.imageScale})` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0b1322] via-[#0b1322]/15 to-black/10" />
+          <div className={`absolute inset-0 bg-gradient-to-t ${presetVisual.overlayClass}`} />
           <div className="absolute inset-x-0 bottom-0 px-5 pb-4">
             <p className="line-clamp-1 text-lg font-black text-white drop-shadow-lg">{goal.name}</p>
           </div>
@@ -158,7 +162,7 @@ function DashboardGoalCard({
             ) : monthsToGoal !== null ? (
               <>
                 ~<strong className="text-slate-200">{monthsToGoal}</strong>{" "}
-                {language === "pl" ? "mies." : monthsToGoal === 1 ? "month" : "months"}
+                {language === "pl" ? "mies." : language === "de" ? (monthsToGoal === 1 ? "Monat" : "Monate") : monthsToGoal === 1 ? "month" : "months"}
               </>
             ) : (
               "—"

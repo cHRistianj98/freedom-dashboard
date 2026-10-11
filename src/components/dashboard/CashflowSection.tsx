@@ -2,21 +2,30 @@ import { ArrowDownRight, ArrowRight, ArrowUpRight, CircleDollarSign, Home, Piggy
 import { useNavigate } from "react-router-dom";
 import type { ExpenseCategory, MonthlyBudget } from "../../types/Cashflow";
 import { DashboardSectionLink } from "./DashboardSectionLink";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
 type Props = { budget: MonthlyBudget; onAddExpenseClick: () => void };
 
-const categoryMeta: Record<ExpenseCategory, { label: string; icon: typeof Home; bar: string; iconClass: string }> = {
-  fixed: { label: "Stałe", icon: Home, bar: "bg-red-500", iconClass: "bg-red-500/10 text-red-400" },
-  living: { label: "Życie", icon: ShoppingBasket, bar: "bg-amber-400", iconClass: "bg-amber-500/10 text-amber-400" },
-  investment: { label: "Inwestycje", icon: TrendingUp, bar: "bg-blue-500", iconClass: "bg-blue-500/10 text-blue-400" },
-  goal: { label: "Cele", icon: Target, bar: "bg-violet-500", iconClass: "bg-violet-500/10 text-violet-400" },
+const categoryMeta: Record<ExpenseCategory, { icon: typeof Home; bar: string; iconClass: string }> = {
+  fixed: { icon: Home, bar: "bg-red-500", iconClass: "bg-red-500/10 text-red-400" },
+  living: { icon: ShoppingBasket, bar: "bg-amber-400", iconClass: "bg-amber-500/10 text-amber-400" },
+  investment: { icon: TrendingUp, bar: "bg-blue-500", iconClass: "bg-blue-500/10 text-blue-400" },
+  goal: { icon: Target, bar: "bg-violet-500", iconClass: "bg-violet-500/10 text-violet-400" },
 };
 
 export function CashflowSection({ budget, onAddExpenseClick }: Props) {
   const navigate = useNavigate();
-  const { t, locale, language } = useLanguage();
-  const money = (value: number) => `${value.toLocaleString(locale, { maximumFractionDigits: 0 })} zł`;
+  const { t, language } = useLanguage();
+  const { formatMoney } = useCurrency();
+  const money = (value: number) => formatMoney(value, { maximumFractionDigits: 0 });
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const categoryLabel = (key: ExpenseCategory) => ({
+    fixed: ui("Stałe", "Fixed", "Fixkosten"),
+    living: ui("Życie", "Living", "Lebenshaltung"),
+    investment: ui("Inwestycje", "Investments", "Investitionen"),
+    goal: ui("Cele", "Goals", "Ziele"),
+  }[key]);
   const income = budget.incomes.reduce((sum, item) => sum + item.amount, 0);
   const expenses = budget.expenses.reduce((sum, item) => sum + item.amount, 0);
   const surplus = income - expenses;
@@ -29,26 +38,26 @@ export function CashflowSection({ budget, onAddExpenseClick }: Props) {
   return (
     <section className="mt-6 rounded-2xl border border-slate-800 bg-[#0b1322] p-6">
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
-        <div><p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Monthly Cashflow</p><h2 className="mt-2 text-lg font-black text-white">Wydatki pod kontrolą</h2><p className="mt-1 text-xs text-slate-500">Szybki obraz miesiąca bez starego wielkiego donuta.</p></div>
-        <div className="flex gap-2"><button onClick={onAddExpenseClick} className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-black text-white hover:bg-blue-500"><Plus size={15} /> Dodaj wydatek</button><button onClick={() => navigate("/finances")} className="flex items-center gap-2 rounded-xl border border-slate-700 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800">Finanse <ArrowRight size={14} /></button></div>
+        <div><p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">{ui("Miesięczny cashflow", "Monthly Cashflow", "Monatlicher Cashflow")}</p><h2 className="mt-2 text-lg font-black text-white">{ui("Wydatki pod kontrolą", "Spending under control", "Ausgaben unter Kontrolle")}</h2><p className="mt-1 text-xs text-slate-500">{ui("Szybki obraz miesiąca bez starego wielkiego donuta.", "A quick monthly snapshot without the old giant donut chart.", "Schneller Monatsüberblick ohne das alte große Donut-Diagramm.")}</p></div>
+        <div className="flex gap-2"><button onClick={onAddExpenseClick} className="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-black text-white hover:bg-blue-500"><Plus size={15} /> {ui("Dodaj wydatek", "Add expense", "Ausgabe hinzufügen")}</button><button onClick={() => navigate("/finances")} className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-700 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800">{ui("Finanse", "Finances", "Finanzen")} <ArrowRight size={14} /></button></div>
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <FlowMetric label="Wpływy" value={money(income)} icon={<ArrowUpRight size={18} />} tone="emerald" />
-        <FlowMetric label="Wydatki" value={money(expenses)} icon={<ArrowDownRight size={18} />} tone="red" />
-        <FlowMetric label="Wolne środki" value={money(surplus)} icon={<CircleDollarSign size={18} />} tone={surplus >= 0 ? "blue" : "red"} />
-        <FlowMetric label="Stopa oszczędności" value={`${savingsRate.toFixed(1)}%`} icon={<PiggyBank size={18} />} tone="violet" />
+        <FlowMetric label={ui("Wpływy", "Income", "Einnahmen")} value={money(income)} icon={<ArrowUpRight size={18} />} tone="emerald" />
+        <FlowMetric label={ui("Wydatki", "Expenses", "Ausgaben")} value={money(expenses)} icon={<ArrowDownRight size={18} />} tone="red" />
+        <FlowMetric label={ui("Wolne środki", "Free cash", "Freie Mittel")} value={money(surplus)} icon={<CircleDollarSign size={18} />} tone={surplus >= 0 ? "blue" : "red"} />
+        <FlowMetric label={ui("Stopa oszczędności", "Savings rate", "Sparquote")} value={`${savingsRate.toFixed(1)}%`} icon={<PiggyBank size={18} />} tone="violet" />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[1.05fr_.95fr]">
         <div className="rounded-2xl border border-slate-800 bg-slate-950/35 p-5">
-          <div className="flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-wider text-slate-400">Top kategorie</p><p className="mt-1 text-[11px] text-slate-600">Gdzie realnie uciekają pieniądze</p></div>{biggest && <span className="rounded-lg bg-amber-500/10 px-2 py-1 text-[10px] font-black text-amber-400">TOP: {categoryMeta[biggest[0]].label}</span>}</div>
-          <div className="mt-5 space-y-4">{categories.map(([key, value]) => { const meta = categoryMeta[key]; const Icon = meta.icon; const pct = expenses > 0 ? (value / expenses) * 100 : 0; return <div key={key}><div className="mb-2 flex items-center justify-between gap-3"><div className="flex items-center gap-2"><span className={`flex h-8 w-8 items-center justify-center rounded-lg ${meta.iconClass}`}><Icon size={15} /></span><div><p className="text-xs font-bold text-slate-200">{meta.label}</p><p className="text-[10px] text-slate-600">{pct.toFixed(1)}% wydatków</p></div></div><p className="text-xs font-black text-white">{money(value)}</p></div><div className="h-1.5 overflow-hidden rounded-full bg-slate-800"><div className={`h-full rounded-full ${meta.bar}`} style={{ width: `${pct}%` }} /></div></div>; })}</div>
+          <div className="flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-wider text-slate-400">{ui("Top kategorie", "Top categories", "Top-Kategorien")}</p><p className="mt-1 text-[11px] text-slate-600">{ui("Gdzie realnie uciekają pieniądze", "Where your money actually goes", "Wohin dein Geld tatsächlich fließt")}</p></div>{biggest && <span className="rounded-lg bg-amber-500/10 px-2 py-1 text-[10px] font-black text-amber-400">TOP: {categoryLabel(biggest[0])}</span>}</div>
+          <div className="mt-5 space-y-4">{categories.map(([key, value]) => { const meta = categoryMeta[key]; const Icon = meta.icon; const pct = expenses > 0 ? (value / expenses) * 100 : 0; return <div key={key}><div className="mb-2 flex items-center justify-between gap-3"><div className="flex items-center gap-2"><span className={`flex h-8 w-8 items-center justify-center rounded-lg ${meta.iconClass}`}><Icon size={15} /></span><div><p className="text-xs font-bold text-slate-200">{categoryLabel(key)}</p><p className="text-[10px] text-slate-600">{pct.toFixed(1)}% {ui("wydatków", "of expenses", "der Ausgaben")}</p></div></div><p className="text-xs font-black text-white">{money(value)}</p></div><div className="h-1.5 overflow-hidden rounded-full bg-slate-800"><div className={`h-full rounded-full ${meta.bar}`} style={{ width: `${pct}%` }} /></div></div>; })}</div>
         </div>
 
         <div className="rounded-2xl border border-slate-800 bg-slate-950/35 p-5">
-          <div className="flex items-center justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-wider text-slate-400">{language === "pl" ? "Ostatnie wydatki" : "Recent expenses"}</p><p className="mt-1 text-[11px] text-slate-600">{language === "pl" ? "Najświeższe transakcje miesiąca" : "Latest transactions this month"}</p></div><DashboardSectionLink onClick={() => navigate("/finances")}>{t("all")}</DashboardSectionLink></div>
-          <div className="mt-4 divide-y divide-slate-800/80">{recent.length ? recent.map((item) => { const meta = categoryMeta[item.category]; const Icon = meta.icon; return <div key={item.id} className="flex items-center justify-between gap-3 py-3"><div className="flex min-w-0 items-center gap-3"><span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${meta.iconClass}`}><Icon size={16} /></span><div className="min-w-0"><p className="truncate text-xs font-bold text-slate-200">{item.name}</p><p className="mt-0.5 text-[10px] text-slate-600">{meta.label} • {item.date}</p></div></div><p className="shrink-0 text-xs font-black text-white">-{money(item.amount)}</p></div>; }) : <div className="py-10 text-center text-xs text-slate-600">Brak wydatków w tym miesiącu.</div>}</div>
+          <div className="flex items-center justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-wider text-slate-400">{localize(language, "Ostatnie wydatki", "Recent expenses", "Letzte Ausgaben")}</p><p className="mt-1 text-[11px] text-slate-600">{localize(language, "Najświeższe transakcje miesiąca", "Latest transactions this month", "Neueste Transaktionen dieses Monats")}</p></div><DashboardSectionLink onClick={() => navigate("/finances")}>{t("all")}</DashboardSectionLink></div>
+          <div className="mt-4 divide-y divide-slate-800/80">{recent.length ? recent.map((item) => { const meta = categoryMeta[item.category]; const Icon = meta.icon; return <div key={item.id} className="flex items-center justify-between gap-3 py-3"><div className="flex min-w-0 items-center gap-3"><span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${meta.iconClass}`}><Icon size={16} /></span><div className="min-w-0"><p className="truncate text-xs font-bold text-slate-200">{item.name}</p><p className="mt-0.5 text-[10px] text-slate-600">{categoryLabel(item.category)} • {item.date}</p></div></div><p className="shrink-0 text-xs font-black text-white">-{money(item.amount)}</p></div>; }) : <div className="py-10 text-center text-xs text-slate-600">{ui("Brak wydatków w tym miesiącu.", "No expenses this month.", "Keine Ausgaben in diesem Monat.")}</div>}</div>
         </div>
       </div>
     </section>

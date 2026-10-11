@@ -1,9 +1,7 @@
 import { Trophy, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type {
-  Achievement,
-  AchievementRarity,
-} from "./achievementEngine";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { localizeAchievement, type Achievement, type AchievementRarity } from "./achievementEngine";
 
 type Props = {
   achievement: Achievement;
@@ -61,9 +59,12 @@ export function AchievementUnlockPopup({
   onClose,
   duration = 5000,
 }: Props) {
+  const { language } = useLanguage();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
   const style = styles[achievement.rarity];
+  const localizedAchievement = localizeAchievement(achievement, language);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setVisible(true));
@@ -94,7 +95,7 @@ export function AchievementUnlockPopup({
         <button
           onClick={beginClose}
           className="absolute right-4 top-4 rounded-lg p-2 text-slate-500 transition hover:bg-white/5 hover:text-white"
-          aria-label="Zamknij"
+          aria-label={ui("Zamknij", "Close", "Schließen")}
         >
           <X size={18} />
         </button>
@@ -105,32 +106,36 @@ export function AchievementUnlockPopup({
           </div>
 
           <p className="mt-5 text-[11px] font-black uppercase tracking-[0.28em] text-amber-400">
-            Achievement unlocked
+            {ui("Osiągnięcie odblokowane", "Achievement unlocked", "Erfolg freigeschaltet")}
           </p>
 
           <div
             className={`mx-auto mt-5 flex h-20 w-20 items-center justify-center rounded-3xl ${style.icon}`}
           >
-            <div className="scale-150">{achievement.icon}</div>
+            <div className="scale-150">{localizedAchievement.icon}</div>
           </div>
 
           <h2 className="mt-5 text-2xl font-black tracking-tight text-white">
-            {achievement.name}
+            {localizedAchievement.name}
           </h2>
 
           <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-400">
-            {achievement.description}
+            {localizedAchievement.description}
           </p>
 
           <div className="mt-5 flex items-center justify-center gap-3">
             <span
               className={`rounded-lg px-3 py-1.5 text-[10px] font-black tracking-[0.18em] ${style.badge}`}
             >
-              {style.label}
+              {ui(
+                achievement.rarity === "common" ? "ZWYKŁE" : achievement.rarity === "rare" ? "RZADKIE" : achievement.rarity === "epic" ? "EPICKIE" : "LEGENDARNE",
+                style.label,
+                achievement.rarity === "common" ? "GEWÖHNLICH" : achievement.rarity === "rare" ? "SELTEN" : achievement.rarity === "epic" ? "EPISCH" : "LEGENDÄR"
+              )}
             </span>
 
             <span className="text-sm font-black text-amber-400">
-              +{achievement.xp} XP
+              +{localizedAchievement.xp} XP
             </span>
           </div>
         </div>

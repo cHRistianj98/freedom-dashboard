@@ -6,7 +6,8 @@ import { getAssetCategory, getAssetIconKey } from "../../types/Asset";
 import type { PortfolioWallet } from "../../types/Portfolio";
 import { AssetIcon } from "../investments/assetIcons";
 import { WalletIcon } from "../investments/PortfolioDialogs";
-import { useLanguage, type AppLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage, type AppLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
 type CashSourcePickerProps = {
   assets: Asset[];
@@ -36,7 +37,9 @@ export function CashSourcePicker({
   title,
 }: CashSourcePickerProps) {
   const { language, locale } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const { formatMoney } = useCurrency();
+  const money = (amount: number) => formatMoney(amount, { maximumFractionDigits: 2 });
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -194,7 +197,7 @@ export function CashSourcePicker({
           </span>
         </div>
         <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-500">
-          {selectedAsset && <><AssetVisual asset={selectedAsset} compact /><span>{assetTypeLabel(selectedAsset, language)}</span><span>•</span><span className={selectedAsset.value < 0 ? "font-bold text-amber-300" : ""}>{money(selectedAsset.value, locale, language)}</span></>}
+          {selectedAsset && <><AssetVisual asset={selectedAsset} compact /><span>{assetTypeLabel(selectedAsset, language)}</span><span>•</span><span className={selectedAsset.value < 0 ? "font-bold text-amber-300" : ""}>{money(selectedAsset.value)}</span></>}
         </div>
       </div>
       <ChevronDown size={17} className={`shrink-0 text-slate-500 transition ${open ? "rotate-180" : ""}`} />
@@ -241,7 +244,7 @@ export function CashSourcePicker({
                   <div className="min-w-0">
                     <span className="block truncate text-xs font-black text-white">{assetDisplayName(asset, language)}</span>
                     <span className={`mt-0.5 block truncate text-[10px] ${asset.value < 0 ? "font-bold text-amber-300" : "text-slate-500"}`}>
-                      {assetTypeLabel(asset, language)} · {money(asset.value, locale, language)}
+                      {assetTypeLabel(asset, language)} · {money(asset.value)}
                     </span>
                   </div>
                   {selected ? <Check size={17} className="text-blue-300" /> : <span />}
@@ -305,16 +308,12 @@ function assetDisplayName(asset: Asset, language: AppLanguage): string {
 
 function assetTypeLabel(asset: Asset, language: AppLanguage): string {
   if (asset.systemCash) return language === "pl" ? "Clearing systemowy" : language === "de" ? "Systemausgleich" : "System clearing";
-  if (asset.fxPriced && asset.cashCurrency) return `${language === "pl" ? "Gotówka" : "Cash"} · ${asset.cashCurrency}`;
+  if (asset.fxPriced && asset.cashCurrency) return `${language === "pl" ? "Gotówka" : language === "de" ? "Bargeld" : "Cash"} · ${asset.cashCurrency}`;
   return language === "pl" ? "Gotówka / konto" : language === "de" ? "Bargeld / Konto" : "Cash / account";
 }
 
-function money(value: number, locale: "pl-PL" | "en-US" | "de-DE", language: AppLanguage): string {
-  return `${value.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${language === "pl" ? "zł" : "PLN"}`;
-}
-
 function walletDisplayName(name: string | undefined, language: AppLanguage) {
-  if (!name) return language === "pl" ? "Portfel" : "Portfolio";
+  if (!name) return language === "pl" ? "Portfel" : language === "de" ? "Portfolio" : "Portfolio";
   const normalized = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   if (normalized === "glowny" || normalized === "main") return language === "pl" ? "Główny" : language === "de" ? "Hauptkonto" : "Main";
   return name;

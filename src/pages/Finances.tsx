@@ -53,7 +53,8 @@ import { getAssetCategory } from "../types/Asset";
 import type { PortfolioWallet } from "../types/Portfolio";
 import type { Goal } from "../types/Goal";
 import { portfolioApi } from "../api/portfolioApi";
-import { useLanguage, type AppLanguage } from "../i18n/LanguageContext";
+import { localize, useLanguage, type AppLanguage } from "../i18n/LanguageContext";
+import { useCurrency } from "../i18n/CurrencyContext";
 import { localizedCategoryName } from "../i18n/categoryNames";
 
 type FinancesProps = {
@@ -208,7 +209,8 @@ export function Finances({
   onDataImported,
 }: FinancesProps) {
   const { language, locale } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const { formatMoney } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
 
   const [
     isAddExpenseOpen,
@@ -634,7 +636,7 @@ export function Finances({
 
               <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-200/90">
                 <span className="rounded-full border border-emerald-400/15 bg-emerald-400/[0.08] px-2.5 py-1">
-                  {monthlyIncomes.length} {language === "pl" ? polishCountWord(monthlyIncomes.length, "źródło", "źródła", "źródeł") : monthlyIncomes.length === 1 ? "source" : "sources"}
+                  {monthlyIncomes.length} {language === "pl" ? polishCountWord(monthlyIncomes.length, "źródło", "źródła", "źródeł") : language === "de" ? (monthlyIncomes.length === 1 ? "Quelle" : "Quellen") : monthlyIncomes.length === 1 ? "source" : "sources"}
                 </span>
                 <span className="rounded-full border border-slate-700 bg-slate-950/50 px-2.5 py-1 text-slate-300">
                   {ui("Śledzenie wpływów", "Income tracking")}
@@ -645,11 +647,7 @@ export function Finances({
 
           <div className="flex items-center gap-3 sm:gap-5">
             <span className="text-lg font-black text-emerald-300 sm:text-xl">
-              +
-              {income.toLocaleString(
-                locale
-              )}{" "}
-              {language === "pl" ? "zł" : "PLN"}
+              {formatMoney(income, { maximumFractionDigits: 2, signDisplay: "always" })}
             </span>
 
             <button
@@ -790,10 +788,7 @@ export function Finances({
                   </div>
 
                   <span className="text-lg font-black text-slate-100 sm:text-xl">
-                    {categoryTotal.toLocaleString(
-                      locale
-                    )}{" "}
-                    {language === "pl" ? "zł" : "PLN"}
+                    {formatMoney(categoryTotal, { maximumFractionDigits: 2 })}
                   </span>
                 </div>
 
@@ -1040,7 +1035,8 @@ function TransactionVisualRow({
   onDelete,
 }: TransactionVisualRowProps) {
   const { language, locale } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const { formatMoney } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const amountClass =
     tone === "income"
       ? "text-emerald-300"
@@ -1138,8 +1134,7 @@ function TransactionVisualRow({
 
       <div className="ml-auto flex items-center gap-3">
         <div className={`min-w-[110px] text-right text-base font-black ${amountClass}`}>
-          {tone === "income" ? "+" : ""}
-          {amount.toLocaleString(locale)} {language === "pl" ? "zł" : "PLN"}
+          {formatMoney(amount, { maximumFractionDigits: 2, signDisplay: tone === "income" ? "always" : "auto" })}
         </div>
 
         <button
@@ -1165,7 +1160,7 @@ function TransactionVisualRow({
 }
 
 function formatTransactionDate(date: string | undefined, locale: "pl-PL" | "en-US" | "de-DE", language: AppLanguage) {
-  if (!date) return language === "pl" ? "Brak daty" : "No date";
+  if (!date) return language === "pl" ? "Brak daty" : language === "de" ? "Kein Datum" : "No date";
 
   const [year, month, day] = date.split("-");
   if (!year || !month || !day) return date;
@@ -1266,8 +1261,9 @@ function SummaryCard({
   progress,
 }: SummaryCardProps) {
   const { language, locale } = useLanguage();
+  const { formatMoney } = useCurrency();
   const palette = summaryAccent[accent];
-  const effectiveSuffix = suffix === " zł" ? (language === "pl" ? " zł" : " PLN") : suffix;
+  const isMoney = suffix === " zł";
 
   return (
     <div className={`group relative min-h-[180px] overflow-hidden rounded-2xl border ${palette.border} bg-gradient-to-br from-slate-900 via-slate-900/95 to-[#07111f] p-5 shadow-[0_18px_55px_rgba(0,0,0,0.22)] transition duration-300 hover:-translate-y-0.5 hover:border-slate-600`}>
@@ -1292,11 +1288,9 @@ function SummaryCard({
 
         <div className="mt-6">
           <div className={`text-[2rem] font-black leading-none tracking-tight ${color}`}>
-            {value.toLocaleString(locale, {
-              minimumFractionDigits: decimals,
-              maximumFractionDigits: decimals,
-            })}
-            {effectiveSuffix}
+            {isMoney
+              ? formatMoney(value, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+              : `${value.toLocaleString(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`}
           </div>
 
           <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
@@ -1307,7 +1301,7 @@ function SummaryCard({
           {progress !== undefined && (
             <div className="mt-4">
               <div className="mb-1.5 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-600">
-                <span>{language === "pl" ? "Postęp" : "Progress"}</span>
+                <span>{language === "pl" ? "Postęp" : language === "de" ? "Fortschritt" : "Progress"}</span>
                 <span>{Math.round(progress)}%</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">

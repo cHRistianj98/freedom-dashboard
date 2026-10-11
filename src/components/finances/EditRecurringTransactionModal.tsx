@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AlertCircle, CalendarClock, ChevronDown } from "lucide-react";
 import type { ExpenseCategory } from "../../types/Cashflow";
 import type { RecurringTransaction } from "../../types/RecurringTransaction";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
 import { DateInput, modalInputClass, ModalCloseButton, MoneyInput } from "./ModalFieldKit";
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
 
 export function EditRecurringTransactionModal({ rule, onClose, onSave }: Props) {
   const { language } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const [name, setName] = useState(rule.name);
   const [amount, setAmount] = useState(String(rule.amount));
   const [dayOfMonth, setDayOfMonth] = useState(String(rule.dayOfMonth));

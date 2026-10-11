@@ -37,6 +37,7 @@ import type {
   BudgetLimit,
   MonthlyBudgetPlan,
 } from "../types/Budget";
+import { formatDisplayMoney } from "../utils/displayMoney";
 
 type BudgetProps = {
   budget: MonthlyBudget;
@@ -1124,9 +1125,7 @@ function sum(values: number[]) {
 }
 
 function money(value: number) {
-  return `${Math.round(value).toLocaleString(
-    "pl-PL"
-  )} zł`;
+  return formatDisplayMoney(value, { maximumFractionDigits: 0 });
 }
 
 function shiftMonth(

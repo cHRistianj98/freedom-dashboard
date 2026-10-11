@@ -9,7 +9,7 @@ import { categoryApi } from "../../api/categoryApi";
 import { CategoryPicker } from "../categories/CategoryPicker";
 import { CashSourcePicker } from "./CashSourcePicker";
 import { CheckboxCard, DateInput, modalInputClass, ModalCloseButton, MoneyInput } from "./ModalFieldKit";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
 
 type EditIncomeModalProps = {
   income: Income;
@@ -27,7 +27,7 @@ export function EditIncomeModal({
   onSave,
 }: EditIncomeModalProps) {
   const { language } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const cashAssets = useMemo(
     () => assets.filter((asset) => asset.systemCash || getAssetCategory(asset) === "cash"),
     [assets]

@@ -6,9 +6,12 @@ import type { Goal } from "../../types/Goal";
 import type { Liability } from "../../types/Liability";
 import {
   getAchievements,
+  localizeAchievement,
   type Achievement,
 } from "./achievementEngine";
 import { AchievementUnlockPopup } from "./AchievementUnlockPopup";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
 type Props = {
   netWorth: number;
@@ -21,14 +24,19 @@ type Props = {
 const STORAGE_KEY = "freedom-seen-achievements-v1";
 
 export function AchievementUnlockManager(props: Props) {
+  const { language } = useLanguage();
+  const { formatMoney } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const achievements = useMemo(
-    () => getAchievements(props),
+    () => getAchievements(props).map((item) => localizeAchievement(item, language, (value) => formatMoney(value, { maximumFractionDigits: 0 }))),
     [
       props.netWorth,
       props.portfolio,
       props.goals,
       props.liabilities,
       props.monthlyBudget,
+      language,
+      formatMoney,
     ]
   );
 
@@ -99,9 +107,12 @@ export function AchievementUnlockManager(props: Props) {
     function handleTest() {
       const testAchievement: Achievement = {
         id: `dev-test-${Date.now()}`,
-        name: "Monster Month",
-        description:
-          "DEV TEST — tak będzie wyglądało prawdziwe odblokowanie achievementu.",
+        name: ui("Potężny miesiąc", "Monster Month", "Monster-Monat"),
+        description: ui(
+          "DEV TEST — tak będzie wyglądało prawdziwe odblokowanie osiągnięcia.",
+          "DEV TEST — this is how a real achievement unlock will look.",
+          "DEV TEST — so wird die echte Freischaltung eines Erfolgs aussehen."
+        ),
         category: "cashflow",
         rarity: "epic",
         xp: 350,
@@ -127,7 +138,7 @@ export function AchievementUnlockManager(props: Props) {
         handleTest
       );
     };
-  }, []);
+  }, [language]);
 
   const currentAchievement = queue[0];
 

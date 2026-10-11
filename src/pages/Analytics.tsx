@@ -23,6 +23,7 @@ import type { MonthlySnapshot } from "../types/MonthlySnapshot";
 import type { PortfolioWallet } from "../types/Portfolio";
 import { portfolioApi } from "../api/portfolioApi";
 import { useLanguage } from "../i18n/LanguageContext";
+import { convertPlnForDisplay, formatDisplayMoney, formatDisplayMoneyCompact } from "../utils/displayMoney";
 
 type AnalyticsProps = {
   monthlyBudget: MonthlyBudget;
@@ -737,7 +738,7 @@ function formatMonthShort(month:string,locale:string){const[y,m]=month.split("-"
 function formatMonthLong(month:string,locale:string){const[y,m]=month.split("-").map(Number);const s=new Intl.DateTimeFormat(locale,{month:"long",year:"numeric"}).format(new Date(y,m-1,1));return s.charAt(0).toUpperCase()+s.slice(1);}
 function formatDate(date:string,locale:string){return new Intl.DateTimeFormat(locale,{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(`${date}T12:00:00`));}
 function formatDateShort(date:string,locale:string){return new Intl.DateTimeFormat(locale,{day:"2-digit",month:"short"}).format(new Date(`${date}T12:00:00`)).replace(".","");}
-function formatMoney(value:number){return `${Math.round(value).toLocaleString("pl-PL")} zł`;}
-function formatSignedMoney(value:number){return `${value>=0?"+":"−"}${Math.round(Math.abs(value)).toLocaleString("pl-PL")} zł`;}
-function formatCompactMoney(value:number){const abs=Math.abs(value);if(abs>=1_000_000)return `${(value/1_000_000).toFixed(abs>=10_000_000?1:2)} mln zł`;if(abs>=1000)return `${(value/1000).toFixed(abs>=100_000?0:1)} tys. zł`;return formatMoney(value);}
-function formatAxisMoney(value:number){const abs=Math.abs(value);const sign=value<0?"−":"";if(abs>=1_000_000)return `${sign}${(abs/1_000_000).toFixed(abs>=10_000_000?0:1)}M`;if(abs>=1000)return `${sign}${Math.round(abs/1000)}k`;return `${sign}${Math.round(abs)}`;}
+function formatMoney(value:number){return formatDisplayMoney(value,{maximumFractionDigits:0});}
+function formatSignedMoney(value:number){return formatDisplayMoney(value,{maximumFractionDigits:0,signDisplay:"always"}).replace("-","−");}
+function formatCompactMoney(value:number){return formatDisplayMoneyCompact(value);}
+function formatAxisMoney(value:number){const converted=convertPlnForDisplay(value);const abs=Math.abs(converted);const sign=converted<0?"−":"";if(abs>=1_000_000)return `${sign}${(abs/1_000_000).toFixed(abs>=10_000_000?0:1)}M`;if(abs>=1000)return `${sign}${Math.round(abs/1000)}k`;return `${sign}${Math.round(abs)}`;}

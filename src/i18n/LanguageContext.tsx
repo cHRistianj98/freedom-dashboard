@@ -1800,16 +1800,48 @@ function translateSegments(value: string, language: AppLanguage) {
   return result;
 }
 
+type AttributeTranslationState = { source: string; lastRendered: string };
+const originalTextByNode = new WeakMap<Text, { source: string; lastRendered: string }>();
+const originalAttributesByElement = new WeakMap<Element, Map<string, AttributeTranslationState>>();
+
+function sourceTextForNode(node: Text) {
+  const current = node.nodeValue ?? "";
+  const state = originalTextByNode.get(node);
+  if (!state || current !== state.lastRendered) {
+    const next = { source: current, lastRendered: current };
+    originalTextByNode.set(node, next);
+    return next;
+  }
+  return state;
+}
+
+function sourceAttributeForElement(element: Element, attribute: string, current: string) {
+  let states = originalAttributesByElement.get(element);
+  if (!states) {
+    states = new Map();
+    originalAttributesByElement.set(element, states);
+  }
+  const state = states.get(attribute);
+  if (!state || current !== state.lastRendered) {
+    const next = { source: current, lastRendered: current };
+    states.set(attribute, next);
+    return next;
+  }
+  return state;
+}
+
 function translateAttributes(root: ParentNode, language: AppLanguage) {
   const elements = root instanceof Element
     ? [root, ...Array.from(root.querySelectorAll("[title], [aria-label], [placeholder]"))]
     : Array.from(root.querySelectorAll("[title], [aria-label], [placeholder]"));
   for (const element of elements) {
     for (const attribute of ["title", "aria-label", "placeholder"]) {
-      const value = element.getAttribute(attribute);
-      if (!value) continue;
-      const translated = translateExact(value, language);
-      if (translated !== value) element.setAttribute(attribute, translated);
+      const current = element.getAttribute(attribute);
+      if (!current) continue;
+      const state = sourceAttributeForElement(element, attribute, current);
+      const translated = translateExact(state.source, language);
+      if (translated !== current) element.setAttribute(attribute, translated);
+      state.lastRendered = translated;
     }
   }
 }
@@ -1818,15 +1850,16 @@ function translateTree(root: ParentNode, language: AppLanguage) {
   if (root instanceof Element && ["SCRIPT", "STYLE", "TEXTAREA"].includes(root.tagName)) return;
 
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  let node = walker.nextNode();
+  let node = walker.nextNode() as Text | null;
   while (node) {
     const parent = node.parentElement;
     if (parent && !["SCRIPT", "STYLE", "TEXTAREA"].includes(parent.tagName)) {
-      const original = node.nodeValue ?? "";
-      const translated = translateExact(original, language);
-      if (translated !== original) node.nodeValue = translated;
+      const state = sourceTextForNode(node);
+      const translated = translateExact(state.source, language);
+      if ((node.nodeValue ?? "") !== translated) node.nodeValue = translated;
+      state.lastRendered = translated;
     }
-    node = walker.nextNode();
+    node = walker.nextNode() as Text | null;
   }
 
   translateAttributes(root, language);
@@ -1911,9 +1944,16 @@ export function useLanguage() {
   return context;
 }
 
+
+export function localize(language: AppLanguage, pl: string, en: string, de?: string) {
+  if (language === "pl") return pl;
+  if (language === "en") return en;
+  return de ?? englishToGerman(en);
+}
+
 export function translateLevelName(name: string, language: AppLanguage) {
   const direct = levelPairs[name];
   if (direct) return direct[language];
-  const entry = Object.values(levelPairs).find((pair) => pair.pl === name || pair.en === name);
+  const entry = Object.values(levelPairs).find((pair) => pair.pl === name || pair.en === name || pair.de === name);
   return entry ? entry[language] : name;
 }

@@ -1,12 +1,22 @@
-import { Check, Languages, Settings2 } from "lucide-react";
-import { useLanguage, type AppLanguage } from "../i18n/LanguageContext";
+import { Check, Languages, RefreshCw, Settings2, WalletCards } from "lucide-react";
+import { useLanguage, type AppLanguage, localize } from "../i18n/LanguageContext";
+import { useCurrency, type DisplayCurrency } from "../i18n/CurrencyContext";
 
 export function Settings() {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, t, locale } = useLanguage();
+  const {
+    displayCurrency,
+    setDisplayCurrency,
+    usdPlnRate,
+    rateUpdatedAt,
+    loadingRate,
+    refreshRate,
+  } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
 
   return (
     <main className="min-h-screen bg-[#050b16] p-8">
-      <section className="mx-auto max-w-4xl">
+      <section className="mx-auto max-w-5xl">
         <div className="flex items-center gap-4 border-b border-slate-800 pb-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-300">
             <Settings2 size={22} />
@@ -29,31 +39,74 @@ export function Settings() {
           </div>
 
           <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <LanguageCard
-              value="pl"
-              selected={language === "pl"}
-              title={t("polish")}
-              description={t("polishDescription")}
+            <LanguageCard value="pl" selected={language === "pl"} title="Polski" description={t("polishDescription")} flag="🇵🇱" onSelect={setLanguage} />
+            <LanguageCard value="en" selected={language === "en"} title="English" description={t("englishDescription")} flag="🇬🇧" onSelect={setLanguage} />
+            <LanguageCard value="de" selected={language === "de"} title="Deutsch" description={t("germanDescription")} flag="🇩🇪" onSelect={setLanguage} />
+          </div>
+        </div>
+
+        <div className="mt-5 rounded-3xl border border-slate-800 bg-[#0b1322] p-6">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-300">
+                <WalletCards size={19} />
+              </div>
+              <div>
+                <h2 className="font-black text-white">{ui("Waluta widoku", "Display currency", "Anzeigewährung")}</h2>
+                <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-500">
+                  {ui(
+                    "Zmienia sposób wyświetlania wartości w aplikacji. Dane księgowe i wartości zapisane w bazie nadal pozostają w PLN.",
+                    "Changes how values are displayed across the app. Accounting data and stored values remain in PLN.",
+                    "Ändert die Anzeige der Werte in der App. Buchungsdaten und gespeicherte Werte bleiben weiterhin in PLN."
+                  )}
+                </p>
+              </div>
+            </div>
+            {displayCurrency === "USD" && (
+              <button
+                type="button"
+                onClick={() => void refreshRate()}
+                disabled={loadingRate}
+                className="inline-flex cursor-pointer items-center gap-2 self-start rounded-xl border border-slate-700 bg-slate-950/50 px-3 py-2 text-xs font-bold text-slate-300 transition hover:border-slate-600 hover:bg-slate-900 disabled:cursor-wait disabled:opacity-60"
+              >
+                <RefreshCw size={14} className={loadingRate ? "animate-spin" : ""} />
+                {ui("Odśwież kurs", "Refresh rate", "Kurs aktualisieren")}
+              </button>
+            )}
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <CurrencyCard
+              value="PLN"
+              selected={displayCurrency === "PLN"}
               flag="🇵🇱"
-              onSelect={setLanguage}
+              title="PLN"
+              description={ui("Złoty polski — waluta bazowa Freedom", "Polish złoty — Freedom base currency", "Polnischer Złoty — Basiswährung von Freedom")}
+              onSelect={setDisplayCurrency}
             />
-            <LanguageCard
-              value="en"
-              selected={language === "en"}
-              title={t("english")}
-              description={t("englishDescription")}
-              flag="🇬🇧"
-              onSelect={setLanguage}
-            />
-            <LanguageCard
-              value="de"
-              selected={language === "de"}
-              title={t("german")}
-              description={t("germanDescription")}
-              flag="🇩🇪"
-              onSelect={setLanguage}
+            <CurrencyCard
+              value="USD"
+              selected={displayCurrency === "USD"}
+              flag="🇺🇸"
+              title="USD"
+              description={
+                usdPlnRate
+                  ? ui(
+                      `1 USD = ${usdPlnRate.toLocaleString(locale, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} PLN`,
+                      `1 USD = ${usdPlnRate.toLocaleString(locale, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} PLN`,
+                      `1 USD = ${usdPlnRate.toLocaleString(locale, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} PLN`
+                    )
+                  : ui("Kurs zostanie pobrany automatycznie", "The rate will be loaded automatically", "Der Kurs wird automatisch geladen")
+              }
+              onSelect={setDisplayCurrency}
             />
           </div>
+
+          {displayCurrency === "USD" && rateUpdatedAt && (
+            <p className="mt-3 text-[11px] text-slate-600">
+              {ui("Kurs zaktualizowany", "Rate updated", "Kurs aktualisiert")}: {new Date(rateUpdatedAt).toLocaleString(locale)}
+            </p>
+          )}
         </div>
       </section>
     </main>
@@ -79,26 +132,64 @@ function LanguageCard({
     <button
       type="button"
       onClick={() => onSelect(value)}
-      className={`group flex cursor-pointer items-center gap-4 rounded-2xl border p-4 text-left transition ${
+      className={`group flex cursor-pointer items-center gap-4 rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 ${
         selected
           ? "border-cyan-400/60 bg-cyan-500/10 shadow-[0_0_0_1px_rgba(34,211,238,.12)]"
           : "border-slate-800 bg-slate-950/40 hover:border-slate-600 hover:bg-slate-900/70"
       }`}
     >
-      <span className="text-2xl">{flag}</span>
+      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-slate-950/55 text-3xl shadow-inner shadow-black/30">{flag}</span>
       <span className="min-w-0 flex-1">
-        <span className="block font-black text-white">{title}</span>
-        <span className="mt-1 block text-xs text-slate-500">{description}</span>
+        <span className="block text-base font-black text-white">{title}</span>
+        <span className="mt-1 block text-xs leading-5 text-slate-500">{description}</span>
       </span>
-      <span
-        className={`flex h-7 w-7 items-center justify-center rounded-full border transition ${
-          selected
-            ? "border-cyan-400 bg-cyan-400 text-slate-950"
-            : "border-slate-700 text-transparent group-hover:border-slate-500"
-        }`}
-      >
-        <Check size={15} strokeWidth={3} />
-      </span>
+      <CheckBubble selected={selected} />
     </button>
+  );
+}
+
+function CurrencyCard({
+  value,
+  selected,
+  title,
+  description,
+  flag,
+  onSelect,
+}: {
+  value: DisplayCurrency;
+  selected: boolean;
+  title: string;
+  description: string;
+  flag: string;
+  onSelect: (value: DisplayCurrency) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(value)}
+      className={`group flex cursor-pointer items-center gap-4 rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 ${
+        selected
+          ? "border-emerald-400/60 bg-emerald-500/10 shadow-[0_0_0_1px_rgba(52,211,153,.12)]"
+          : "border-slate-800 bg-slate-950/40 hover:border-slate-600 hover:bg-slate-900/70"
+      }`}
+    >
+      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-slate-950/55 text-3xl">{flag}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-base font-black text-white">{title}</span>
+        <span className="mt-1 block text-xs leading-5 text-slate-500">{description}</span>
+      </span>
+      <CheckBubble selected={selected} tone="emerald" />
+    </button>
+  );
+}
+
+function CheckBubble({ selected, tone = "cyan" }: { selected: boolean; tone?: "cyan" | "emerald" }) {
+  const selectedClass = tone === "emerald"
+    ? "border-emerald-400 bg-emerald-400 text-slate-950"
+    : "border-cyan-400 bg-cyan-400 text-slate-950";
+  return (
+    <span className={`flex h-7 w-7 items-center justify-center rounded-full border transition ${selected ? selectedClass : "border-slate-700 text-transparent group-hover:border-slate-500"}`}>
+      <Check size={15} strokeWidth={3} />
+    </span>
   );
 }

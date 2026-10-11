@@ -5,8 +5,9 @@ import type { Asset } from "../../types/Asset";
 import type { Goal, GoalPriority } from "../../types/Goal";
 import type { Liability } from "../../types/Liability";
 import type { MonthlyBudget } from "../../types/Cashflow";
-import type { AppLanguage } from "../../i18n/LanguageContext";
+import { localize, type AppLanguage } from "../../i18n/LanguageContext";
 import { calculateFreedomEngine } from "../freedom/freedomEngine";
+import { formatDisplayMoney } from "../../utils/displayMoney";
 
 export type MissionPriority = "CRITICAL" | "HIGH" | "MEDIUM" | "GROWTH";
 export type MissionStatus = "ACTIVE" | "COMPLETE";
@@ -44,7 +45,7 @@ export function getFreedomMissions(
   input: MissionEngineInput,
   language: AppLanguage = "pl"
 ): FreedomMission[] {
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const engine = calculateFreedomEngine(input, language);
 
   const activeGoals = input.goals
@@ -126,7 +127,7 @@ export function getFreedomMissions(
 }
 
 function toGoalMission(goal: Goal, language: AppLanguage): FreedomMission {
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const target = Math.max(goal.targetAmount, 0);
   const current = Math.max(goal.currentAmount, 0);
   const complete = target > 0 && current >= target;
@@ -158,7 +159,7 @@ function toGoalMission(goal: Goal, language: AppLanguage): FreedomMission {
 }
 
 function buildGoalDescription(goal: Goal, language: AppLanguage) {
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   switch (goal.type) {
     case "EMERGENCY_FUND":
       return ui(
@@ -206,11 +207,7 @@ function clamp(value: number) {
 }
 
 function formatMoney(value: number, language: AppLanguage) {
-  return new Intl.NumberFormat(language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US", {
-    style: "currency",
-    currency: "PLN",
-    maximumFractionDigits: 0,
-  }).format(Math.round(value));
+  return formatDisplayMoney(value, { language, maximumFractionDigits: 0 });
 }
 
 function formatSignedMoney(value: number, language: AppLanguage) {

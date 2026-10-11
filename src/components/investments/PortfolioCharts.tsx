@@ -7,17 +7,19 @@ import type { LiabilityAllocationOverview } from "../../types/LiabilityAllocatio
 import type { MonthlySnapshot } from "../../types/MonthlySnapshot";
 import type { PortfolioWallet } from "../../types/Portfolio";
 import { portfolioHistory, wealthBreakdown, type Breakdown } from "./portfolioView";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
 export function Donut({ rows, total, small = false }: { rows: Breakdown[]; total?: number; small?: boolean }) {
-  const { language, locale } = useLanguage();
-  const displayMoney = (value: number) => new Intl.NumberFormat(locale, { style: "currency", currency: "PLN", maximumFractionDigits: 2 }).format(value);
+  const { language } = useLanguage();
+  const { formatMoney } = useCurrency();
+  const displayMoney = (value: number) => formatMoney(value, { maximumFractionDigits: 2 });
   const positive = rows.filter(row => row.value > 0).sort((a, b) => b.value - a.value);
   const sum = positive.reduce((value, row) => value + row.value, 0);
   const shadowId = `donutShadow-${useId().replace(/:/g, "")}`;
   let offset = 0;
   return <div className={small ? "investment-donut small" : "investment-donut"}>
-    <svg viewBox={small ? "0 0 120 120" : "0 0 120 126"} role="img" aria-label={positive.length ? positive.map(row => `${row.name}: ${displayMoney(row.value)}`).join(", ") : language === "pl" ? "Brak aktywów" : "No assets"}>
+    <svg viewBox={small ? "0 0 120 120" : "0 0 120 126"} role="img" aria-label={positive.length ? positive.map(row => `${row.name}: ${displayMoney(row.value)}`).join(", ") : localize(language, "Brak aktywów", "No assets", "Keine Anlagen")}>
       {!small && <defs>
         <filter id={shadowId} x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="5" stdDeviation="4" floodColor="#000814" floodOpacity=".65"/></filter>
       </defs>}
@@ -44,7 +46,7 @@ export function Donut({ rows, total, small = false }: { rows: Breakdown[]; total
       </g>
       {!small && <circle cx="60" cy="60" r="35.5" className="investment-donut-inner"/>}
     </svg>
-    {!small && <div className="investment-donut-label"><strong>{displayMoney(total ?? sum)}</strong><span>{language === "pl" ? "Łączny majątek" : "Total net worth"}</span></div>}
+    {!small && <div className="investment-donut-label"><strong>{displayMoney(total ?? sum)}</strong><span>{localize(language, "Łączny majątek", "Total net worth", "Gesamtvermögen")}</span></div>}
   </div>;
 }
 
@@ -52,8 +54,9 @@ export function WealthChart({ assets, wallets, overview, liabilityOverview, tota
   assets: Asset[]; wallets: PortfolioWallet[]; overview: MoneyFlowOverview | null; liabilityOverview?: LiabilityAllocationOverview | null; total: number; snapshots: MonthlySnapshot[];
 }) {
   const { language, locale } = useLanguage();
-  const ui = (pl: string, en: string) => language === "pl" ? pl : en;
-  const displayMoney = (value: number) => new Intl.NumberFormat(locale, { style: "currency", currency: "PLN", maximumFractionDigits: 2 }).format(value);
+  const { formatMoney } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const displayMoney = (value: number) => formatMoney(value, { maximumFractionDigits: 2 });
   const displayPercent = (value: number, base: number) => `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(base > 0 ? value / base * 100 : 0)}%`;
   const [mode, setMode] = useState<"portfolios" | "assets" | "goals">("portfolios");
   const rows = [...wealthBreakdown(mode, assets, wallets, overview, liabilityOverview ?? null)]
@@ -165,8 +168,9 @@ function assetCategoryMonthlyChanges(assets: Asset[], snapshots: MonthlySnapshot
 
 export function HistoryChart({ snapshots, total }: { snapshots: MonthlySnapshot[]; total: number }) {
   const { language, locale } = useLanguage();
-  const ui = (pl: string, en: string) => language === "pl" ? pl : en;
-  const displayMoney = (value: number) => new Intl.NumberFormat(locale, { style: "currency", currency: "PLN", maximumFractionDigits: 2 }).format(value);
+  const { formatMoney, convertFromPln } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const displayMoney = (value: number) => formatMoney(value, { maximumFractionDigits: 2 });
   const [period, setPeriod] = useState("1R");
   const gradient = useId().replace(/:/g, "");
   const data = portfolioHistory(snapshots, total, { "6M": 6, "1R": 12, "5L": 60, MAX: null }[period] ?? null);
@@ -185,7 +189,7 @@ export function HistoryChart({ snapshots, total }: { snapshots: MonthlySnapshot[
           <CartesianGrid stroke="#14253b" vertical={true} />
           <XAxis dataKey="time" type="number" domain={["dataMin", "dataMax"]} scale="time" minTickGap={35} tickLine={false} axisLine={{ stroke: "#34465e" }} tick={{ fill: "#a2b9d7", fontSize: 10 }}
             tickFormatter={value => new Date(value).toLocaleDateString(locale, { month: "short" })} />
-          <YAxis tickLine={false} axisLine={false} tick={{ fill: "#a2b9d7", fontSize: 10 }} tickFormatter={value => Intl.NumberFormat(locale, { notation: "compact" }).format(value)} />
+          <YAxis tickLine={false} axisLine={false} tick={{ fill: "#a2b9d7", fontSize: 10 }} tickFormatter={value => Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 }).format(convertFromPln(Number(value)))} />
           <Tooltip contentStyle={{ background: "#071322", border: "1px solid #25476c", borderRadius: 9, color: "#fff" }}
             labelFormatter={value => new Date(Number(value)).toLocaleDateString(locale, { month: "long", year: "numeric" })}
             formatter={value => [displayMoney(Number(value)), ui("Wartość aktywów", "Asset value")]} />

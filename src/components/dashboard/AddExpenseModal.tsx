@@ -12,7 +12,7 @@ import type { PortfolioWallet } from "../../types/Portfolio";
 import type { SpendableGoal } from "../../types/GoalSpending";
 import { CheckboxCard, DateInput, modalInputClass, ModalCloseButton, MoneyInput } from "../finances/ModalFieldKit";
 import { GoalLinkPicker } from "../finances/GoalLinkPicker";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
 
 type AddExpenseModalProps = {
   assets: Asset[];
@@ -35,7 +35,7 @@ export function AddExpenseModal({
   onAdd,
 }: AddExpenseModalProps) {
   const { language, locale } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const cashAssets = useMemo(
     () => assets.filter((asset) => asset.systemCash || getAssetCategory(asset) === "cash"),
     [assets]
@@ -147,11 +147,13 @@ export function AddExpenseModal({
       const available = `${selectedGoal.reservedOnAsset.toLocaleString(locale, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })} ${language === "pl" ? "zł" : "PLN"}`;
+      })} ${language === "pl" ? "zł" : language === "de" ? "PLN" : "PLN"}`;
       return setError(
-        language === "pl"
-          ? `Cel „${selectedGoal.name}” ma na tym aktywie dostępne ${available} rezerwy.`
-          : `Goal “${selectedGoal.name}” has ${available} of reserve available on this asset.`
+        ui(
+          `Cel „${selectedGoal.name}” ma na tym aktywie dostępne ${available} rezerwy.`,
+          `Goal “${selectedGoal.name}” has ${available} of reserve available on this asset.`,
+          `Das Ziel „${selectedGoal.name}” hat auf diesem Vermögenswert ${available} Reserve verfügbar.`
+        )
       );
     }
 

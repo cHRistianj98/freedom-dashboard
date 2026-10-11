@@ -5,6 +5,8 @@ import type { MoneyFlowOverview, PortfolioAllocation } from "../../types/GoalAll
 import type { LiabilityAllocationOverview } from "../../types/LiabilityAllocation";
 import type { MonthlySnapshot } from "../../types/MonthlySnapshot";
 import type { PortfolioWallet } from "../../types/Portfolio";
+import { formatDisplayMoney, localeForLanguage, readStoredLanguage } from "../../utils/displayMoney";
+import { localize } from "../../i18n/LanguageContext";
 
 export const portfolioColors = ["#318bff", "#35d5a4", "#ffbf3f", "#f74763", "#8b5cf6", "#39c6d6"];
 export type Breakdown = { id: string; name: string; value: number; color: string };
@@ -14,11 +16,9 @@ export type FundedGoal = {
   sources: string[]; allocations: PortfolioAllocation[];
 };
 
-export const money = (value: number) => new Intl.NumberFormat("pl-PL", {
-  style: "currency", currency: "PLN", useGrouping: "always", maximumFractionDigits: 2, minimumFractionDigits: 0,
-}).format(value);
+export const money = (value: number) => formatDisplayMoney(value, { maximumFractionDigits: 2, minimumFractionDigits: 0 });
 export const percent = (value: number, total: number) =>
-  new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 1 }).format(total > 0 ? value / total * 100 : 0) + "%";
+  new Intl.NumberFormat(localeForLanguage(readStoredLanguage()), { maximumFractionDigits: 1 }).format(total > 0 ? value / total * 100 : 0) + "%";
 
 export function allocationsByAsset(overview: MoneyFlowOverview | null) {
   const result = new Map<number, number>();
@@ -58,7 +58,7 @@ export function fundedGoals(overview: MoneyFlowOverview | null, goals: Goal[], a
     const asset = assets.find(item => item.id === allocation.assetId);
     const source = wallets.find(item => item.id === (allocation.portfolioId ?? asset?.portfolioId))?.name
       ?? allocation.portfolioName
-      ?? "Nieprzypisane źródło";
+      ?? localize(readStoredLanguage(), "Nieprzypisane źródło", "Unassigned source", "Nicht zugewiesene Quelle");
     if (!row.sources.includes(source)) row.sources.push(source);
     result.set(row.id, row);
   }
@@ -90,18 +90,18 @@ export function wealthBreakdown(mode: "portfolios" | "assets" | "goals", assets:
       entry.value += row.amount;
       rows.set(row.goalId, entry);
     }
-    const result: Breakdown[] = [{ id: "available", name: "Kapitał dostępny", value: assets.reduce((sum, a) => sum + a.value, 0) - locked, color: "#318bff" }, ...rows.values()];
-    if (liabilitiesLocked > 0) result.push({ id: "liabilities", name: "Na spłatę zobowiązań", value: liabilitiesLocked, color: "#f59e0b" });
+    const result: Breakdown[] = [{ id: "available", name: localize(readStoredLanguage(), "Kapitał dostępny", "Available capital", "Verfügbares Kapital"), value: assets.reduce((sum, a) => sum + a.value, 0) - locked, color: "#318bff" }, ...rows.values()];
+    if (liabilitiesLocked > 0) result.push({ id: "liabilities", name: localize(readStoredLanguage(), "Na spłatę zobowiązań", "For liability repayment", "Für Schuldentilgung"), value: liabilitiesLocked, color: "#f59e0b" });
     return result;
   }
   const rows = wallets.filter(w => w.type !== "GOALS").map(wallet => ({
-    id: String(wallet.id), name: wallet.name + (wallet.allocatedOut > 0 ? " · dostępne" : ""), color: wallet.color,
+    id: String(wallet.id), name: wallet.name + (wallet.allocatedOut > 0 ? localize(readStoredLanguage(), " · dostępne", " · available", " · verfügbar") : ""), color: wallet.color,
     value: assets.filter(asset => asset.portfolioId === wallet.id).reduce((sum, a) => sum + a.value - (reserved.get(a.id) ?? 0), 0),
   }));
   const unassigned = assets.filter(a => !wallets.some(w => w.id === a.portfolioId)).reduce((sum, a) => sum + a.value - (reserved.get(a.id) ?? 0), 0);
-  if (unassigned !== 0) rows.push({ id: "unassigned", name: "Bez portfela", value: unassigned, color: "#64748b" });
-  if (goalsLocked > 0) rows.push({ id: "locked-goals", name: "Przypisane do celów", value: goalsLocked, color: "#8b5cf6" });
-  if (liabilitiesLocked > 0) rows.push({ id: "locked-liabilities", name: "Na spłatę zobowiązań", value: liabilitiesLocked, color: "#f59e0b" });
+  if (unassigned !== 0) rows.push({ id: "unassigned", name: localize(readStoredLanguage(), "Bez portfela", "No portfolio", "Ohne Portfolio"), value: unassigned, color: "#64748b" });
+  if (goalsLocked > 0) rows.push({ id: "locked-goals", name: localize(readStoredLanguage(), "Przypisane do celów", "Allocated to goals", "Zielen zugeordnet"), value: goalsLocked, color: "#8b5cf6" });
+  if (liabilitiesLocked > 0) rows.push({ id: "locked-liabilities", name: localize(readStoredLanguage(), "Na spłatę zobowiązań", "For liability repayment", "Für Schuldentilgung"), value: liabilitiesLocked, color: "#f59e0b" });
   return rows;
 }
 

@@ -32,6 +32,7 @@ import { goalAllocationApi } from "../api/goalAllocationApi";
 import { liabilityAllocationApi } from "../api/liabilityAllocationApi";
 import { portfolioApi } from "../api/portfolioApi";
 import type { PortfolioWallet } from "../types/Portfolio";
+import { formatDisplayMoney } from "../utils/displayMoney";
 
 
 type Props = {
@@ -42,7 +43,7 @@ type Props = {
   onDeleteLiability: (id: number) => void;
 };
 
-const money = (value: number) => `${value.toLocaleString("pl-PL", { maximumFractionDigits: 2 })} zł`;
+const money = (value: number) => formatDisplayMoney(value, { maximumFractionDigits: 2 });
 
 export function Liabilities({
   liabilities,

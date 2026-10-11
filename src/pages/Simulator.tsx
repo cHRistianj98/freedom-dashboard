@@ -14,6 +14,8 @@ import {
   WalletCards,
 } from "lucide-react";
 
+import { formatDisplayMoney, formatDisplayMoneyCompact } from "../utils/displayMoney";
+
 type SimulatorProps = {
   netWorth: number;
   rollingMonthlyCashflow?: number;
@@ -745,7 +747,7 @@ export function Simulator({
                   />
                   <ScenarioMetric
                     label="Wpłata"
-                    value={`${scenario.monthlyContribution.toLocaleString("pl-PL")} zł`}
+                    value={formatMoney(scenario.monthlyContribution)}
                   />
                   <ScenarioMetric
                     label={`Majątek za ${years} lat`}
@@ -1741,59 +1743,14 @@ function findMilestoneYear(
  * =========================================
  */
 
-function formatMoney(
-  value: number
-) {
-  return `${Math.round(
-    value
-  ).toLocaleString(
-    "pl-PL"
-  )} zł`;
+function formatMoney(value: number) {
+  return formatDisplayMoney(value, { maximumFractionDigits: 0 });
 }
 
-function formatSignedMoney(
-  value: number
-) {
-  const rounded = Math.round(value);
-  const sign =
-    rounded > 0 ? "+" : "";
-
-  return `${sign}${rounded.toLocaleString(
-    "pl-PL"
-  )} zł`;
+function formatSignedMoney(value: number) {
+  return formatDisplayMoney(value, { maximumFractionDigits: 0, signDisplay: "always" });
 }
 
-function formatCompactMoney(
-  value: number
-) {
-  if (
-    Math.abs(value) >=
-    1_000_000
-  ) {
-    return `${(
-      value / 1_000_000
-    ).toLocaleString(
-      "pl-PL",
-      {
-        maximumFractionDigits: 1,
-      }
-    )} mln`;
-  }
-
-  if (
-    Math.abs(value) >=
-    1_000
-  ) {
-    return `${Math.round(
-      value / 1_000
-    ).toLocaleString(
-      "pl-PL"
-    )}k`;
-  }
-
-  return Math.round(
-    value
-  ).toLocaleString(
-    "pl-PL"
-  );
+function formatCompactMoney(value: number) {
+  return formatDisplayMoneyCompact(value);
 }

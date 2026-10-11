@@ -12,7 +12,7 @@ import { CategoryPicker } from "../categories/CategoryPicker";
 import { CashSourcePicker } from "./CashSourcePicker";
 import { CheckboxCard, DateInput, modalInputClass, ModalCloseButton, MoneyInput } from "./ModalFieldKit";
 import { GoalLinkPicker } from "./GoalLinkPicker";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
 
 type EditExpenseModalProps = {
   expense: Expense;
@@ -37,7 +37,7 @@ export function EditExpenseModal({
   onSave,
 }: EditExpenseModalProps) {
   const { language } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const cashAssets = useMemo(
     () => assets.filter((asset) => asset.systemCash || getAssetCategory(asset) === "cash"),
     [assets]

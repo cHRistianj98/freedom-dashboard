@@ -14,6 +14,7 @@ import type { MonthlyBudget } from "../types/Cashflow";
 import type { MonthlySnapshot } from "../types/MonthlySnapshot";
 import type { NetWorthSnapshot } from "../types/NetWorthHistory";
 import { useLanguage } from "../i18n/LanguageContext";
+import { convertPlnForDisplay, formatDisplayMoney, readStoredLanguage } from "../utils/displayMoney";
 
 type FinancialTimelineProps = {
   netWorth: number;
@@ -457,10 +458,12 @@ function WealthChart({
 }
 
 function formatAxisMoney(value: number) {
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `${(value / 1_000_000).toLocaleString("pl-PL", { maximumFractionDigits: 1 })} mln`;
-  if (abs >= 1_000) return `${Math.round(value / 1_000).toLocaleString("pl-PL")}k`;
-  return Math.round(value).toLocaleString("pl-PL");
+  const converted = convertPlnForDisplay(value);
+  const abs = Math.abs(converted);
+  const locale = readStoredLanguage() === "de" ? "de-DE" : readStoredLanguage() === "en" ? "en-US" : "pl-PL";
+  if (abs >= 1_000_000) return `${(converted / 1_000_000).toLocaleString(locale, { maximumFractionDigits: 1 })}M`;
+  if (abs >= 1_000) return `${Math.round(converted / 1_000).toLocaleString(locale)}k`;
+  return Math.round(converted).toLocaleString(locale);
 }
 
 function SummaryCard({
@@ -550,7 +553,7 @@ function sum(values: number[]) {
 }
 
 function formatMoney(value: number) {
-  return `${Math.round(value).toLocaleString("pl-PL")} PLN`;
+  return formatDisplayMoney(value, { maximumFractionDigits: 0 });
 }
 
 function signedMoney(value: number) {

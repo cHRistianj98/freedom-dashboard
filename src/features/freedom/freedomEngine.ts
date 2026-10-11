@@ -2,7 +2,8 @@ import type { Asset } from "../../types/Asset";
 import { getAssetCategory } from "../../types/Asset";
 import type { Liability } from "../../types/Liability";
 import type { MonthlyBudget } from "../../types/Cashflow";
-import type { AppLanguage } from "../../i18n/LanguageContext";
+import { localize, type AppLanguage } from "../../i18n/LanguageContext";
+import { formatDisplayMoney } from "../../utils/displayMoney";
 
 export type FreedomEngineInput = {
   netWorth: number;
@@ -77,7 +78,7 @@ export function calculateFreedomEngine({
   liabilities,
   monthlyBudget,
 }: FreedomEngineInput, language: AppLanguage = "pl"): FreedomEngineResult {
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const monthlyStats = buildMonthlyStats(monthlyBudget);
   const rolling = monthlyStats.slice(-3);
   const rollingMonths = rolling.length;
@@ -364,7 +365,7 @@ function buildIntelligence({
   unclassifiedAssets: number;
   language: AppLanguage;
 }): FreedomInsight[] {
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
   const insights: FreedomInsight[] = [];
 
   if (unclassifiedAssets > 0) {
@@ -481,12 +482,11 @@ function addMonthsToToday(months: number, language: AppLanguage) {
 }
 
 function formatMoney(value: number) {
-  return `${Math.round(value).toLocaleString("pl-PL")} zł`;
+  return formatDisplayMoney(value, { maximumFractionDigits: 0 });
 }
 
 function formatSignedMoney(value: number) {
-  const prefix = value >= 0 ? "+" : "";
-  return `${prefix}${Math.round(value).toLocaleString("pl-PL")} zł`;
+  return formatDisplayMoney(value, { maximumFractionDigits: 0, signDisplay: "always" });
 }
 
 function formatMonths(months: number) {

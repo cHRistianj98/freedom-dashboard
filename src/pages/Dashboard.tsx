@@ -34,7 +34,8 @@ import { PortfolioOverviewSection } from "../components/dashboard/PortfolioOverv
 import { LiabilitiesSection } from "../components/dashboard/LiabilitiesSection";
 import { CashflowSection } from "../components/dashboard/CashflowSection";
 import { AddExpenseModal } from "../components/dashboard/AddExpenseModal";
-import { useLanguage, type AppLanguage } from "../i18n/LanguageContext";
+import { localize, useLanguage, type AppLanguage } from "../i18n/LanguageContext";
+import { formatDisplayMoney, formatDisplayMoneyCompact } from "../utils/displayMoney";
 
 import {
   calculatePlayerLevel,
@@ -156,7 +157,7 @@ export function Dashboard({
   onAddExpense,
 }: DashboardProps) {
   const { t, language, levelName: translateLevelName } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
 
   const [
     isAddExpenseOpen,
@@ -2550,14 +2551,8 @@ function formatMonthShort(
     .replace(".", "");
 }
 
-function formatMoney(
-  value: number
-) {
-  return `${Math.round(
-    value
-  ).toLocaleString(
-    "pl-PL"
-  )} zł`;
+function formatMoney(value: number) {
+  return formatDisplayMoney(value, { maximumFractionDigits: 0 });
 }
 
 function formatSignedMoney(
@@ -2618,31 +2613,8 @@ function formatMoneyComparison(
   )}% vs ${previousMonthLabel}`;
 }
 
-function formatCompactMoney(
-  value: number
-) {
-  if (value >= 1_000_000) {
-    const millions =
-      value / 1_000_000;
-
-    return `${millions.toLocaleString(
-      "pl-PL",
-      {
-        maximumFractionDigits:
-          1,
-      }
-    )} mln`;
-  }
-
-  if (value >= 1000) {
-    return `${Math.round(
-      value / 1000
-    )}k`;
-  }
-
-  return value.toLocaleString(
-    "pl-PL"
-  );
+function formatCompactMoney(value: number) {
+  return formatDisplayMoneyCompact(value);
 }
 
 function findFreedomLevel(

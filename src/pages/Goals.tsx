@@ -19,7 +19,8 @@ import {
 
 import { AddGoalModal } from "../components/goals/AddGoalModal";
 import { EditGoalModal } from "../components/goals/EditGoalModal";
-import { GOAL_TYPE_OPTIONS, getGoalTypeLabel, readGoalImageFile } from "../components/goals/goalCatalog";
+import { GOAL_TYPE_OPTIONS, getGoalTypeLabel, getGoalVisual, readGoalImageFile } from "../components/goals/goalCatalog";
+import { formatDisplayMoney, localeForLanguage, readStoredLanguage } from "../utils/displayMoney";
 
 import type { Goal } from "../types/Goal";
 import type { Asset } from "../types/Asset";
@@ -232,33 +233,18 @@ export function Goals({
               className="overflow-hidden rounded-2xl border border-slate-800 bg-[#0b1322] shadow-sm transition hover:border-slate-700"
             >
               {/* HERO — zdjęcie jest osobną sekcją NAD paskiem postępu */}
-              <div
-                className={`relative overflow-hidden ${
-                  goal.imageUrl ? "h-56" : "h-36"
-                }`}
-              >
-                {goal.imageUrl ? (
+              {(() => {
+                const visual = getGoalVisual(goal.type);
+                const imageUrl = goal.imageUrl || visual.image;
+                const objectPosition = goal.imagePosition ?? visual.imagePosition;
+                return <div className="relative h-52 overflow-hidden sm:h-56">
                   <img
-                    src={goal.imageUrl}
+                    src={imageUrl}
                     alt={goal.name}
-                    className={`absolute inset-0 h-full w-full object-cover ${
-                      goal.imagePosition === "top"
-                        ? "object-top"
-                        : goal.imagePosition === "bottom"
-                          ? "object-bottom"
-                          : "object-center"
-                    }`}
+                    className="absolute inset-0 h-full w-full object-cover transition duration-500 hover:scale-[1.03]"
+                    style={{ objectPosition, transform: `scale(${goal.imageUrl ? 1.02 : visual.imageScale})` }}
                   />
-                ) : (
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background: `linear-gradient(135deg, ${goal.color}22, #07101d 70%)`,
-                    }}
-                  />
-                )}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-[#07101d] via-[#07101d]/20 to-black/15" />
+                  <div className={`absolute inset-0 bg-gradient-to-t ${visual.overlayClass}`} />
 
                 <div className="absolute left-4 top-4">
                   <div
@@ -334,17 +320,18 @@ export function Goals({
                     </span>
                   </div>
                 </div>
-              </div>
+              </div>;
+              })()}
 
               {/* CONTENT — jak w mockupie: kwota + progress bez zdjęcia pod spodem */}
               <div className="p-5">
                 <div className="flex items-end justify-between gap-4">
                   <div>
                     <span className="text-2xl font-black text-white">
-                      {goal.currentAmount.toLocaleString("pl-PL")} zł
+                      {money(goal.currentAmount)}
                     </span>
                     <span className="ml-2 text-sm text-slate-500">
-                      / {goal.targetAmount.toLocaleString("pl-PL")} zł
+                      / {money(goal.targetAmount)}
                     </span>
                   </div>
 
@@ -366,21 +353,21 @@ export function Goals({
                 <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <Info
                     label="Odłożone"
-                    value={`${(goal.reservedAmount ?? 0).toLocaleString("pl-PL")} zł`}
+                    value={money(goal.reservedAmount ?? 0)}
                     status="good"
                   />
 
                   <Info
                     label="Wydano"
-                    value={`${(goal.spentAmount ?? 0).toLocaleString("pl-PL")} zł`}
+                    value={money(goal.spentAmount ?? 0)}
                   />
 
                   <Info
                     label="Brakuje"
                     value={
                       completed
-                        ? "0 zł"
-                        : `${remaining.toLocaleString("pl-PL")} zł`
+                        ? money(0)
+                        : money(remaining)
                     }
                   />
 
@@ -388,7 +375,7 @@ export function Goals({
                     label="Wymagane / mies."
                     value={
                       requiredMonthly !== null
-                        ? `${requiredMonthly.toLocaleString("pl-PL")} zł`
+                        ? money(requiredMonthly)
                         : "Brak deadline"
                     }
                     status={
@@ -422,7 +409,7 @@ export function Goals({
                         <span className="text-slate-400">
                           Deadline:{" "}
                           <strong className="text-slate-200">
-                            {targetDate.toLocaleDateString("pl-PL", {
+                            {targetDate.toLocaleDateString(localeForLanguage(readStoredLanguage()), {
                               month: "long",
                               year: "numeric",
                             })}
@@ -439,10 +426,10 @@ export function Goals({
                       >
                         {onTrack
                           ? "✓ ON TRACK"
-                          : `Brakuje ${Math.max(
+                          : `${readStoredLanguage() === "de" ? "Es fehlen" : readStoredLanguage() === "en" ? "Missing" : "Brakuje"} ${money(Math.max(
                               contributionGap ?? 0,
                               0
-                            ).toLocaleString("pl-PL")} zł / mies.`}
+                            ))} / ${readStoredLanguage() === "de" ? "Monat" : readStoredLanguage() === "en" ? "month" : "mies."}`}
                       </span>
                     </div>
                   </div>
@@ -709,15 +696,15 @@ function CompletedGoalCard({
         <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-600">Wydano</p>
-            <p className="mt-1 font-black text-slate-300">{spent.toLocaleString("pl-PL")} zł</p>
+            <p className="mt-1 font-black text-slate-300">{money(spent)}</p>
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-600">Budżet</p>
-            <p className="mt-1 font-black text-slate-300">{goal.targetAmount.toLocaleString("pl-PL")} zł</p>
+            <p className="mt-1 font-black text-slate-300">{money(goal.targetAmount)}</p>
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-600">Niewykorzystane</p>
-            <p className="mt-1 font-black text-slate-300">{unused.toLocaleString("pl-PL")} zł</p>
+            <p className="mt-1 font-black text-slate-300">{money(unused)}</p>
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-600">Ukończono</p>
@@ -819,9 +806,9 @@ function GoalCompletionModal({
           )}
 
           <div className="grid grid-cols-3 gap-3">
-            <Info label="Budżet" value={`${goal.targetAmount.toLocaleString("pl-PL")} zł`} />
-            <Info label="Wydano" value={`${(goal.spentAmount ?? 0).toLocaleString("pl-PL")} zł`} />
-            <Info label="Nadal odłożone" value={`${reserved.toLocaleString("pl-PL")} zł`} status={reserved > 0 ? "good" : "neutral"} />
+            <Info label="Budżet" value={`${money(goal.targetAmount)}`} />
+            <Info label="Wydano" value={money(goal.spentAmount ?? 0)} />
+            <Info label="Nadal odłożone" value={money(reserved)} status={reserved > 0 ? "good" : "neutral"} />
           </div>
 
           {reserved > 0 ? (
@@ -873,7 +860,7 @@ function GoalCompletionModal({
                 >
                   {goals.map((candidate) => (
                     <option key={candidate.id} value={candidate.id}>
-                      {candidate.name} — brakuje {Math.max(candidate.targetAmount - candidate.currentAmount, 0).toLocaleString("pl-PL")} zł
+                      {candidate.name} — brakuje {money(Math.max(candidate.targetAmount - candidate.currentAmount, 0))}
                     </option>
                   ))}
                 </select>
@@ -1108,7 +1095,7 @@ function GoalFundingModal({
         parsedAmount > targetUnallocated
       ) {
         setError(
-          `W ${targetAsset?.name ?? "aktywie"} masz tylko ${targetUnallocated.toLocaleString("pl-PL")} zł wolnych po wszystkich rezerwacjach.`
+          `W ${targetAsset?.name ?? "aktywie"} masz tylko ${money(targetUnallocated)} wolnych po wszystkich rezerwacjach.`
         );
       } else if (
         mode === "TRANSFER_AND_ALLOCATE" &&
@@ -1116,7 +1103,7 @@ function GoalFundingModal({
         parsedAmount > sourceAvailable
       ) {
         setError(
-          `Źródło ma tylko ${sourceAvailable.toLocaleString("pl-PL")} zł wolnych po rezerwacjach.`
+          `Źródło ma tylko ${money(sourceAvailable)} wolnych po rezerwacjach.`
         );
       } else {
         setError(
@@ -1230,7 +1217,7 @@ function GoalFundingModal({
                 Cel teraz
               </p>
               <p className="mt-1 text-lg font-black text-white">
-                {goal.currentAmount.toLocaleString("pl-PL")} zł
+                {money(goal.currentAmount)}
               </p>
             </div>
 
@@ -1239,7 +1226,7 @@ function GoalFundingModal({
                 Po operacji
               </p>
               <p className="mt-1 text-lg font-black text-emerald-300">
-                {nextGoalAmount.toLocaleString("pl-PL")} zł
+                {money(nextGoalAmount)}
               </p>
             </div>
           </div>
@@ -1342,7 +1329,7 @@ function GoalFundingModal({
                     key={asset.id}
                     value={asset.id}
                   >
-                    {asset.name} · {Math.max(asset.value - (reservedByAsset.get(asset.id) ?? 0), 0).toLocaleString("pl-PL")} zł wolne
+                    {asset.name} · {money(Math.max(asset.value - (reservedByAsset.get(asset.id) ?? 0), 0))} wolne
                   </option>
                 ))}
               </select>
@@ -1369,7 +1356,7 @@ function GoalFundingModal({
                   key={asset.id}
                   value={asset.id}
                 >
-                  {asset.name} · {Math.max(asset.value - (reservedByAsset.get(asset.id) ?? 0), 0).toLocaleString("pl-PL")} zł wolne
+                  {asset.name} · {money(Math.max(asset.value - (reservedByAsset.get(asset.id) ?? 0), 0))} wolne
                 </option>
               ))}
             </select>
@@ -1382,7 +1369,7 @@ function GoalFundingModal({
                   <strong className="text-slate-300">
                     {isLoadingSummary
                       ? "..."
-                      : `${targetUnallocated.toLocaleString("pl-PL")} zł`}
+                      : `${money(targetUnallocated)}`}
                   </strong>
                 </p>
               )}
@@ -1401,7 +1388,7 @@ function GoalFundingModal({
                 <div className="flex items-center gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-300"><WalletCards size={19}/></div>
                   <div className="min-w-0"><p className="text-[9px] font-black uppercase tracking-[0.14em] text-cyan-400">Portfel przypisany automatycznie</p><p className="mt-1 truncate text-sm font-black text-white">{linkedPortfolio.portfolioName ?? linkedPortfolio.assetName}</p></div>
-                  <strong className="ml-auto text-base text-cyan-200">{linkedPortfolio.amount.toLocaleString("pl-PL")} zł</strong>
+                  <strong className="ml-auto text-base text-cyan-200">{money(linkedPortfolio.amount)}</strong>
                 </div>
                 <p className="mt-3 text-xs leading-5 text-slate-500">To jest bieżąca wartość portfela faktycznie pracująca na cel, po innych ręcznych rezerwacjach i z limitem do budżetu celu.</p>
                 <button type="button" disabled={isSaving} onClick={() => void releasePortfolio()} className="mt-3 cursor-pointer rounded-xl border border-slate-700 px-3 py-2 text-[10px] font-black text-slate-400 transition hover:border-amber-400/40 hover:text-amber-300 disabled:opacity-50">ODŁĄCZ PORTFEL</button>
@@ -1409,10 +1396,10 @@ function GoalFundingModal({
             ) : <>
               <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-[0.14em] text-slate-500">Portfel</span>
                 <select value={portfolioId ?? ""} onChange={(event) => setPortfolioId(Number(event.target.value))} disabled={isSaving || selectableWallets.length === 0} className="w-full cursor-pointer rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-slate-200 outline-none focus:border-cyan-400/40">
-                  {selectableWallets.map((wallet) => <option key={wallet.id} value={wallet.id}>{wallet.name} · {wallet.grossValue.toLocaleString("pl-PL")} zł brutto</option>)}
+                  {selectableWallets.map((wallet) => <option key={wallet.id} value={wallet.id}>{wallet.name} · {money(wallet.grossValue)} brutto</option>)}
                 </select>
               </label>
-              {selectedWallet && <div className="grid gap-3 sm:grid-cols-2"><div className="rounded-xl border border-slate-800 bg-slate-950/40 px-4 py-3"><p className="text-[9px] font-black uppercase tracking-[0.12em] text-slate-600">Wolne w portfelu teraz</p><strong className="mt-1 block text-sm text-white">{selectedWalletFreeValue.toLocaleString("pl-PL")} zł</strong></div><div className="rounded-xl border border-cyan-500/15 bg-cyan-500/[0.04] px-4 py-3"><p className="text-[9px] font-black uppercase tracking-[0.12em] text-cyan-500">Doda do celu teraz</p><strong className="mt-1 block text-sm text-cyan-200">{portfolioReserveNow.toLocaleString("pl-PL")} zł</strong></div></div>}
+              {selectedWallet && <div className="grid gap-3 sm:grid-cols-2"><div className="rounded-xl border border-slate-800 bg-slate-950/40 px-4 py-3"><p className="text-[9px] font-black uppercase tracking-[0.12em] text-slate-600">Wolne w portfelu teraz</p><strong className="mt-1 block text-sm text-white">{money(selectedWalletFreeValue)}</strong></div><div className="rounded-xl border border-cyan-500/15 bg-cyan-500/[0.04] px-4 py-3"><p className="text-[9px] font-black uppercase tracking-[0.12em] text-cyan-500">Doda do celu teraz</p><strong className="mt-1 block text-sm text-cyan-200">{money(portfolioReserveNow)}</strong></div></div>}
               <div className="rounded-xl border border-slate-800 bg-slate-950/35 px-4 py-3 text-xs leading-5 text-slate-500"><strong className="text-slate-300">Bez podwójnego liczenia:</strong> ręczne rezerwy na inne cele i zobowiązania mają pierwszeństwo. Ten tryb wykorzystuje wyłącznie pozostały wolny kapitał. Jeden portfel może być dynamicznie przypisany tylko do jednego celu albo zobowiązania.</div>
             </>}
           </div>}
@@ -1436,7 +1423,7 @@ function GoalFundingModal({
                           <span className="truncate">{allocation.assetName}</span>
                           {allocation.sourceType === "PORTFOLIO" && <span className="rounded-md border border-cyan-500/20 bg-cyan-500/10 px-1.5 py-0.5 text-[8px] font-black text-cyan-300">AUTO</span>}
                         </span>
-                        <div className="flex items-center gap-2"><span className={allocation.sourceType === "PORTFOLIO" ? "font-black text-cyan-200" : "font-black text-white"}>{allocation.amount.toLocaleString("pl-PL")} zł</span>{allocation.sourceType === "PORTFOLIO" ? allocation.portfolioId != null && <button type="button" disabled={isSaving} onClick={() => void releasePortfolio()} className="rounded-lg border border-slate-700 px-2 py-1 text-[10px] font-black text-slate-400 hover:border-amber-400/40 hover:text-amber-300">ODŁĄCZ</button> : allocation.assetId!==null&&<button type="button" onClick={async()=>{const raw=window.prompt("Ile zł cofnąć z celu?",String(allocation.amount));if(!raw)return;const value=Number(raw.replace(",","."));if(!Number.isFinite(value)||value<=0)return;await onRelease(allocation.assetId!,value);setSummary(await goalAllocationApi.getSummary(goal.id));await onChanged();}} className="rounded-lg border border-slate-700 px-2 py-1 text-[10px] font-black text-slate-400 hover:border-amber-400/40 hover:text-amber-300">COFNIJ</button>}</div>
+                        <div className="flex items-center gap-2"><span className={allocation.sourceType === "PORTFOLIO" ? "font-black text-cyan-200" : "font-black text-white"}>{money(allocation.amount)}</span>{allocation.sourceType === "PORTFOLIO" ? allocation.portfolioId != null && <button type="button" disabled={isSaving} onClick={() => void releasePortfolio()} className="rounded-lg border border-slate-700 px-2 py-1 text-[10px] font-black text-slate-400 hover:border-amber-400/40 hover:text-amber-300">ODŁĄCZ</button> : allocation.assetId!==null&&<button type="button" onClick={async()=>{const raw=window.prompt("Ile zł cofnąć z celu?",String(allocation.amount));if(!raw)return;const value=Number(raw.replace(",","."));if(!Number.isFinite(value)||value<=0)return;await onRelease(allocation.assetId!,value);setSummary(await goalAllocationApi.getSummary(goal.id));await onChanged();}} className="rounded-lg border border-slate-700 px-2 py-1 text-[10px] font-black text-slate-400 hover:border-amber-400/40 hover:text-amber-300">COFNIJ</button>}</div>
                       </div>
                     )
                   )}
@@ -1717,7 +1704,7 @@ function GoalVisualModal({
 }
 
 function formatGoalType(type: Goal["type"]) {
-  return getGoalTypeLabel(type);
+  return getGoalTypeLabel(type, readStoredLanguage());
 }
 
 type InfoProps = {
@@ -1750,4 +1737,7 @@ function Info({
       </div>
     </div>
   );
+}
+function money(value: number) {
+  return formatDisplayMoney(value, { maximumFractionDigits: 2 });
 }

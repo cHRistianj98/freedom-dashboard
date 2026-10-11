@@ -12,7 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { portfolioApi } from "../../api/portfolioApi";
 import type { Asset } from "../../types/Asset";
 import type { PortfolioWallet } from "../../types/Portfolio";
-import { useLanguage } from "../../i18n/LanguageContext";
+import { localize, useLanguage } from "../../i18n/LanguageContext";
+import { useCurrency } from "../../i18n/CurrencyContext";
 
 type PortfolioChartProps = {
   portfolio: Asset[];
@@ -26,14 +27,10 @@ type WalletSlice = {
 
 export function PortfolioChart({ portfolio }: PortfolioChartProps) {
   const navigate = useNavigate();
-  const { language, locale } = useLanguage();
-  const ui = (pl: string, en: string) => (language === "pl" ? pl : en);
-  const money = (value: number) =>
-    new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: "PLN",
-      maximumFractionDigits: 2,
-    }).format(value);
+  const { language } = useLanguage();
+  const { formatMoney } = useCurrency();
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const money = (value: number) => formatMoney(value, { maximumFractionDigits: 2 });
 
   const [wallets, setWallets] = useState<PortfolioWallet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -133,7 +130,9 @@ export function PortfolioChart({ portfolio }: PortfolioChartProps) {
                     <p className="mt-1 text-[10px] text-slate-500">
                       {assets.length} {language === "pl"
                         ? assets.length === 1 ? "aktywo" : "aktywów"
-                        : assets.length === 1 ? "asset" : "assets"}
+                        : language === "de"
+                          ? assets.length === 1 ? "Vermögenswert" : "Vermögenswerte"
+                          : assets.length === 1 ? "asset" : "assets"}
                     </p>
                   </div>
                   <strong className="shrink-0 text-base font-black text-white">{money(value)}</strong>

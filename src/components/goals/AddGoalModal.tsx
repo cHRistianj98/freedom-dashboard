@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 
 import type { Goal, GoalPriority, GoalType } from "../../types/Goal";
-import { GOAL_TYPE_OPTIONS, getGoalTypeOption, readGoalImageFile } from "./goalCatalog";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { GOAL_TYPE_OPTIONS, getGoalTypeOption, localizeGoalTypeOption, readGoalImageFile } from "./goalCatalog";
 
 type AddGoalModalProps = {
   onClose: () => void;
@@ -31,6 +32,7 @@ const colors = [
 ];
 
 export function AddGoalModal({ onClose, onAdd }: AddGoalModalProps) {
+  const { language } = useLanguage();
   const [name, setName] = useState("");
   const [currentAmount, setCurrentAmount] = useState("0");
   const [targetAmount, setTargetAmount] = useState("");
@@ -68,7 +70,7 @@ export function AddGoalModal({ onClose, onAdd }: AddGoalModalProps) {
     setColor(next.color);
     if (!customImage) {
       setImageUrl(next.image);
-      setImagePosition("center");
+      setImagePosition(next.imagePosition ?? "center");
     }
   }
 
@@ -86,7 +88,7 @@ export function AddGoalModal({ onClose, onAdd }: AddGoalModalProps) {
 
   function restorePreset() {
     setImageUrl(selectedType.image);
-    setImagePosition("center");
+    setImagePosition(selectedType.imagePosition ?? "center");
     setCustomImage(false);
     setImageError("");
   }
@@ -152,15 +154,15 @@ export function AddGoalModal({ onClose, onAdd }: AddGoalModalProps) {
                       key={item.value}
                       type="button"
                       onClick={() => chooseType(item.value)}
-                      title={item.description}
+                      title={localizeGoalTypeOption(item, language).description}
                       className={`group relative cursor-pointer overflow-hidden rounded-xl border text-left transition hover:-translate-y-0.5 ${goalType === item.value ? "border-violet-400/70 bg-violet-500/10 ring-2 ring-violet-500/15" : "border-slate-800 bg-slate-900/50 hover:border-slate-600"}`}
                     >
                       <div className="relative h-[72px] overflow-hidden bg-slate-900">
-                        <img src={item.image} alt="" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#07101d]/90 via-transparent to-transparent" />
+                        <img src={item.image} alt="" className="h-full w-full object-cover transition duration-300 group-hover:scale-110" style={{ objectPosition: item.imagePosition ?? "center", transform: `scale(${item.imageScale ?? 1.03})` }} />
+                        <div className={`absolute inset-0 bg-gradient-to-t ${item.overlayClass ?? "from-[#07101d]/90 via-transparent to-transparent"}`} />
                         {goalType === item.value && <span className="absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full bg-violet-500 text-[10px] font-black text-white">✓</span>}
                       </div>
-                      <span className="block truncate px-2.5 py-2 text-[10px] font-black text-slate-200">{item.shortLabel}</span>
+                      <span className="block truncate px-2.5 py-2 text-[10px] font-black text-slate-200">{localizeGoalTypeOption(item, language).shortLabel}</span>
                     </button>
                   ))}
                 </div>
