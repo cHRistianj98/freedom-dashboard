@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode, type FormEvent } from "react";
-import { X, Wallet, Shield, Sprout, Clock3, House, Gem, Target, ArrowRight, ArrowRightLeft, ArrowUpRight, ArrowDownLeft, ChevronDown, Coins, LockKeyhole, Plus, CircleCheck, LoaderCircle, Image as ImageIcon, ReceiptText } from "lucide-react";
+import { X, Wallet, Shield, Sprout, Clock3, House, Gem, Target, ArrowRight, ArrowRightLeft, ArrowUpRight, ArrowDownLeft, ChevronDown, Coins, LockKeyhole, Plus, CircleCheck, LoaderCircle, Image as ImageIcon, ReceiptText, CircleDollarSign } from "lucide-react";
 import type { Asset, AssetCategory, CashCurrency } from "../../types/Asset";
 import { getAssetCategory, getAssetIconKey } from "../../types/Asset";
 import type { PortfolioTransferInput, PurchaseTargetInput } from "../../api/portfolioApi";
@@ -161,22 +161,145 @@ export function PortfolioForm({ wallet, onClose, onSave }: {
     </form>
   </PortfolioDialog>;
 }
+type TransferSelectValue = string | number;
+
+type TransferSelectOption<T extends TransferSelectValue> = {
+  value: T;
+  label: string;
+  meta?: string;
+  icon?: ReactNode;
+  color?: string;
+  disabled?: boolean;
+};
+
+function TransferSelect<T extends TransferSelectValue>({
+  value,
+  options,
+  onChange,
+  disabled = false,
+  placeholder = "Wybierz…",
+}: {
+  value?: T;
+  options: TransferSelectOption<T>[];
+  onChange: (value: T) => void;
+  disabled?: boolean;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const selected = options.find(option => option.value === value);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  return (
+    <div ref={rootRef} className={`transfer-app-select ${open ? "open" : ""}`}>
+      <button
+        type="button"
+        className="transfer-app-select-trigger"
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen(current => !current)}
+      >
+        <span className="transfer-app-select-leading" style={{ color: selected?.color }}>
+          {selected?.icon ?? <Coins size={18}/>} 
+        </span>
+        <span className="transfer-app-select-copy">
+          <strong>{selected?.label ?? placeholder}</strong>
+          {selected?.meta && <small>{selected.meta}</small>}
+        </span>
+        <ChevronDown size={16} className="transfer-app-select-chevron"/>
+      </button>
+
+      {open && !disabled && (
+        <div className="transfer-app-select-menu" role="listbox">
+          {options.length ? options.map(option => (
+            <button
+              key={String(option.value)}
+              type="button"
+              role="option"
+              aria-selected={option.value === value}
+              disabled={option.disabled}
+              className={option.value === value ? "selected" : ""}
+              onClick={() => {
+                if (option.disabled) return;
+                onChange(option.value);
+                setOpen(false);
+              }}
+            >
+              <span className="transfer-app-select-option-icon" style={{ color: option.color }}>
+                {option.icon ?? <Coins size={17}/>} 
+              </span>
+              <span className="transfer-app-select-option-copy">
+                <strong>{option.label}</strong>
+                {option.meta && <small>{option.meta}</small>}
+              </span>
+              {option.value === value && <CircleCheck size={16} className="transfer-app-select-check"/>}
+            </button>
+          )) : (
+            <div className="transfer-app-select-empty">Brak dostępnych opcji.</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function isPlnCashTransferSource(asset: Asset) {
+  return getAssetCategory(asset) === "cash" && !asset.fxPriced;
+}
+
+function isDirectCashTarget(asset: Asset) {
+  return getAssetCategory(asset) === "cash" && !asset.fxPriced;
+}
+
+function isSupportedPurchaseTarget(asset: Asset) {
+  return unitPurchaseMeta(asset) !== null;
+}
+
+function canTransferToExistingAsset(source: Asset | undefined, target: Asset) {
+  if (!source || source.id === target.id || !isPlnCashTransferSource(source)) return false;
+  return isDirectCashTarget(target) || isSupportedPurchaseTarget(target);
+}
+
+function transferTargetMeta(asset: Asset) {
+  if (isDirectCashTarget(asset)) return "Konto / gotówka PLN · zwykły transfer";
+  const category = getAssetCategory(asset);
+  if (category === "crypto") return "Krypto · zakup jednostek";
+  if (category === "stocks") return "Akcje / ETF · zakup jednostek";
+  if (category === "cash" && asset.fxPriced) return `${asset.cashCurrency ?? "FX"} · wymiana waluty`;
+  return "Nieobsługiwany typ transferu";
+}
+
 export function TransferForm({ assets, wallets, allocated, sourceId, onClose, onTransfer }: {
   assets: Asset[]; wallets: PortfolioWallet[]; allocated: Map<number, number>; sourceId?: number;
   onClose: () => void; onTransfer: (input: PortfolioTransferInput) => Promise<void>;
 }) {
   const realWallets = wallets.filter(wallet => wallet.type !== "GOALS");
   const availableFor = (asset: Asset) => Math.max(0, asset.value - (allocated.get(asset.id) ?? 0));
-  const initialSource = assets.find(asset => asset.id === sourceId)
-    ?? assets.find(asset => isSpendablePurchaseSource(asset) && availableFor(asset) > 0)
-    ?? assets.find(asset => availableFor(asset) > 0)
-    ?? assets[0];
-  const initialTargetWallet = realWallets.find(wallet => wallet.id !== initialSource?.portfolioId
-    && assets.some(asset => asset.portfolioId === wallet.id))
-    ?? realWallets.find(wallet => wallet.id !== initialSource?.portfolioId)
-    ?? realWallets[0];
+  const eligibleSources = assets.filter(asset => isPlnCashTransferSource(asset) && availableFor(asset) > 0);
+  const sourceWallets = realWallets.filter(wallet => eligibleSources.some(asset => asset.portfolioId === wallet.id));
+  const initialSource = assets.find(asset => asset.id === sourceId && isPlnCashTransferSource(asset) && availableFor(asset) > 0)
+    ?? eligibleSources[0];
+  const initialTargetWallet = realWallets.find(wallet => assets.some(asset =>
+    asset.portfolioId === wallet.id && canTransferToExistingAsset(initialSource, asset)
+  )) ?? realWallets[0];
 
-  const [sourceWalletId, setSourceWalletId] = useState(initialSource?.portfolioId ?? realWallets[0]?.id ?? 0);
+  const [sourceWalletId, setSourceWalletId] = useState(initialSource?.portfolioId ?? sourceWallets[0]?.id ?? 0);
   const [targetWalletId, setTargetWalletId] = useState(initialTargetWallet?.id ?? 0);
   const [sourceAssetId, setSourceAssetId] = useState(initialSource?.id ?? 0);
   const [targetAssetId, setTargetAssetId] = useState(0);
@@ -197,11 +320,17 @@ export function TransferForm({ assets, wallets, allocated, sourceId, onClose, on
   const [fxQuoteLoading, setFxQuoteLoading] = useState(false);
   const [fxQuoteError, setFxQuoteError] = useState("");
 
-  const sourceWallet = realWallets.find(wallet => wallet.id === sourceWalletId);
-  const targetWallet = realWallets.find(wallet => wallet.id === targetWalletId);
-  const sourceAssets = assets.filter(asset => asset.portfolioId === sourceWalletId);
+  const sourceWallet = sourceWallets.find(wallet => wallet.id === sourceWalletId) ?? sourceWallets[0];
+  const sourceAssets = eligibleSources.filter(asset => asset.portfolioId === sourceWallet?.id);
   const source = sourceAssets.find(asset => asset.id === sourceAssetId) ?? sourceAssets[0];
-  const targetAssets = assets.filter(asset => asset.portfolioId === targetWalletId && asset.id !== source?.id);
+  const existingTargetWallets = realWallets.filter(wallet => assets.some(asset =>
+    asset.portfolioId === wallet.id && canTransferToExistingAsset(source, asset)
+  ));
+  const selectableTargetWallets = targetMode === "new" ? realWallets : existingTargetWallets;
+  const targetWallet = selectableTargetWallets.find(wallet => wallet.id === targetWalletId) ?? selectableTargetWallets[0];
+  const targetAssets = targetMode === "existing" && targetWallet
+    ? assets.filter(asset => asset.portfolioId === targetWallet.id && canTransferToExistingAsset(source, asset))
+    : [];
   const target = targetAssets.find(asset => asset.id === targetAssetId) ?? targetAssets[0];
   const targetUnit = targetMode === "existing" && target ? unitPurchaseMeta(target) : null;
   const isPurchase = targetMode === "new" || targetUnit !== null;
@@ -256,6 +385,37 @@ export function TransferForm({ assets, wallets, allocated, sourceId, onClose, on
       })
     : fxQuote?.effectiveDate ?? null;
 
+  const sourceWalletOptions: TransferSelectOption<number>[] = sourceWallets.map(wallet => ({
+    value: wallet.id,
+    label: wallet.name,
+    meta: wallet.type === "MAIN" ? "Portfel systemowy" : `${eligibleSources.filter(asset => asset.portfolioId === wallet.id).length} źr. gotówki PLN`,
+    color: wallet.color,
+    icon: <WalletIcon name={wallet.iconKey ?? "wallet"} size={19}/>,
+  }));
+  const sourceAssetOptions: TransferSelectOption<number>[] = sourceAssets.map(asset => ({
+    value: asset.id,
+    label: asset.name,
+    meta: `${money(availableFor(asset))} dostępne`,
+    color: asset.color,
+    icon: <AssetIcon iconKey={getAssetIconKey(asset)} size={18}/>,
+  }));
+  const targetWalletOptions: TransferSelectOption<number>[] = selectableTargetWallets.map(wallet => ({
+    value: wallet.id,
+    label: wallet.name,
+    meta: targetMode === "new"
+      ? "Możesz utworzyć tu nową pozycję"
+      : `${assets.filter(asset => asset.portfolioId === wallet.id && canTransferToExistingAsset(source, asset)).length} obsługiwane cele`,
+    color: wallet.color,
+    icon: <WalletIcon name={wallet.iconKey ?? "wallet"} size={19}/>,
+  }));
+  const targetAssetOptions: TransferSelectOption<number>[] = targetAssets.map(asset => ({
+    value: asset.id,
+    label: asset.name,
+    meta: transferTargetMeta(asset),
+    color: asset.color,
+    icon: <AssetIcon iconKey={getAssetIconKey(asset)} size={18}/>,
+  }));
+
   useEffect(() => {
     let cancelled = false;
     let intervalId: number | null = null;
@@ -294,12 +454,35 @@ export function TransferForm({ assets, wallets, allocated, sourceId, onClose, on
 
   function chooseSourceWallet(id: number) {
     setSourceWalletId(id);
-    const candidates = assets.filter(asset => asset.portfolioId === id);
-    setSourceAssetId((candidates.find(asset => isSpendablePurchaseSource(asset) && availableFor(asset) > 0)
-      ?? candidates.find(asset => availableFor(asset) > 0)
-      ?? candidates[0])?.id ?? 0);
+    const candidates = eligibleSources.filter(asset => asset.portfolioId === id);
+    setSourceAssetId(candidates[0]?.id ?? 0);
+    setTargetAssetId(0);
+    setAcquiredQuantity("");
     setFee("");
     setError("");
+  }
+
+  function chooseSourceAsset(id: number) {
+    setSourceAssetId(id);
+    setTargetAssetId(0);
+    setAcquiredQuantity("");
+    setFee("");
+    setError("");
+  }
+
+  function chooseTargetMode(mode: "existing" | "new") {
+    setTargetMode(mode);
+    setTargetAssetId(0);
+    setAcquiredQuantity("");
+    setError("");
+    if (mode === "existing") {
+      const firstWallet = realWallets.find(wallet => assets.some(asset =>
+        asset.portfolioId === wallet.id && canTransferToExistingAsset(source, asset)
+      ));
+      if (firstWallet) setTargetWalletId(firstWallet.id);
+    } else if (!realWallets.some(wallet => wallet.id === targetWalletId) && realWallets[0]) {
+      setTargetWalletId(realWallets[0].id);
+    }
   }
 
   function chooseNewCategory(category: Extract<AssetCategory, "crypto" | "stocks" | "cash">) {
@@ -340,7 +523,7 @@ export function TransferForm({ assets, wallets, allocated, sourceId, onClose, on
       await onTransfer({
         sourceAssetId: source.id,
         targetAssetId: targetMode === "existing" ? target?.id ?? null : null,
-        targetPortfolioId: targetMode === "new" ? targetWalletId : null,
+        targetPortfolioId: targetMode === "new" ? targetWallet?.id ?? null : null,
         newTarget: buildNewTarget(),
         amount: numericAmount,
         acquiredQuantity: isPurchase ? numericQuantity : null,
@@ -351,68 +534,92 @@ export function TransferForm({ assets, wallets, allocated, sourceId, onClose, on
   }
 
   return <PortfolioDialog
-    title={isPurchase ? "Zakup aktywa" : "Transfer kapitału"}
-    subtitle={isPurchase ? "Kwota zakupu znika z gotówki, a pozycja rośnie o faktycznie otrzymane jednostki." : "Twoje pieniądze. Nowy kierunek."}
+    title={isPurchase ? "Zakup / wymiana aktywa" : "Transfer środków"}
+    subtitle={isPurchase
+      ? "Freedom pokazuje tylko operacje, które da się poprawnie zaksięgować: z gotówki PLN do waluty obcej, krypto lub akcji / ETF."
+      : "Bezpieczny transfer między kontami / gotówką PLN — bez sztucznego przenoszenia mieszkań, obligacji czy innych aktywów."}
     icon={<ArrowRightLeft size={24}/>} className="transfer-dialog" onClose={onClose} busy={saving}
   >
     <form onSubmit={submit} className="investment-form transfer-form">
+      <div className="transfer-logic-banner">
+        <CircleCheck size={17}/>
+        <div>
+          <strong>Freedom filtruje niemożliwe transfery</strong>
+          <span>Źródłem może być konto / gotówka PLN. Celem może być inne konto PLN albo pozycja kupowana za gotówkę: waluta obca, krypto lub akcje / ETF.</span>
+        </div>
+      </div>
+
       <div className="transfer-route">
         <section className="transfer-side source">
           <div className="transfer-side-heading"><span><ArrowUpRight size={17}/>Skąd płacisz</span><span className="transfer-step">01</span></div>
+
           <label>Portfel źródłowy
-            <span className="transfer-select">
-              <span className="transfer-select-icon" style={{ color: sourceWallet?.color }}><WalletIcon name={sourceWallet?.iconKey ?? "wallet"} size={21}/></span>
-              <select value={sourceWalletId} disabled={saving} onChange={event => chooseSourceWallet(Number(event.target.value))}>
-                {realWallets.map(wallet => <option key={wallet.id} value={wallet.id}>{wallet.name}{wallet.type === "MAIN" ? " · systemowy" : ""}</option>)}
-              </select><ChevronDown size={15} className="transfer-select-chevron"/>
-            </span>
+            <TransferSelect
+              value={sourceWallet?.id}
+              options={sourceWalletOptions}
+              disabled={saving || sourceWalletOptions.length === 0}
+              placeholder="Brak portfela z wolną gotówką PLN"
+              onChange={chooseSourceWallet}
+            />
           </label>
+
           <label>Źródło pieniędzy
-            <span className="transfer-select">
-              <span className="transfer-select-icon" style={{ color: source?.color }}>{source ? <AssetIcon iconKey={getAssetIconKey(source)} size={19}/> : <Coins size={19}/>}</span>
-              <select value={source?.id ?? ""} disabled={saving || !sourceAssets.length} onChange={event => { setSourceAssetId(Number(event.target.value)); setFee(""); setError(""); }}>
-                {!sourceAssets.length && <option value="">Brak aktywów w portfelu</option>}
-                {sourceAssets.map(asset => <option key={asset.id} value={asset.id}>{asset.name}</option>)}
-              </select><ChevronDown size={15} className="transfer-select-chevron"/>
-            </span>
+            <TransferSelect
+              value={source?.id}
+              options={sourceAssetOptions}
+              disabled={saving || sourceAssetOptions.length === 0}
+              placeholder="Brak dostępnej gotówki PLN"
+              onChange={chooseSourceAsset}
+            />
           </label>
+
           <div className="transfer-balance"><span><Wallet size={14}/>Dostępne</span><strong>{money(available)}</strong></div>
           <p className="transfer-reserved"><LockKeyhole size={12}/>{money(reserved)} zarezerwowane na cele lub zobowiązania</p>
-          {isPurchase && source && !purchaseSourceAllowed && <p className="transfer-source-warning">Zakup jednostek wybierz z konta / gotówki w PLN. Dzięki temu liczba monet, akcji lub waluty pozostaje spójna.</p>}
+          <p className="transfer-route-rule">Źródła typu nieruchomość, obligacje, pojazd, metale czy już kupione krypto nie są tutaj traktowane jak „gotówka do wydania”.</p>
         </section>
 
         <span className="transfer-route-arrow" aria-hidden="true"><ArrowRight size={20}/></span>
 
         <section className="transfer-side destination">
-          <div className="transfer-side-heading"><span><ArrowDownLeft size={17}/>Co kupujesz</span><span className="transfer-step">02</span></div>
+          <div className="transfer-side-heading"><span><ArrowDownLeft size={17}/>{isPurchase ? "Co kupujesz" : "Dokąd trafiają środki"}</span><span className="transfer-step">02</span></div>
+
           <label>Portfel docelowy
-            <span className="transfer-select">
-              <span className="transfer-select-icon" style={{ color: targetWallet?.color }}><WalletIcon name={targetWallet?.iconKey ?? "wallet"} size={21}/></span>
-              <select value={targetWalletId} disabled={saving} onChange={event => { setTargetWalletId(Number(event.target.value)); setTargetAssetId(0); setError(""); }}>
-                {realWallets.map(wallet => <option key={wallet.id} value={wallet.id}>{wallet.name}{wallet.type === "MAIN" ? " · systemowy" : ""}</option>)}
-              </select><ChevronDown size={15} className="transfer-select-chevron"/>
-            </span>
+            <TransferSelect
+              value={targetWallet?.id}
+              options={targetWalletOptions}
+              disabled={saving || targetWalletOptions.length === 0}
+              placeholder={targetMode === "existing" ? "Brak portfela z obsługiwanym celem" : "Wybierz portfel"}
+              onChange={id => { setTargetWalletId(id); setTargetAssetId(0); setAcquiredQuantity(""); setError(""); }}
+            />
           </label>
 
           <div className="transfer-target-mode" role="group" aria-label="Sposób wyboru pozycji docelowej">
-            <button type="button" className={targetMode === "existing" ? "selected" : ""} onClick={() => { setTargetMode("existing"); setError(""); }}>Istniejąca pozycja</button>
-            <button type="button" className={targetMode === "new" ? "selected" : ""} onClick={() => { setTargetMode("new"); setError(""); }}>+ Nowa pozycja</button>
+            <button type="button" className={targetMode === "existing" ? "selected" : ""} onClick={() => chooseTargetMode("existing")}>Istniejąca pozycja</button>
+            <button type="button" className={targetMode === "new" ? "selected" : ""} onClick={() => chooseTargetMode("new")}>+ Nowa pozycja</button>
           </div>
 
           {targetMode === "existing" ? <>
-            <label>Aktywo docelowe
-              <span className="transfer-select">
-                <span className="transfer-select-icon" style={{ color: target?.color }}>{target ? <AssetIcon iconKey={getAssetIconKey(target)} size={19}/> : <Coins size={19}/>}</span>
-                <select value={target?.id ?? ""} disabled={saving || !targetAssets.length} onChange={event => { setTargetAssetId(Number(event.target.value)); setAcquiredQuantity(""); setError(""); }}>
-                  {!targetAssets.length && <option value="">Brak aktywa docelowego</option>}
-                  {targetAssets.map(asset => <option key={asset.id} value={asset.id}>{asset.name}</option>)}
-                </select><ChevronDown size={15} className="transfer-select-chevron"/>
-              </span>
+            <label>Konto / aktywo docelowe
+              <TransferSelect
+                value={target?.id}
+                options={targetAssetOptions}
+                disabled={saving || targetAssetOptions.length === 0}
+                placeholder="Brak logicznego celu w tym portfelu"
+                onChange={id => { setTargetAssetId(id); setAcquiredQuantity(""); setError(""); }}
+              />
             </label>
+
             {target ? <>
-              <div className="transfer-balance"><span><Coins size={14}/>{targetUnit ? "Aktualna ilość" : "Aktualna wartość aktywa"}</span><strong>{targetUnit ? `${formatUnits(targetUnit.quantity)} ${targetUnit.symbol}` : money(target.value)}</strong></div>
-              <p className="transfer-reserved"><Plus size={12}/>{targetUnit ? "Zakup zwiększy liczbę jednostek, a wartość policzy rynek" : "Tutaj trafi przeniesiona kwota"}</p>
-            </> : <div className="transfer-empty-target"><p>Brak aktywa docelowego. Możesz utworzyć pozycję bezpośrednio w tej operacji.</p><button type="button" className="investment-button secondary" onClick={() => setTargetMode("new")}><Plus size={14}/>Utwórz nową pozycję</button></div>}
+              <div className="transfer-operation-kind">
+                <span>{targetUnit ? "ZAKUP" : "TRANSFER"}</span>
+                <strong>{transferTargetMeta(target)}</strong>
+              </div>
+              <div className="transfer-balance"><span><Coins size={14}/>{targetUnit ? "Aktualna ilość" : "Aktualna wartość konta"}</span><strong>{targetUnit ? `${formatUnits(targetUnit.quantity)} ${targetUnit.symbol}` : money(target.value)}</strong></div>
+              <p className="transfer-reserved"><Plus size={12}/>{targetUnit ? "Zakup zwiększy liczbę jednostek, a wycenę policzy rynek" : "Kwota zostanie przesunięta między kontami PLN"}</p>
+            </> : <div className="transfer-empty-target">
+              <p>W tym portfelu nie ma pozycji, do której Freedom może logicznie wykonać tę operację.</p>
+              <button type="button" className="investment-button secondary" onClick={() => chooseTargetMode("new")}><Plus size={14}/>Utwórz nową pozycję</button>
+            </div>}
           </> : <NewPurchaseTargetFields
             category={newCategory} onCategory={chooseNewCategory}
             name={newName} onName={setNewName}
@@ -516,9 +723,33 @@ function NewPurchaseTargetFields({ category, onCategory, name, onName, cryptoCoi
     </div>}
     {category === "stocks" && <div className="investment-form-columns">
       <label>Ticker Yahoo<input value={stockSymbol} disabled={disabled} onChange={event => onStockSymbol(event.target.value)} placeholder="MCD, DNP.WA, IWDA.L" /></label>
-      <label>Waluta notowania<select value={stockCurrency} disabled={disabled} onChange={event => onStockCurrency(event.target.value as CashCurrency)}>{(["PLN", "USD", "EUR", "GBP", "CHF"] as CashCurrency[]).map(currency => <option key={currency}>{currency}</option>)}</select></label>
+      <label>Waluta notowania
+        <TransferSelect
+          value={stockCurrency}
+          disabled={disabled}
+          options={(["PLN", "USD", "EUR", "GBP", "CHF"] as CashCurrency[]).map(currency => ({
+            value: currency,
+            label: currency,
+            meta: currency === "PLN" ? "Notowanie w złotych" : "Waluta notowania instrumentu",
+            icon: <CircleDollarSign size={17}/>,
+          }))}
+          onChange={onStockCurrency}
+        />
+      </label>
     </div>}
-    {category === "cash" && <label>Waluta<select value={cashCurrency} disabled={disabled} onChange={event => onCashCurrency(event.target.value as Exclude<CashCurrency, "PLN">)}>{(["USD", "EUR", "CHF", "GBP", "CZK"] as Exclude<CashCurrency, "PLN">[]).map(currency => <option key={currency}>{currency}</option>)}</select></label>}
+    {category === "cash" && <label>Waluta
+      <TransferSelect
+        value={cashCurrency}
+        disabled={disabled}
+        options={(["USD", "EUR", "CHF", "GBP", "CZK"] as Exclude<CashCurrency, "PLN">[]).map(currency => ({
+          value: currency,
+          label: currency,
+          meta: "Waluta obca",
+          icon: <CircleDollarSign size={17}/>,
+        }))}
+        onChange={onCashCurrency}
+      />
+    </label>}
     <p className="investment-note">Pozycja zostanie utworzona z ilością z tej transakcji. Nie powstanie sztuczny „kapitał początkowy”.</p>
   </div>;
 }

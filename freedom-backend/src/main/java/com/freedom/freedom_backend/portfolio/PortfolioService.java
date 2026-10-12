@@ -253,6 +253,19 @@ public class PortfolioService {
         }
 
         AssetRow target = asset(r.targetAssetId(), user.getId());
+
+        // A plain value transfer is intentionally restricted to PLN cash/account assets.
+        // Buying crypto, stocks/ETF or foreign currency must go through the quantity-aware
+        // purchase branch above. This prevents nonsense operations such as moving part of a
+        // flat, car or bond position into an unrelated asset and silently corrupting valuation data.
+        if (!isPlainPlnCash(source) || !isPlainPlnCash(target)) {
+            throw new IllegalArgumentException(
+                    "Zwykły transfer jest dostępny wyłącznie między kontami / gotówką w PLN. "
+                            + "Krypto, akcje / ETF i waluty obce kupuj z gotówki PLN przez operację zakupu. "
+                            + "Nieruchomości, pojazdów, obligacji, metali i innych aktywów nie przenosimy w ten sposób."
+            );
+        }
+
         if (fee.signum() > 0) {
             if (!"CASH".equals(source.category()) || source.fxPriced()) {
                 throw new IllegalArgumentException("Prowizję można pobrać z konta / gotówki w PLN.");
@@ -271,6 +284,10 @@ public class PortfolioService {
                 user.getId(), source.id(), target.id(), source.name(), target.name(), r.amount()
         );
         createInvestmentFeeExpense(source, target, fee, user);
+    }
+
+    private boolean isPlainPlnCash(AssetRow asset) {
+        return asset != null && "CASH".equals(asset.category()) && !asset.fxPriced();
     }
 
     private void createInvestmentFeeExpense(AssetRow source, AssetRow target, BigDecimal fee, User user) {
@@ -353,9 +370,7 @@ public class PortfolioService {
                 """,
                 user.getId(), source.id(), target.id(), source.name(), target.name(), amount,
                 target.cashCurrency().name(), quote.ratePln(), fxSpread.effectiveRate(), fxSpread.loss(),
-                fxSpread.spreadPercent(),
-                java.time.OffsetDateTime.ofInstant(quote.quotedAt(), java.time.ZoneOffset.UTC),
-                quote.source(), quote.provider()
+                fxSpread.spreadPercent(), quote.quotedAt(), quote.source(), quote.provider()
         );
     }
 
@@ -455,10 +470,9 @@ public class PortfolioService {
     }
 
     @Transactional(readOnly = true)
-    public List<ValuationEventResponse> valuations(User user, int requestedLimit) {
-        int limit = Math.max(1, Math.min(5000, requestedLimit));
+    public List<ValuationEventResponse> valuations(User user) {
         return jdbc.query(
-                "SELECT id,asset_id,asset_name_snapshot,previous_value,new_value,delta,reason,created_at FROM asset_valuation_events WHERE user_id=? ORDER BY created_at DESC,id DESC LIMIT ?",
+                "SELECT id,asset_id,asset_name_snapshot,previous_value,new_value,delta,reason,created_at FROM asset_valuation_events WHERE user_id=? ORDER BY created_at DESC,id DESC LIMIT 100",
                 (rs, n) -> new ValuationEventResponse(
                         rs.getLong("id"),
                         (Long) rs.getObject("asset_id"),
@@ -469,8 +483,7 @@ public class PortfolioService {
                         rs.getString("reason"),
                         rs.getTimestamp("created_at").toInstant()
                 ),
-                user.getId(),
-                limit
+                user.getId()
         );
     }
 

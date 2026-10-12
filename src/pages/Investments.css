@@ -127,8 +127,6 @@
 .composition-row { padding: 6px 8px; border-radius: 10px; background: linear-gradient(90deg, #0d1a2d88, #09122033); border: 1px solid #14304d; }
 .composition-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #d2e5ff; font-weight: 600; }
 .composition-value { font-weight: 700; color: #eef5ff; }
-.asset-change-badges { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
-.asset-change-badges .asset-change-badge { padding-inline: 6px; font-size: 9px; }
 .asset-change-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 999px; white-space: nowrap; font-size: 10px; font-weight: 800; letter-spacing: .1px; }
 .asset-change-badge.positive { color: #8ff0c7; background: #11362b; border: 1px solid #1f6d52; }
 .asset-change-badge.negative { color: #ffd08a; background: #38230f; border: 1px solid #8c5a20; }
@@ -1022,60 +1020,94 @@
 .transfer-fx-source-line span:last-child { text-align: right; }
 @media (max-width: 650px) { .transfer-fx-source-line { flex-direction: column; } .transfer-fx-source-line span:last-child { text-align: left; } }
 
-/* Performance period switch: one selected horizon drives asset + portfolio badges. */
-.performance-period-switch {
-  display: inline-flex;
+/* Freedom custom dropdowns inside transfer / purchase modal */
+.transfer-app-select { position: relative; width: 100%; }
+.transfer-app-select-trigger {
+  width: 100%;
+  min-height: 50px;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 18px;
   align-items: center;
-  gap: 3px;
-  min-height: 31px;
-  padding: 3px;
-  border: 1px solid #294764;
-  border-radius: 9px;
-  background: #091727;
-  box-shadow: inset 0 0 18px #06111f;
-}
-.performance-period-switch > span {
-  padding: 0 6px 0 7px;
-  color: #7797b9;
-  font-size: 9px;
-  font-weight: 850;
-  letter-spacing: .65px;
-  text-transform: uppercase;
-}
-.performance-period-switch button {
-  min-width: 42px;
-  height: 25px;
-  padding: 0 9px;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  background: transparent;
-  color: #91acc8;
-  font-size: 10px;
-  font-weight: 850;
+  gap: 9px;
+  padding: 9px 11px;
+  border: 1px solid #29425c;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #0a1727, #071220);
+  color: #e9f3ff;
+  text-align: left;
   cursor: pointer;
-  transition: color .15s, border-color .15s, background .15s, box-shadow .15s;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
 }
-.performance-period-switch button:hover { color: #dcecff; background: #13273f; }
-.performance-period-switch button.active {
-  color: #dff3ff;
-  border-color: #2f70a7;
-  background: linear-gradient(180deg, #1c446a, #143352);
-  box-shadow: 0 0 0 1px #2d77b52c, inset 0 1px 0 #6fbbff22;
+.transfer-app-select-trigger:hover:not(:disabled) { border-color: #3c638a; background: #0b1a2c; }
+.transfer-app-select.open .transfer-app-select-trigger,
+.transfer-app-select-trigger:focus-visible { outline: none; border-color: #3d8feb; box-shadow: 0 0 0 3px #2d86ef1a; }
+.transfer-app-select-trigger:disabled { cursor: not-allowed; opacity: .55; }
+.transfer-app-select-leading { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid #28435f; border-radius: 9px; background: #102137; color: var(--transfer-accent); }
+.transfer-app-select-copy { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.transfer-app-select-copy strong { overflow: hidden; color: #edf6ff; font-size: 12px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+.transfer-app-select-copy small { overflow: hidden; color: #718ba8; font-size: 9px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.transfer-app-select-chevron { color: #6f90b1; transition: transform .18s ease; }
+.transfer-app-select.open .transfer-app-select-chevron { transform: rotate(180deg); }
+.transfer-app-select-menu {
+  position: absolute;
+  z-index: 80;
+  top: calc(100% + 7px);
+  left: 0;
+  right: 0;
+  max-height: 250px;
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid #294968;
+  border-radius: 13px;
+  background: #071220;
+  box-shadow: 0 18px 45px #000b, 0 0 0 1px #1e3a5533 inset;
 }
-.portfolio-month-change.neutral,
-.asset-change-badge.neutral {
-  color: #9bb4cf !important;
-  border: 1px solid #36506b;
-  background: #122235;
+.transfer-app-select-menu > button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 7px 9px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #dcecff;
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
 }
-.performance-neutral-dot {
-  display: inline-block;
-  line-height: 1;
-  font-size: 12px;
-  transform: translateY(-1px);
-}
+.transfer-app-select-menu > button:hover:not(:disabled) { border-color: #294968; background: #102137; }
+.transfer-app-select-menu > button.selected { border-color: #3478bd66; background: #123055; }
+.transfer-app-select-menu > button:disabled { cursor: not-allowed; opacity: .45; }
+.transfer-app-select-option-icon { display: grid; width: 32px; height: 32px; place-items: center; border: 1px solid #29425c; border-radius: 9px; background: #0b1b2d; color: #73b9f2; }
+.transfer-app-select-option-copy { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.transfer-app-select-option-copy strong { overflow: hidden; color: #ecf6ff; font-size: 11px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+.transfer-app-select-option-copy small { overflow: hidden; color: #718ba8; font-size: 9px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.transfer-app-select-check { color: #5de3bd; }
+.transfer-app-select-empty { padding: 14px 12px; color: #718ba8; font-size: 10px; text-align: center; }
 
-@media (max-width: 760px) {
-  .performance-period-switch { order: -1; }
-  .performance-period-switch > span { display: none; }
+.transfer-logic-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #275079;
+  border-radius: 12px;
+  background: linear-gradient(120deg, #12315755, #0b1627 75%);
+}
+.transfer-logic-banner > svg { flex: 0 0 auto; margin-top: 1px; color: #66baff; }
+.transfer-logic-banner > div { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.transfer-logic-banner strong { color: #cce7ff; font-size: 11px; font-weight: 800; }
+.transfer-logic-banner span { color: #829dbb; font-size: 9px; line-height: 1.55; }
+.transfer-route-rule { margin: -7px 0 0; padding: 9px 10px; border: 1px dashed #28435e; border-radius: 9px; background: #07132188; color: #748eaa; font-size: 9px; line-height: 1.5; }
+.transfer-operation-kind { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid #28524888; border-radius: 9px; background: #0d2b2544; }
+.transfer-operation-kind span { border-radius: 999px; background: #49d4a61a; padding: 3px 7px; color: #62d9b4; font-size: 8px; font-weight: 900; letter-spacing: .12em; }
+.transfer-operation-kind strong { min-width: 0; overflow: hidden; color: #9fdac9; font-size: 9px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 600px) {
+  .transfer-app-select-menu { position: fixed; z-index: 120; top: auto; right: 16px; bottom: 16px; left: 16px; max-height: 46vh; border-radius: 16px; }
+  .transfer-app-select-copy small,
+  .transfer-app-select-option-copy small { white-space: normal; }
 }
