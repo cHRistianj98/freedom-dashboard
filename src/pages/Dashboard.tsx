@@ -46,6 +46,8 @@ import {
 import { calculateFreedomEngine } from "../features/freedom/freedomEngine";
 import { getFreedomMissions } from "../features/missions/missionEngine";
 import { routeMoney } from "../features/intelligence/moneyRouter";
+import { getFreedomMilestoneVisual } from "../features/achievements/achievementVisuals";
+import { getDashboardMetricArtwork } from "../features/dashboard/dashboardVisuals";
 
 import type {
   Expense,
@@ -1222,8 +1224,27 @@ export function Dashboard({
           FREEDOM LEVEL
       ====================================== */}
 
-      <section className="mt-5 rounded-2xl border border-slate-800 bg-[#0b1322] p-6">
-        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+      {(() => {
+        const milestoneVisual = getFreedomMilestoneVisual(
+          nextTarget !== null ? Math.min(currentLevel.level + 1, 7) : currentLevel.level
+        );
+
+        return (
+      <section className="relative mt-5 overflow-hidden rounded-2xl border border-slate-800 bg-[#0b1322] p-6">
+        <div className="pointer-events-none absolute inset-0">
+          <img
+            src={milestoneVisual.image}
+            alt=""
+            className="absolute inset-y-0 right-0 h-full w-2/3 object-cover opacity-25"
+            style={{
+              objectPosition: milestoneVisual.objectPosition ?? "center",
+              transform: `scale(${milestoneVisual.imageScale ?? 1.04})`,
+            }}
+          />
+          <div className={`absolute inset-0 bg-gradient-to-r ${milestoneVisual.overlayClass}`} />
+        </div>
+
+        <div className="relative flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
               {t("wealthMilestone")}
@@ -1304,6 +1325,8 @@ export function Dashboard({
           </span>
         </div>
       </section>
+        );
+      })()}
 
       {/* =====================================
           MONTHLY CASHFLOW + COMPARISON
@@ -1322,6 +1345,7 @@ export function Dashboard({
             />
           }
           accent="emerald"
+          artwork={getDashboardMetricArtwork("income")}
           comparison={
             hasPreviousMonthData
               ? {
@@ -1358,6 +1382,7 @@ export function Dashboard({
             />
           }
           accent="red"
+          artwork={getDashboardMetricArtwork("expenses")}
           comparison={
             hasPreviousMonthData
               ? {
@@ -1406,6 +1431,7 @@ export function Dashboard({
               ? "blue"
               : "red"
           }
+          artwork={getDashboardMetricArtwork("surplus")}
           comparison={
             hasPreviousMonthData
               ? {
@@ -1453,6 +1479,7 @@ export function Dashboard({
                 ? "amber"
                 : "red"
           }
+          artwork={getDashboardMetricArtwork("savings")}
           comparison={
             hasPreviousMonthData
               ? {
@@ -1721,73 +1748,29 @@ export function Dashboard({
           </h2>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-7">
-          {freedomLevels.map(
-            (level) => {
-              const completed =
-                effectiveNetWorth >=
-                (level.target ??
-                  level.min);
+        <div className="mt-6 grid min-w-0 grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
+          {freedomLevels.map((level) => {
+            const completed =
+              effectiveNetWorth >=
+              (level.target ??
+                level.min);
 
-              const active =
-                level.level ===
-                currentLevel.level;
+            const active =
+              level.level ===
+              currentLevel.level;
 
-              return (
-                <div
-                  key={
-                    level.level
-                  }
-                  className={`rounded-xl border p-4 transition ${
-                    active
-                      ? "border-blue-500/40 bg-blue-500/10"
-                      : completed
-                        ? "border-emerald-500/20 bg-emerald-500/5"
-                        : "border-slate-800 bg-slate-950/40"
-                  }`}
-                >
-                  <div
-                    className={`text-xs font-bold ${
-                      active
-                        ? "text-blue-400"
-                        : completed
-                          ? "text-emerald-400"
-                          : "text-slate-600"
-                    }`}
-                  >
-                    {ui("POZIOM", "LEVEL")}{" "}
-                    {level.level}
-                  </div>
-
-                  <div className="mt-2 font-semibold">
-                    {translateLevelName(level.name)}
-                  </div>
-
-                  <div className="mt-1 text-xs text-slate-500">
-                    {level.level ===
-                    1
-                      ? "< 100k"
-                      : formatCompactMoney(
-                          level.min
-                        )}
-                  </div>
-
-                  {active && (
-                    <div className="mt-3 text-xs font-bold text-blue-400">
-                      ← {ui("TY", "YOU")}
-                    </div>
-                  )}
-
-                  {!active &&
-                    completed && (
-                      <div className="mt-3 text-xs font-bold text-emerald-400">
-                        ✓ {ui("GOTOWE", "DONE")}
-                      </div>
-                    )}
-                </div>
-              );
-            }
-          )}
+            return (
+              <FreedomRoadCard
+                key={level.level}
+                level={level}
+                active={active}
+                completed={completed}
+                effectiveNetWorth={effectiveNetWorth}
+                language={language}
+                translateLevelName={translateLevelName}
+              />
+            );
+          })}
         </div>
       </section>
 
@@ -1849,6 +1832,12 @@ type DashboardMetricProps = {
   subtitle: string;
   icon: ReactNode;
   accent: MetricAccent;
+  artwork?: {
+    image: string;
+    overlayClass: string;
+    objectPosition?: string;
+    imageScale?: number;
+  };
 
   comparison?: MetricComparison;
 };
@@ -1958,6 +1947,7 @@ function DashboardMetric({
   subtitle,
   icon,
   accent,
+  artwork,
   comparison,
 }: DashboardMetricProps) {
   const accentClasses = {
@@ -1992,6 +1982,7 @@ function DashboardMetric({
   return (
     <div
       className={`
+        group relative overflow-hidden
         rounded-2xl
         border border-slate-800
         bg-[#0b1322]
@@ -2000,35 +1991,52 @@ function DashboardMetric({
         ${classes.border}
       `}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-sm text-slate-500">
-            {title}
-          </p>
-
-          <p className="mt-2 text-2xl font-black tracking-tight">
-            {value}
-          </p>
+      {artwork && (
+        <div className="pointer-events-none absolute inset-0">
+          <img
+            src={artwork.image}
+            alt=""
+            className="absolute inset-y-0 right-0 h-full w-2/3 object-cover opacity-25 transition duration-500 group-hover:scale-[1.04]"
+            style={{
+              objectPosition: artwork.objectPosition ?? "center",
+              transform: `scale(${artwork.imageScale ?? 1.04})`,
+            }}
+          />
+          <div className={`absolute inset-0 bg-gradient-to-r ${artwork.overlayClass}`} />
         </div>
-
-        <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${classes.icon}`}
-        >
-          {icon}
-        </div>
-      </div>
-
-      <p className="mt-3 text-xs text-slate-500">
-        {subtitle}
-      </p>
-
-      {comparison && (
-        <ComparisonBadge
-          comparison={
-            comparison
-          }
-        />
       )}
+
+      <div className="relative">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm text-slate-500">
+              {title}
+            </p>
+
+            <p className="mt-2 text-2xl font-black tracking-tight">
+              {value}
+            </p>
+          </div>
+
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${classes.icon}`}
+          >
+            {icon}
+          </div>
+        </div>
+
+        <p className="mt-3 text-xs text-slate-500">
+          {subtitle}
+        </p>
+
+        {comparison && (
+          <ComparisonBadge
+            comparison={
+              comparison
+            }
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -2875,4 +2883,147 @@ function getSavingsMessage(
   }
 
   return "Nadwyżka jest niewielka względem przychodów.";
+}
+function FreedomRoadCard({
+  level,
+  active,
+  completed,
+  effectiveNetWorth,
+  language,
+  translateLevelName,
+}: {
+  level: FreedomLevel;
+  active: boolean;
+  completed: boolean;
+  effectiveNetWorth: number;
+  language: AppLanguage;
+  translateLevelName: (value: string) => string;
+}) {
+  const ui = (pl: string, en: string, de?: string) =>
+    localize(language, pl, en, de);
+  const visual = getFreedomMilestoneVisual(level.level);
+  const progress = getFreedomRoadCardProgress(level, effectiveNetWorth);
+
+  return (
+    <div
+      className={`group min-w-0 overflow-hidden rounded-2xl border bg-[#08111f] transition duration-300 hover:-translate-y-0.5 hover:shadow-lg ${
+        active
+          ? "border-blue-500/45 shadow-blue-950/20"
+          : completed
+            ? "border-emerald-500/25"
+            : "border-slate-800"
+      }`}
+    >
+      <div className="relative h-[88px] overflow-hidden border-b border-white/5">
+        <img
+          src={visual.image}
+          alt=""
+          className={`absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04] ${
+            completed || active ? "opacity-95" : "opacity-40 grayscale-[30%]"
+          }`}
+          style={{ objectPosition: visual.objectPosition ?? "center" }}
+        />
+        <div
+          className={`absolute inset-0 bg-gradient-to-t ${
+            completed || active
+              ? visual.overlayClass
+              : "from-[#050b16]/95 via-[#050b16]/70 to-[#050b16]/25"
+          }`}
+        />
+
+        <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-2 p-2.5">
+          <span
+            className={`shrink-0 rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-[0.12em] backdrop-blur-md ${
+              active
+                ? "border-blue-400/35 bg-blue-500/20 text-blue-200"
+                : completed
+                  ? "border-emerald-400/30 bg-emerald-500/15 text-emerald-200"
+                  : "border-slate-700/60 bg-black/35 text-slate-400"
+            }`}
+          >
+            {ui("Poziom", "Level", "Level")} {level.level}
+          </span>
+
+          {(active || completed) && (
+            <span
+              className={`shrink-0 rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-[0.1em] backdrop-blur-md ${
+                active
+                  ? "border-blue-400/35 bg-blue-500/20 text-blue-200"
+                  : "border-emerald-400/30 bg-emerald-500/15 text-emerald-200"
+              }`}
+            >
+              {active
+                ? ui("Ty", "You", "Du")
+                : ui("Gotowe", "Done", "Fertig")}
+            </span>
+          )}
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 px-3 pb-2.5">
+          <h3 className="truncate text-[15px] font-black text-white drop-shadow-lg">
+            {translateLevelName(level.name)}
+          </h3>
+        </div>
+      </div>
+
+      <div className="min-w-0 p-3">
+        <div className="flex min-w-0 items-center justify-between gap-2 text-[10px]">
+          <span className="truncate text-slate-500">
+            {level.target === null
+              ? ui("Cel", "Target", "Ziel")
+              : ui("Próg", "Threshold", "Schwelle")}
+          </span>
+          <span className="shrink-0 font-bold text-slate-300">
+            {formatCompactMoney(level.target ?? level.min)}
+          </span>
+        </div>
+
+        <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-slate-800">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${
+              active
+                ? "bg-blue-500"
+                : completed
+                  ? "bg-emerald-400"
+                  : "bg-slate-700"
+            }`}
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        <div className="mt-2 flex items-center justify-between gap-2 text-[10px]">
+          <span className="truncate text-slate-600">
+            {ui("Postęp", "Progress", "Fortschritt")}
+          </span>
+          <span
+            className={`shrink-0 font-bold ${
+              active
+                ? "text-blue-300"
+                : completed
+                  ? "text-emerald-300"
+                  : "text-slate-500"
+            }`}
+          >
+            {completed ? "100%" : `${progress.toFixed(0)}%`}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getFreedomRoadCardProgress(level: FreedomLevel, effectiveNetWorth: number) {
+  if (level.target === null) {
+    return effectiveNetWorth >= level.min ? 100 : 0;
+  }
+
+  if (effectiveNetWorth >= level.target) {
+    return 100;
+  }
+
+  if (effectiveNetWorth <= level.min) {
+    return 0;
+  }
+
+  return ((effectiveNetWorth - level.min) / (level.target - level.min)) * 100;
 }

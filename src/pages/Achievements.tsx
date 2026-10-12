@@ -20,6 +20,11 @@ import {
   type Achievement,
   type AchievementRarity,
 } from "../features/achievements/achievementEngine";
+import {
+  getAchievementCardVisual,
+  getFreedomMilestoneVisual,
+  getRarityGlowClass,
+} from "../features/achievements/achievementVisuals";
 import { localize, useLanguage, translateLevelName, type AppLanguage } from "../i18n/LanguageContext";
 import { useCurrency } from "../i18n/CurrencyContext";
 
@@ -169,7 +174,7 @@ export function Achievements(props: AchievementsProps) {
         <h2 className="mt-2 text-xl font-black">{ui("Droga do wolności", "Road to freedom", "Weg zur Freiheit")}</h2>
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-7">
           {achievements.filter((item) => item.category === "wealth").map((achievement, index) => (
-            <WealthMilestone key={achievement.id} achievement={achievement} artworkIndex={index} formatCompactMoney={formatCompactMoney} />
+            <WealthMilestone key={achievement.id} achievement={achievement} artworkIndex={index} formatCompactMoney={formatCompactMoney} language={language} />
           ))}
         </div>
       </section>
@@ -205,37 +210,86 @@ export function Achievements(props: AchievementsProps) {
 function AchievementCard({ achievement, language, locale, formatMoney }: { achievement: Achievement; language: AppLanguage; locale: string; formatMoney: (value: number, options?: any) => string }) {
   const style = rarityClasses[achievement.rarity];
   const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const visual = getAchievementCardVisual(achievement);
+
   return (
-    <div className={`relative overflow-hidden rounded-2xl border p-5 transition ${achievement.unlocked ? `${style.border} ${style.background}` : "border-slate-800 bg-[#0b1322] opacity-70"}`}>
-      <div className="flex items-start justify-between gap-4">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${achievement.unlocked ? style.badge : "bg-slate-800 text-slate-600"}`}>{achievement.unlocked ? achievement.icon : <LockKeyhole size={21} />}</div>
-        <div className="text-right">
-          <span className={`rounded-md px-2 py-1 text-[10px] font-black tracking-wider ${achievement.unlocked ? style.badge : "bg-slate-800 text-slate-600"}`}>{rarityLabels[achievement.rarity][language]}</span>
-          <p className="mt-2 text-xs font-bold text-amber-400">+{achievement.xp} XP</p>
+    <div className={`group relative overflow-hidden rounded-2xl border transition duration-300 hover:-translate-y-1 hover:shadow-xl ${getRarityGlowClass(achievement.rarity)} ${achievement.unlocked ? `${style.border} ${style.background}` : "border-slate-800 bg-[#0b1322]"}`}>
+      <div className="relative h-28 overflow-hidden border-b border-white/5">
+        <img
+          src={visual.image}
+          alt=""
+          className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.05] ${achievement.unlocked ? "opacity-100" : "opacity-45 grayscale-[25%]"}`}
+          style={{ objectPosition: visual.objectPosition ?? "center", transform: `scale(${visual.imageScale ?? 1.04})` }}
+        />
+        <div className={`absolute inset-0 bg-gradient-to-t ${achievement.unlocked ? visual.overlayClass : "from-[#050b16]/95 via-[#050b16]/70 to-[#050b16]/35"}`} />
+
+        <div className="absolute inset-x-0 top-0 flex items-start justify-between p-4">
+          <div className={`flex h-11 w-11 items-center justify-center rounded-xl border backdrop-blur-md ${achievement.unlocked ? "border-white/10 bg-black/30 text-white" : "border-slate-700/50 bg-black/35 text-slate-500"}`}>
+            {achievement.unlocked ? achievement.icon : <LockKeyhole size={20} />}
+          </div>
+
+          <div className="text-right">
+            <span className={`rounded-md px-2 py-1 text-[10px] font-black tracking-wider backdrop-blur-md ${achievement.unlocked ? style.badge : "bg-black/35 text-slate-500"}`}>
+              {rarityLabels[achievement.rarity][language]}
+            </span>
+            <p className="mt-2 text-xs font-bold text-amber-400">+{achievement.xp} XP</p>
+          </div>
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 p-4">
+          <h3 className={`text-lg font-black ${achievement.unlocked ? "text-white" : "text-slate-300"}`}>{achievement.name}</h3>
         </div>
       </div>
-      <h3 className={`mt-5 text-lg font-black ${achievement.unlocked ? "text-white" : "text-slate-500"}`}>{achievement.name}</h3>
-      <p className="mt-1 min-h-10 text-sm leading-5 text-slate-500">{achievement.description}</p>
-      <div className="mt-5">
-        <div className="flex justify-between text-xs">
-          <span className="text-slate-600">{formatAchievementValue(achievement.current, achievement.unit, formatMoney, locale)}</span>
-          <span className={achievement.unlocked ? style.text : "text-slate-600"}>{achievement.unlocked ? ui("ODBLOKOWANE", "UNLOCKED", "FREIGESCHALTET") : formatAchievementValue(achievement.target, achievement.unit, formatMoney, locale)}</span>
+
+      <div className={`p-5 ${achievement.unlocked ? "" : "opacity-75"}`}>
+        <p className="min-h-10 text-sm leading-5 text-slate-500">{achievement.description}</p>
+        <div className="mt-5">
+          <div className="flex justify-between text-xs">
+            <span className="text-slate-600">{formatAchievementValue(achievement.current, achievement.unit, formatMoney, locale)}</span>
+            <span className={achievement.unlocked ? style.text : "text-slate-600"}>{achievement.unlocked ? ui("ODBLOKOWANE", "UNLOCKED", "FREIGESCHALTET") : formatAchievementValue(achievement.target, achievement.unit, formatMoney, locale)}</span>
+          </div>
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800"><div className={`h-full rounded-full ${achievement.unlocked ? getProgressColor(achievement.rarity) : "bg-slate-700"}`} style={{ width: `${achievement.progress}%` }} /></div>
         </div>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800"><div className={`h-full rounded-full ${achievement.unlocked ? getProgressColor(achievement.rarity) : "bg-slate-700"}`} style={{ width: `${achievement.progress}%` }} /></div>
       </div>
-      {achievement.unlocked && <div className="absolute right-4 top-20 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400"><Check size={15} /></div>}
+
+      {achievement.unlocked && <div className="absolute right-4 top-[5.55rem] flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400 shadow-lg shadow-emerald-950/30"><Check size={15} /></div>}
     </div>
   );
 }
 
-function WealthMilestone({ achievement, artworkIndex, formatCompactMoney }: { achievement: Achievement; artworkIndex: number; formatCompactMoney: (value: number) => string }) {
+function WealthMilestone({ achievement, artworkIndex, formatCompactMoney, language }: { achievement: Achievement; artworkIndex: number; formatCompactMoney: (value: number) => string; language: AppLanguage }) {
+  const visual = getFreedomMilestoneVisual(artworkIndex + 1);
+  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+
   return (
-    <div className={`group relative min-h-[150px] overflow-hidden rounded-2xl border transition duration-300 hover:-translate-y-1 hover:shadow-xl ${achievement.unlocked ? "border-blue-400/40 shadow-blue-500/10" : "border-slate-800"}`}>
-      <div className="absolute inset-0 bg-no-repeat transition-transform duration-500 group-hover:scale-105" style={{ backgroundImage: "url('/levels/levels.png')", backgroundSize: "700% 100%", backgroundPosition: `${(artworkIndex / 6) * 100}% center` }} />
-      <div className={`absolute inset-0 ${achievement.unlocked ? "bg-gradient-to-t from-[#06101f] via-[#06101f]/55 to-transparent" : "bg-gradient-to-t from-[#050b16] via-[#050b16]/80 to-[#050b16]/45 grayscale-[55%]"}`} />
-      <div className="relative flex min-h-[150px] flex-col items-center justify-between p-3 text-center">
-        <div className="flex w-full justify-end"><div className={`flex h-8 w-8 items-center justify-center rounded-full border backdrop-blur-md ${achievement.unlocked ? "border-blue-400/40 bg-blue-500/20 text-blue-300" : "border-slate-600/50 bg-black/35 text-slate-400"}`}>{achievement.unlocked ? <Check size={16} /> : <LockKeyhole size={14} />}</div></div>
-        <div className="w-full rounded-xl border border-white/10 bg-black/30 px-2 py-2 backdrop-blur-sm"><p className="text-sm font-black text-white drop-shadow-lg">{formatCompactMoney(achievement.target)}</p><p className={`mt-1 text-[9px] font-black uppercase tracking-wider ${achievement.unlocked ? "text-blue-300" : "text-slate-400"}`}>{achievement.name}</p></div>
+    <div className={`group relative min-h-[188px] overflow-hidden rounded-2xl border transition duration-300 hover:-translate-y-1 hover:shadow-xl ${achievement.unlocked ? "border-blue-400/35 shadow-blue-950/20" : "border-slate-800 shadow-black/10"}`}>
+      <div className="relative h-full min-h-[188px] overflow-hidden">
+        <img
+          src={visual.image}
+          alt=""
+          className={`absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.05] ${achievement.unlocked ? "opacity-100" : "opacity-45 grayscale-[35%]"}`}
+          style={{ objectPosition: visual.objectPosition ?? "center", transform: `scale(${visual.imageScale ?? 1.04})` }}
+        />
+        <div className={`absolute inset-0 bg-gradient-to-t ${achievement.unlocked ? visual.overlayClass : "from-[#050b16]/95 via-[#050b16]/75 to-[#050b16]/40"}`} />
+
+        <div className="relative flex min-h-[188px] flex-col justify-between p-3.5">
+          <div className="flex items-start justify-between gap-3">
+            <div className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] backdrop-blur-md ${achievement.unlocked ? "border-white/10 bg-black/30 text-white" : "border-slate-700/60 bg-black/35 text-slate-400"}`}>
+              {ui("Poziom", "Level", "Level")} {artworkIndex + 1}
+            </div>
+            <div className={`flex h-8 w-8 items-center justify-center rounded-full border backdrop-blur-md ${achievement.unlocked ? "border-blue-400/40 bg-blue-500/20 text-blue-300" : "border-slate-600/50 bg-black/35 text-slate-400"}`}>
+              {achievement.unlocked ? <Check size={16} /> : <LockKeyhole size={14} />}
+            </div>
+          </div>
+
+          <div className={`rounded-2xl border px-3 py-3 backdrop-blur-md ${achievement.unlocked ? visual.panelClass : "border-slate-700/50 bg-black/35"}`}>
+            <p className={`text-[10px] font-black uppercase tracking-[0.16em] ${achievement.unlocked ? visual.accentClass : "text-slate-500"}`}>{achievement.name}</p>
+            <p className="mt-1 text-lg font-black text-white">{formatCompactMoney(achievement.target)}</p>
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-900/70">
+              <div className={`h-full rounded-full ${achievement.unlocked ? "bg-blue-400" : "bg-slate-600"}`} style={{ width: `${Math.max(achievement.progress, achievement.unlocked ? 100 : 0)}%` }} />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
