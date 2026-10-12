@@ -15,7 +15,6 @@ export type ForeignDisplayCurrency = Exclude<DisplayCurrency, "PLN">;
 
 const STORAGE_KEY = "freedom.displayCurrency";
 const RATE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
-const FOREIGN_CURRENCIES: ForeignDisplayCurrency[] = ["USD", "EUR", "CHF"];
 
 function rateKey(currency: ForeignDisplayCurrency) {
   return `freedom.fx.${currency.toLowerCase()}PlnRate`;

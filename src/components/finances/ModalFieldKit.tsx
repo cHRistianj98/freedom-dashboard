@@ -92,6 +92,7 @@ export function DateInput({
   accent?: Accent;
 }) {
   const { language, locale } = useLanguage();
+  const ui = (pl: string, en: string, de?: string, es?: string) => localize(language, pl, en, de, es);
   const theme = accentMap[accent];
   const rootRef = useRef<HTMLDivElement>(null);
   const parsedValue = useMemo(() => parseDateOnly(value), [value]);
@@ -347,7 +348,7 @@ function formatDateOnly(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-function weekdayLabels(locale: "pl-PL" | "en-US" | "de-DE") {
+function weekdayLabels(locale: string) {
   const monday = new Date(2026, 0, 5, 12, 0, 0, 0);
   return Array.from({ length: 7 }, (_, index) =>
     new Intl.DateTimeFormat(locale, { weekday: "short" })
@@ -357,7 +358,7 @@ function weekdayLabels(locale: "pl-PL" | "en-US" | "de-DE") {
   );
 }
 
-function formatDisplayDate(date: Date, locale: "pl-PL" | "en-US" | "de-DE") {
+function formatDisplayDate(date: Date, locale: string) {
   return new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "2-digit",

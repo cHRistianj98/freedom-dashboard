@@ -272,6 +272,7 @@ function WealthChart({
   min: number;
   range: number;
 }) {
+  const { locale } = useLanguage();
   const width = 1000;
   const height = 280;
   const left = 96;

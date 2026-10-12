@@ -1114,6 +1114,7 @@ function App() {
                   monthlySnapshots={
                     monthlySnapshots
                   }
+                  recurringTransactions={recurringTransactions}
                   onAddExpense={
                     handleAddExpense
                   }
@@ -1193,9 +1194,6 @@ function App() {
                   goals={goals}
                   monthlySnapshots={monthlySnapshots}
                   onReleaseMoney={handleReleaseGoalMoney}
-                  onGoalsChanged={async () => {
-                    await refreshGoals();
-                  }}
                 />
               }
             />

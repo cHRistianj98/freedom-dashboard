@@ -960,31 +960,6 @@ async function copyTextToClipboard(text: string): Promise<void> {
 
 type PerformancePeriod = "24H" | "1M";
 
-function oneMonthReferenceSnapshot(snapshots: MonthlySnapshot[]): MonthlySnapshot | null {
-  if (!snapshots.length) return null;
-  const target = new Date();
-  target.setHours(0, 0, 0, 0);
-  target.setDate(target.getDate() - 30);
-
-  const withDates = snapshots
-    .map(snapshot => ({ snapshot, date: monthEndDate(snapshot.month) }))
-    .filter((row): row is { snapshot: MonthlySnapshot; date: Date } => row.date != null)
-    .sort((a, b) => a.date.getTime() - b.date.getTime());
-
-  const onOrBefore = withDates.filter(row => row.date.getTime() <= target.getTime());
-  if (onOrBefore.length) return onOrBefore[onOrBefore.length - 1].snapshot;
-  return withDates[0]?.snapshot ?? null;
-}
-
-function monthEndDate(month: string): Date | null {
-  const match = /^(\d{4})-(\d{2})$/.exec(month);
-  if (!match) return null;
-  const year = Number(match[1]);
-  const monthIndex = Number(match[2]);
-  if (!Number.isInteger(year) || monthIndex < 1 || monthIndex > 12) return null;
-  return new Date(year, monthIndex, 0, 23, 59, 59, 999);
-}
-
 type AssetPerformanceChange = {
   value: number;
   label: "24h" | "1M";

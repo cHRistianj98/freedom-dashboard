@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { RefreshCw, Search } from "lucide-react";
-import { marketPriceApi, type CryptoQuote, type CryptoSearchResult } from "../../api/marketPriceApi";
+import { marketPriceApi, type CryptoQuote, type CryptoSearchResult } from "../../../../api/marketPriceApi";
 
 export type CryptoSelection = {
   id: string;

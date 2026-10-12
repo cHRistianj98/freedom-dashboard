@@ -34,6 +34,7 @@ import { PortfolioOverviewSection } from "../components/dashboard/PortfolioOverv
 import { LiabilitiesSection } from "../components/dashboard/LiabilitiesSection";
 import { CashflowSection } from "../components/dashboard/CashflowSection";
 import { AddExpenseModal } from "../components/dashboard/AddExpenseModal";
+import { FinancialCommandCenter } from "../components/dashboard/FinancialCommandCenter";
 import { localize, useLanguage, type AppLanguage } from "../i18n/LanguageContext";
 import { formatDisplayMoney, formatDisplayMoneyCompact } from "../utils/displayMoney";
 
@@ -60,6 +61,7 @@ import type { Goal } from "../types/Goal";
 import type { Liability } from "../types/Liability";
 import type { NetWorthSnapshot } from "../types/NetWorthHistory";
 import type { MonthlySnapshot } from "../types/MonthlySnapshot";
+import type { RecurringTransaction } from "../types/RecurringTransaction";
 
 type DashboardProps = {
   netWorth: number;
@@ -69,6 +71,7 @@ type DashboardProps = {
   netWorthHistory: NetWorthSnapshot[];
   monthlyBudget: MonthlyBudget;
   monthlySnapshots: MonthlySnapshot[];
+  recurringTransactions: RecurringTransaction[];
 
   onAddExpense: (
     expense: Expense
@@ -156,6 +159,7 @@ export function Dashboard({
   netWorthHistory,
   monthlyBudget,
   monthlySnapshots,
+  recurringTransactions,
   onAddExpense,
 }: DashboardProps) {
   const { t, language, levelName: translateLevelName } = useLanguage();
@@ -859,6 +863,17 @@ export function Dashboard({
           )}
         </div>
       </section>
+
+      {/* Decision layer: uses the CURRENT ledger and reservation APIs only. */}
+      {isCurrentMonth && (
+        <FinancialCommandCenter
+          portfolio={portfolio}
+          goals={goals}
+          liabilities={liabilities}
+          monthlyBudget={monthlyBudget}
+          recurringTransactions={recurringTransactions}
+        />
+      )}
 
       {/* =====================================
           PRIORITY OVERVIEW

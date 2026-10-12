@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, Target } from "lucide-react";
+import { CalendarDays, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import type { Goal } from "../../types/Goal";

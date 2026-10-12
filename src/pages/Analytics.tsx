@@ -536,6 +536,7 @@ function Signal({label,value,positive}:{label:string;value:string;positive:boole
 }
 
 function AnomalyBanner({ anomalies }: { anomalies: IncomeAnomaly[] }) {
+  const { locale } = useLanguage();
   const first=anomalies[0];
   return <section className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5"><div className="flex items-start gap-4"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400"><AlertTriangle size={20}/></div><div><p className="font-bold text-amber-300">Wykryto nietypową wartość</p><p className="mt-1 text-sm leading-6 text-slate-400">„<span className="font-semibold text-slate-200">{first.transaction.name}</span>” z {formatDate(first.transaction.date, locale)}: <span className="font-bold text-amber-300">{formatMoney(first.transaction.amount)}</span>. {first.reason}</p>{anomalies.length>1&&<p className="mt-2 text-xs text-amber-400/80">+ {anomalies.length-1} kolejna/e nietypowa/e transakcja/e.</p>}<p className="mt-2 text-xs text-slate-600">Analytics niczego nie zmienia — tylko sygnalizuje dane do sprawdzenia w Finansach.</p></div></div></section>;
 }

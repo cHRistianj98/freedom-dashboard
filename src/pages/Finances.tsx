@@ -1185,7 +1185,7 @@ function TransactionVisualRow({
   );
 }
 
-function formatTransactionDate(date: string | undefined, locale: "pl-PL" | "en-US" | "de-DE", language: AppLanguage) {
+function formatTransactionDate(date: string | undefined, locale: string, language: AppLanguage) {
   if (!date) return language === "pl" ? "Brak daty" : language === "de" ? "Kein Datum" : language === "es" ? "Sin fecha" : "No date";
 
   const [year, month, day] = date.split("-");
