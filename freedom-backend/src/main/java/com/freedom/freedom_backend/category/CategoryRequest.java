@@ -8,6 +8,7 @@ public record CategoryRequest(
         @NotNull CategoryGroup group,
         @NotBlank String name,
         @NotBlank String iconKey,
+        String imageKey,
         @NotBlank String color,
         Boolean active,
         Integer sortOrder

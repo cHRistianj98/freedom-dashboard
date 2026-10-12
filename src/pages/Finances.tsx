@@ -17,6 +17,7 @@ import {
   Trash2,
   Sparkles,
   FileUp,
+  Tags,
   Target,
   TrendingDown,
   TrendingUp,
@@ -30,6 +31,7 @@ import { AddExpenseModal } from "../components/dashboard/AddExpenseModal";
 import { EditExpenseModal } from "../components/finances/EditExpenseModal";
 
 import { CategoryMiniImage } from "../components/categories/CategoryMiniImage";
+import { CategoryManagerModal } from "../components/categories/CategoryManagerModal";
 
 import { RecurringTransactionsSection } from "../components/finances/RecurringTransactionsSection";
 import { AddRecurringTransactionModal } from "../components/finances/AddRecurringTransactionModal";
@@ -235,6 +237,11 @@ export function Finances({
   const [
     isAiPromptOpen,
     setIsAiPromptOpen,
+  ] = useState(false);
+
+  const [
+    isCategoryManagerOpen,
+    setIsCategoryManagerOpen,
   ] = useState(false);
 
   const [
@@ -517,6 +524,15 @@ export function Finances({
 
           <button
             type="button"
+            onClick={() => setIsCategoryManagerOpen(true)}
+            className="flex cursor-pointer items-center gap-2 rounded-xl border border-cyan-500/20 bg-cyan-500/[0.06] px-4 py-3 text-sm font-semibold text-cyan-200 transition hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-white"
+          >
+            <Tags size={18} />
+            {ui("Kategorie", "Categories", "Kategorien")}
+          </button>
+
+          <button
+            type="button"
             onClick={() =>
               setIsAddExpenseOpen(
                 true
@@ -696,6 +712,7 @@ export function Finances({
                   recurring={incomeItem.recurring}
                   categoryName={localizedCategoryName(incomeItem.categoryName ?? "Przychód", language)}
                   categoryIconKey={incomeItem.categoryIconKey ?? "Wallet"}
+                  categoryImageKey={incomeItem.categoryImageKey}
                   categoryColor={incomeItem.categoryColor ?? "#10b981"}
                   tone="income"
                   currentAssetId={incomeItem.assetId}
@@ -826,6 +843,7 @@ export function Finances({
                             recurring={expense.recurring}
                             categoryName={localizedCategoryName(expense.categoryName ?? config.title, language)}
                             categoryIconKey={expense.categoryIconKey ?? fallbackIconKey(config.category)}
+                            categoryImageKey={expense.categoryImageKey}
                             categoryColor={expense.categoryColor ?? fallbackCategoryColor(config.category)}
                             tone="expense"
                             goal={expense.goalId ? goals.find((goal) => goal.id === expense.goalId) : undefined}
@@ -994,6 +1012,11 @@ export function Finances({
         onClose={() => setIsImportOpen(false)}
         onImported={onDataImported}
       />
+
+      <CategoryManagerModal
+        open={isCategoryManagerOpen}
+        onClose={() => setIsCategoryManagerOpen(false)}
+      />
     </main>
   );
 }
@@ -1006,6 +1029,7 @@ type TransactionVisualRowProps = {
   recurring: boolean;
   categoryName: string;
   categoryIconKey: string;
+  categoryImageKey?: string;
   categoryColor: string;
   tone: "income" | "expense";
   goal?: Goal;
@@ -1024,6 +1048,7 @@ function TransactionVisualRow({
   recurring,
   categoryName,
   categoryIconKey,
+  categoryImageKey,
   categoryColor,
   tone,
   goal,
@@ -1047,6 +1072,7 @@ function TransactionVisualRow({
       <CategoryMiniImage
         name={categoryName}
         iconKey={categoryIconKey}
+        imageKey={categoryImageKey}
         color={categoryColor}
         size="md"
       />

@@ -7,6 +7,7 @@ public record CategoryResponse(
         String slug,
         String name,
         String iconKey,
+        String imageKey,
         String color,
         boolean systemDefault,
         boolean active,
@@ -14,6 +15,6 @@ public record CategoryResponse(
 ) {
     public static CategoryResponse from(Category c) {
         return new CategoryResponse(c.getId(), c.getType(), c.getGroup(), c.getSlug(), c.getName(),
-                c.getIconKey(), c.getColor(), c.isSystemDefault(), c.isActive(), c.getSortOrder());
+                c.getIconKey(), c.getImageKey(), c.getColor(), c.isSystemDefault(), c.isActive(), c.getSortOrder());
     }
 }

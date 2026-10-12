@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { CategoryIcon } from "./CategoryIcon";
+import { categoryArtworkSrc } from "./categoryVisualCatalog";
 
 type CategoryMiniImageProps = {
   name: string;
   iconKey: string;
   color: string;
+  imageKey?: string;
   size?: "sm" | "md" | "lg";
   className?: string;
 };
@@ -73,6 +75,7 @@ export function CategoryMiniImage({
   name,
   iconKey,
   color,
+  imageKey,
   size = "md",
   className = "",
 }: CategoryMiniImageProps) {
@@ -81,8 +84,8 @@ export function CategoryMiniImage({
   const fileName = categoryPhotoFiles[normalized];
 
   const src = useMemo(
-    () => fileName ? `/categories/${fileName}` : null,
-    [fileName]
+    () => categoryArtworkSrc(imageKey) ?? (fileName ? `/categories/${fileName}` : null),
+    [fileName, imageKey]
   );
 
   return (

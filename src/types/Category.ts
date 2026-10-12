@@ -8,13 +8,14 @@ export type Category = {
   slug: string;
   name: string;
   iconKey: string;
+  imageKey?: string;
   color: string;
   systemDefault: boolean;
   active: boolean;
   sortOrder: number;
 };
 
-export type CategoryInput = Pick<Category, "type" | "group" | "name" | "iconKey" | "color"> & {
+export type CategoryInput = Pick<Category, "type" | "group" | "name" | "iconKey" | "imageKey" | "color"> & {
   active?: boolean;
   sortOrder?: number;
 };

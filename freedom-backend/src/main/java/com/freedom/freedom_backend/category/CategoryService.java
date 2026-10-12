@@ -35,7 +35,7 @@ public class CategoryService {
         ensureDefaults(user);
         String slug = uniqueSlug(user, request.type(), slugify(request.name()));
         Category category = new Category(user, request.type(), request.group(), slug, request.name().trim(),
-                request.iconKey().trim(), request.color().trim(), false,
+                request.iconKey().trim(), normalizeImageKey(request.imageKey()), request.color().trim(), false,
                 request.active() == null || request.active(), request.sortOrder() == null ? 1000 : request.sortOrder());
         return CategoryResponse.from(repository.save(category));
     }
@@ -45,18 +45,23 @@ public class CategoryService {
         if (category.getType() != request.type()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category type cannot be changed");
         }
-        category.update(request.name().trim(), request.group(), request.iconKey().trim(), request.color().trim(),
+        category.update(request.name().trim(), request.group(), request.iconKey().trim(),
+                request.imageKey() == null ? category.getImageKey() : normalizeImageKey(request.imageKey()), request.color().trim(),
                 request.active() == null || request.active(), request.sortOrder() == null ? category.getSortOrder() : request.sortOrder());
         return CategoryResponse.from(category);
     }
 
     public void delete(Long id, User user) {
         Category category = findOwned(id, user);
-        if (category.isSystemDefault()) {
-            category.update(category.getName(), category.getGroup(), category.getIconKey(), category.getColor(), false, category.getSortOrder());
-            return;
-        }
-        repository.delete(category);
+        category.update(
+                category.getName(),
+                category.getGroup(),
+                category.getIconKey(),
+                category.getImageKey(),
+                category.getColor(),
+                false,
+                category.getSortOrder()
+        );
     }
 
     public Category findOwned(Long id, User user) {
@@ -84,7 +89,7 @@ public class CategoryService {
         String slug = uniqueSlug(user, type, slugify(cleanName));
         String color = type == CategoryType.INCOME ? "#4A9FE8" : "#64748B";
         Category imported = new Category(
-                user, type, group, slug, cleanName, "CircleHelp", color, false, true, 900
+                user, type, group, slug, cleanName, "CircleHelp", "other", color, false, true, 900
         );
         return repository.save(imported);
     }
@@ -115,12 +120,62 @@ public class CategoryService {
                     seed.slug,
                     seed.name,
                     seed.icon,
+                    seedImageKey(seed.slug),
                     seed.color,
                     true,
                     true,
                     sortOrder
             ));
         }
+    }
+
+    private static String normalizeImageKey(String imageKey) {
+        if (imageKey == null) return null;
+        String value = imageKey.trim();
+        return value.isBlank() ? null : value;
+    }
+
+    private static String seedImageKey(String slug) {
+        return switch (slug) {
+            case "groceries" -> "groceries";
+            case "hairdresser" -> "hairdresser";
+            case "eating-out" -> "eating-out";
+            case "care" -> "care";
+            case "transport" -> "transport";
+            case "home" -> "home";
+            case "pharmacy" -> "pharmacy";
+            case "dentist" -> "dentist";
+            case "supplements" -> "supplements";
+            case "internet" -> "internet";
+            case "loan" -> "loan";
+            case "electricity" -> "electricity";
+            case "subscriptions" -> "subscriptions";
+            case "phone" -> "phone";
+            case "taxes" -> "taxes";
+            case "education" -> "education";
+            case "gym" -> "gym";
+            case "dance" -> "dance";
+            case "investments", "investment-fees" -> "investments";
+            case "currency-spread" -> "fx-spread";
+            case "gaming" -> "gaming";
+            case "chess" -> "chess";
+            case "equipment" -> "equipment";
+            case "clothes" -> "clothes";
+            case "health" -> "health";
+            case "donations" -> "donations";
+            case "gifts" -> "gifts";
+            case "wedding" -> "wedding";
+            case "trips" -> "trips";
+            case "car" -> "car";
+            case "sport" -> "sport";
+            case "salary" -> "salary";
+            case "gift-income" -> "gift-income";
+            case "interest" -> "interest";
+            case "tax-refund" -> "tax-refund";
+            case "family" -> "family";
+            case "sale" -> "sale";
+            default -> "other";
+        };
     }
 
     private String uniqueSlug(User user, CategoryType type, String base) {

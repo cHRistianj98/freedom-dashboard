@@ -12,6 +12,7 @@ type BackendTransaction = {
   categoryId?: number | null;
   categoryName?: string | null;
   categoryIconKey?: string | null;
+  categoryImageKey?: string | null;
   categoryColor?: string | null;
   categoryGroup?: string | null;
   recurring: boolean;
@@ -52,6 +53,7 @@ function details(item: BackendTransaction) {
     categoryId: item.categoryId ?? undefined,
     categoryName: item.categoryName ?? undefined,
     categoryIconKey: item.categoryIconKey ?? undefined,
+    categoryImageKey: item.categoryImageKey ?? undefined,
     categoryColor: item.categoryColor ?? undefined,
     categoryGroup: item.categoryGroup ?? undefined,
   };

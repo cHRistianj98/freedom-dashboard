@@ -37,6 +37,9 @@ public class Category {
     @Column(name = "icon_key", nullable = false, length = 80)
     private String iconKey;
 
+    @Column(name = "image_key", length = 80)
+    private String imageKey;
+
     @Column(nullable = false, length = 16)
     private String color;
 
@@ -52,7 +55,7 @@ public class Category {
     protected Category() {}
 
     public Category(User user, CategoryType type, CategoryGroup group, String slug,
-                    String name, String iconKey, String color, boolean systemDefault,
+                    String name, String iconKey, String imageKey, String color, boolean systemDefault,
                     boolean active, int sortOrder) {
         this.user = user;
         this.type = type;
@@ -60,16 +63,18 @@ public class Category {
         this.slug = slug;
         this.name = name;
         this.iconKey = iconKey;
+        this.imageKey = imageKey;
         this.color = color;
         this.systemDefault = systemDefault;
         this.active = active;
         this.sortOrder = sortOrder;
     }
 
-    public void update(String name, CategoryGroup group, String iconKey, String color, boolean active, int sortOrder) {
+    public void update(String name, CategoryGroup group, String iconKey, String imageKey, String color, boolean active, int sortOrder) {
         this.name = name;
         this.group = group;
         this.iconKey = iconKey;
+        this.imageKey = imageKey;
         this.color = color;
         this.active = active;
         this.sortOrder = sortOrder;
@@ -82,6 +87,7 @@ public class Category {
     public String getSlug() { return slug; }
     public String getName() { return name; }
     public String getIconKey() { return iconKey; }
+    public String getImageKey() { return imageKey; }
     public String getColor() { return color; }
     public boolean isSystemDefault() { return systemDefault; }
     public boolean isActive() { return active; }

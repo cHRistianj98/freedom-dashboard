@@ -8,6 +8,7 @@ export type TransactionCategoryDetails = {
   categoryId?: number;
   categoryName?: string;
   categoryIconKey?: string;
+  categoryImageKey?: string;
   categoryColor?: string;
   categoryGroup?: string;
 };
