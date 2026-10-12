@@ -23,12 +23,12 @@ export function getStoredUsdPlnRate(): number | null {
 
 export function localeForLanguage(language?: AppLanguage) {
   const selected = language ?? readStoredLanguage();
-  return selected === "de" ? "de-DE" : selected === "en" ? "en-US" : "pl-PL";
+  return selected === "de" ? "de-DE" : selected === "es" ? "es-ES" : selected === "en" ? "en-US" : "pl-PL";
 }
 
 export function readStoredLanguage(): AppLanguage {
   const value = window.localStorage.getItem("freedom.language");
-  return value === "en" || value === "de" ? value : "pl";
+  return value === "en" || value === "de" || value === "es" ? value : "pl";
 }
 
 export function convertPlnForDisplay(plnAmount: number, currency = getStoredDisplayCurrency()) {

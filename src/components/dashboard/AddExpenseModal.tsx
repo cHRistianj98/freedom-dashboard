@@ -147,7 +147,7 @@ export function AddExpenseModal({
       const available = `${selectedGoal.reservedOnAsset.toLocaleString(locale, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })} ${language === "pl" ? "zł" : language === "de" ? "PLN" : "PLN"}`;
+      })} ${language === "pl" ? "zł" : language === "de" ? "PLN" : language === "es" ? "PLN" : "PLN"}`;
       return setError(
         ui(
           `Cel „${selectedGoal.name}” ma na tym aktywie dostępne ${available} rezerwy.`,
@@ -167,6 +167,7 @@ export function AddExpenseModal({
       categoryId,
       categoryName: selectedCategory?.name,
       categoryIconKey: selectedCategory?.iconKey,
+      categoryImageKey: selectedCategory?.imageKey,
       categoryColor: selectedCategory?.color,
       categoryGroup: selectedCategory?.group,
       recurring: goalId ? false : recurring,

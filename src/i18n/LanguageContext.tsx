@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 
-export type AppLanguage = "pl" | "en" | "de";
+export type AppLanguage = "pl" | "en" | "de" | "es";
 
 const STORAGE_KEY = "freedom.language";
 
@@ -19,9 +19,11 @@ const messages = {
     polish: "Polski",
     english: "Angielski",
     german: "Niemiecki",
+    spanish: "Hiszpański",
     polishDescription: "Pełny interfejs po polsku.",
     englishDescription: "Pełny interfejs po angielsku.",
     germanDescription: "Pełny interfejs po niemiecku.",
+    spanishDescription: "Pełny interfejs po hiszpańsku.",
     savedLocally: "Ustawienie jest zapisywane lokalnie w tej przeglądarce.",
     dashboard: "Pulpit",
     freedomEngine: "Silnik Freedom",
@@ -83,9 +85,11 @@ const messages = {
     polish: "Polish",
     english: "English",
     german: "German",
+    spanish: "Spanish",
     polishDescription: "Full interface in Polish.",
     englishDescription: "Full interface in English.",
     germanDescription: "Full interface in German.",
+    spanishDescription: "Full interface in Spanish.",
     savedLocally: "This setting is saved locally in this browser.",
     dashboard: "Dashboard",
     freedomEngine: "Freedom Engine",
@@ -147,9 +151,11 @@ const messages = {
     polish: "Polnisch",
     english: "Englisch",
     german: "Deutsch",
+    spanish: "Spanisch",
     polishDescription: "Vollständige Oberfläche auf Polnisch.",
     englishDescription: "Vollständige Oberfläche auf Englisch.",
     germanDescription: "Vollständige Oberfläche auf Deutsch.",
+    spanishDescription: "Vollständige Oberfläche auf Spanisch.",
     savedLocally: "Diese Einstellung wird lokal in diesem Browser gespeichert.",
     dashboard: "Dashboard",
     freedomEngine: "Freedom Engine",
@@ -204,28 +210,94 @@ const messages = {
     quickInsight: "Schneller Einblick",
     freedomRoad: "Weg zur Freiheit",
   },
+  es: {
+    settings: "Ajustes",
+    language: "Idioma de la aplicación",
+    languageDescription: "Elige un idioma para toda la interfaz de Freedom.",
+    polish: "Polaco",
+    english: "Inglés",
+    german: "Alemán",
+    spanish: "Español",
+    polishDescription: "Interfaz completa en polaco.",
+    englishDescription: "Interfaz completa en inglés.",
+    germanDescription: "Interfaz completa en alemán.",
+    spanishDescription: "Interfaz completa en español.",
+    savedLocally: "Este ajuste se guarda localmente en este navegador.",
+    dashboard: "Panel",
+    freedomEngine: "Motor Freedom",
+    finances: "Finanzas",
+    investments: "Inversiones",
+    goals: "Objetivos",
+    budget: "Presupuesto",
+    liabilities: "Pasivos",
+    analytics: "Análisis",
+    timeline: "Cronología",
+    review: "Revisión",
+    simulator: "Simulador",
+    achievements: "Logros",
+    signedIn: "Sesión iniciada",
+    signOut: "Cerrar sesión",
+    yourFinancialGame: "Tu juego financiero",
+    playerLevel: "Nivel de jugador",
+    totalXp: "XP total",
+    toNextLevel: "Hasta el siguiente nivel",
+    maxPlayerLevel: "Nivel máximo de jugador",
+    levelExplanation: "Tu nivel aumenta con la XP de los logros. El patrimonio neto tiene una ruta de hitos independiente.",
+    hello: "¡Hola, Andrew!",
+    level: "Nivel",
+    financialCommandCenter: "Centro de mando financiero",
+    currentFinancialPicture: "Tu situación financiera actual y tu camino hacia la libertad.",
+    historicalFinancialPicture: "Vista histórica de tus finanzas.",
+    today: "Hoy",
+    currentMonth: "Mes actual",
+    history: "Historial",
+    previousMonth: "Mes anterior",
+    nextMonth: "Mes siguiente",
+    thisIsCurrentMonth: "Este es el mes actual",
+    managePortfolios: "Gestionar carteras",
+    seeAll: "Ver todo",
+    all: "Todo",
+    debtControl: "Control de deuda",
+    monthlyCashflow: "Flujo de caja mensual",
+    wealthCharts: "Gráficos de patrimonio",
+    portfolioStructure: "Estructura de carteras",
+    netWorthHistory: "Historial de patrimonio neto",
+    monthlyOperatingSystem: "Sistema operativo mensual",
+    netWorth: "Patrimonio neto",
+    primaryMission: "Misión principal",
+    currentTrajectory: "Trayectoria actual",
+    nextMove: "Tu siguiente movimiento",
+    lastReview: "Última revisión",
+    monthScore: "Puntuación del mes",
+    monthStatus: "Estado del mes",
+    nextAction: "Siguiente acción",
+    wealthMilestone: "Hito patrimonial",
+    monthOverMonth: "Mes a mes",
+    quickInsight: "Vista rápida",
+    freedomRoad: "Camino a la libertad",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof messages.pl;
 
-const levelPairs: Record<string, { pl: string; en: string; de: string }> = {
-  Rookie: { pl: "Debiutant", en: "Rookie", de: "Anfänger" },
-  Planner: { pl: "Planista", en: "Planner", de: "Planer" },
-  Saver: { pl: "Oszczędzający", en: "Saver", de: "Sparer" },
-  Builder: { pl: "Budowniczy", en: "Builder", de: "Aufbauer" },
-  Investor: { pl: "Inwestor", en: "Investor", de: "Investor" },
-  Strategist: { pl: "Strateg", en: "Strategist", de: "Stratege" },
-  Capitalist: { pl: "Kapitalista", en: "Capitalist", de: "Kapitalist" },
-  Mogul: { pl: "Mogoł", en: "Mogul", de: "Mogul" },
-  Tycoon: { pl: "Magnat", en: "Tycoon", de: "Magnat" },
-  Starter: { pl: "Start", en: "Starter", de: "Start" },
-  Accelerator: { pl: "Akcelerator", en: "Accelerator", de: "Beschleuniger" },
-  Millionaire: { pl: "Milioner", en: "Millionaire", de: "Millionär" },
-  Independent: { pl: "Niezależny", en: "Independent", de: "Unabhängig" },
-  FREE: { pl: "Wolność", en: "Free", de: "Freiheit" },
+const levelPairs: Record<string, { pl: string; en: string; de: string; es: string }> = {
+  Rookie: { pl: "Debiutant", en: "Rookie", de: "Anfänger", es: "Principiante" },
+  Planner: { pl: "Planista", en: "Planner", de: "Planer", es: "Planificador" },
+  Saver: { pl: "Oszczędzający", en: "Saver", de: "Sparer", es: "Ahorrador" },
+  Builder: { pl: "Budowniczy", en: "Builder", de: "Aufbauer", es: "Constructor" },
+  Investor: { pl: "Inwestor", en: "Investor", de: "Investor", es: "Inversor" },
+  Strategist: { pl: "Strateg", en: "Strategist", de: "Stratege", es: "Estratega" },
+  Capitalist: { pl: "Kapitalista", en: "Capitalist", de: "Kapitalist", es: "Capitalista" },
+  Mogul: { pl: "Mogoł", en: "Mogul", de: "Mogul", es: "Magnate" },
+  Tycoon: { pl: "Magnat", en: "Tycoon", de: "Magnat", es: "Magnate" },
+  Starter: { pl: "Start", en: "Starter", de: "Start", es: "Inicio" },
+  Accelerator: { pl: "Akcelerator", en: "Accelerator", de: "Beschleuniger", es: "Acelerador" },
+  Millionaire: { pl: "Milioner", en: "Millionaire", de: "Millionär", es: "Millonario" },
+  Independent: { pl: "Niezależny", en: "Independent", de: "Unabhängig", es: "Independiente" },
+  FREE: { pl: "Wolność", en: "Free", de: "Freiheit", es: "Libertad" },
 };
 
-const phrasePairs: Array<{ pl: string; en: string; de?: string }> = [
+const phrasePairs: Array<{ pl: string; en: string; de?: string; es?: string }> = [
   { pl: "Finanse", en: "Finances" },
   { pl: "Inwestycje", en: "Investments" },
   { pl: "Cele", en: "Goals" },
@@ -1199,6 +1271,16 @@ const phrasePairs: Array<{ pl: string; en: string; de?: string }> = [
   { pl: "% WOLNOŚCI", en: "% FREE", de: "% FREIHEIT" },
   { pl: "Kroczące przepływy pieniężne", en: "Rolling cashflow", de: "Rollierender Cashflow" },
   { pl: "Ten miesiąc pochodzi ze starszej historii. Przepływy pieniężne i majątek netto są historyczne, ale cele, dług i progresja nie były wtedy zapisywane — dlatego pokazujemy ich aktualny stan.", en: "This month comes from older history. Cashflow and net worth are historical, but goals, debt and progression were not recorded then — so their current state is shown.", de: "Dieser Monat stammt aus einer älteren Historie. Cashflow und Nettovermögen sind historisch, aber Ziele, Schulden und Fortschritt wurden damals nicht gespeichert — daher zeigen wir ihren aktuellen Stand." },
+  { pl: "Brak dostępnych opcji.", en: "No available options.", de: "Keine verfügbaren Optionen.", es: "No hay opciones disponibles." },
+  { pl: "Freedom filtruje niemożliwe transfery", en: "Freedom filters impossible transfers", de: "Freedom filtert unmögliche Transfers", es: "Freedom filtra las transferencias imposibles" },
+  { pl: "Źródłem może być konto / gotówka PLN. Celem może być inne konto PLN albo pozycja kupowana za gotówkę: waluta obca, krypto lub akcje / ETF.", en: "The source can be a PLN account / cash. The destination can be another PLN account or a position bought with cash: foreign currency, crypto or stocks / ETF.", de: "Quelle kann ein PLN-Konto / Bargeld sein. Ziel kann ein anderes PLN-Konto oder eine mit Bargeld gekaufte Position sein: Fremdwährung, Krypto oder Aktien / ETF.", es: "El origen puede ser una cuenta / efectivo en PLN. El destino puede ser otra cuenta en PLN o una posición comprada con efectivo: divisa extranjera, cripto o acciones / ETF." },
+  { pl: "Brak portfela z wolną gotówką PLN", en: "No portfolio with free PLN cash", de: "Kein Portfolio mit freiem PLN-Bargeld", es: "No hay cartera con efectivo PLN disponible" },
+  { pl: "Brak dostępnej gotówki PLN", en: "No PLN cash available", de: "Kein PLN-Bargeld verfügbar", es: "No hay efectivo PLN disponible" },
+  { pl: "Źródła typu nieruchomość, obligacje, pojazd, metale czy już kupione krypto nie są tutaj traktowane jak „gotówka do wydania”.", en: "Sources such as real estate, bonds, vehicles, metals or already purchased crypto are not treated here as spendable cash.", de: "Quellen wie Immobilien, Anleihen, Fahrzeuge, Metalle oder bereits gekaufte Kryptowährungen werden hier nicht als verfügbares Bargeld behandelt.", es: "Los activos como inmuebles, bonos, vehículos, metales o criptomonedas ya compradas no se tratan aquí como efectivo disponible para gastar." },
+  { pl: "Konto / aktywo docelowe", en: "Destination account / asset", de: "Zielkonto / Vermögenswert", es: "Cuenta / activo de destino" },
+  { pl: "Brak logicznego celu w tym portfelu", en: "No logical destination in this portfolio", de: "Kein sinnvolles Ziel in diesem Portfolio", es: "No hay un destino lógico en esta cartera" },
+  { pl: "W tym portfelu nie ma pozycji, do której Freedom może logicznie wykonać tę operację.", en: "This portfolio has no position to which Freedom can logically perform this operation.", de: "Dieses Portfolio enthält keine Position, für die Freedom diese Operation sinnvoll ausführen kann.", es: "Esta cartera no contiene ninguna posición para la que Freedom pueda realizar esta operación de forma lógica." },
+
 ];
 
 const germanPhraseMap = new Map<string, string>([
@@ -1586,6 +1668,217 @@ const germanPhraseMap = new Map<string, string>([
   ["Asset value", "Vermögenswert"],
 ]);
 
+const spanishPhraseMap = new Map<string, string>([
+  ["Settings", "Ajustes"],
+  ["App language", "Idioma de la aplicación"],
+  ["Display currency", "Moneda de visualización"],
+  ["Dashboard", "Panel"],
+  ["Freedom Engine", "Motor Freedom"],
+  ["Finances", "Finanzas"],
+  ["Investments", "Inversiones"],
+  ["Goals", "Objetivos"],
+  ["Budget", "Presupuesto"],
+  ["Liabilities", "Pasivos"],
+  ["Analytics", "Análisis"],
+  ["Timeline", "Cronología"],
+  ["Review", "Revisión"],
+  ["Simulator", "Simulador"],
+  ["Achievements", "Logros"],
+  ["Player level", "Nivel de jugador"],
+  ["Total XP", "XP total"],
+  ["Next unlock", "Siguiente desbloqueo"],
+  ["Wealth milestones", "Hitos patrimoniales"],
+  ["Trophy collection", "Colección de trofeos"],
+  ["Road to freedom", "Camino a la libertad"],
+  ["Net worth", "Patrimonio neto"],
+  ["Net worth history", "Historial del patrimonio neto"],
+  ["Portfolio structure", "Estructura de carteras"],
+  ["Manage portfolios", "Gestionar carteras"],
+  ["See all", "Ver todo"],
+  ["Monthly cashflow", "Flujo de caja mensual"],
+  ["Monthly Cashflow", "Flujo de caja mensual"],
+  ["Spending under control", "Gastos bajo control"],
+  ["Income", "Ingresos"],
+  ["Expenses", "Gastos"],
+  ["Free cash", "Efectivo disponible"],
+  ["Savings rate", "Tasa de ahorro"],
+  ["Surplus", "Superávit"],
+  ["Current month", "Mes actual"],
+  ["Previous month", "Mes anterior"],
+  ["Next month", "Mes siguiente"],
+  ["Month over month", "Mes a mes"],
+  ["Month score", "Puntuación del mes"],
+  ["Month status", "Estado del mes"],
+  ["Next action", "Siguiente acción"],
+  ["Primary mission", "Misión principal"],
+  ["Current trajectory", "Trayectoria actual"],
+  ["No trajectory", "Sin trayectoria"],
+  ["Your next move", "Tu siguiente movimiento"],
+  ["Quick insight", "Vista rápida"],
+  ["Debt Control", "Control de deuda"],
+  ["Debt control", "Control de deuda"],
+  ["Recurring transactions", "Transacciones recurrentes"],
+  ["Add rule", "Añadir regla"],
+  ["No recurring transactions", "No hay transacciones recurrentes"],
+  ["Add expense", "Añadir gasto"],
+  ["Add income", "Añadir ingreso"],
+  ["Edit expense", "Editar gasto"],
+  ["Edit income", "Editar ingreso"],
+  ["Name", "Nombre"],
+  ["Amount", "Importe"],
+  ["Date", "Fecha"],
+  ["Source of funds", "Origen de fondos"],
+  ["Category", "Categoría"],
+  ["Search categories…", "Buscar categorías…"],
+  ["No linked goal", "Sin objetivo vinculado"],
+  ["Goal expense", "Gasto de objetivo"],
+  ["Main", "Principal"],
+  ["Unallocated funds", "Fondos no asignados"],
+  ["System clearing", "Compensación del sistema"],
+  ["One-off", "Única vez"],
+  ["Today", "Hoy"],
+  ["Yesterday", "Ayer"],
+  ["Transaction date", "Fecha de transacción"],
+  ["Previous month", "Mes anterior"],
+  ["Next month", "Mes siguiente"],
+  ["Cancel", "Cancelar"],
+  ["Save", "Guardar"],
+  ["Delete", "Eliminar"],
+  ["Close", "Cerrar"],
+  ["Open", "Abrir"],
+  ["Selected", "Seleccionado"],
+  ["Available", "Disponible"],
+  ["Reserved", "Reservado"],
+  ["Spent", "Gastado"],
+  ["Total", "Total"],
+  ["Active", "Activo"],
+  ["Funded", "Financiado"],
+  ["Completed", "Completado"],
+  ["Progress", "Progreso"],
+  ["Target", "Objetivo"],
+  ["Deadline", "Fecha límite"],
+  ["No deadline", "Sin fecha límite"],
+  ["Goal", "Objetivo"],
+  ["Portfolio", "Cartera"],
+  ["Portfolios", "Carteras"],
+  ["Assets", "Activos"],
+  ["Cash", "Efectivo"],
+  ["Debt", "Deuda"],
+  ["Interest", "Intereses"],
+  ["Interest rate", "Tipo de interés"],
+  ["Payment", "Pago"],
+  ["Balance", "Saldo"],
+  ["Value", "Valor"],
+  ["History", "Historial"],
+  ["Analysis", "Análisis"],
+  ["Invested capital", "Capital invertido"],
+  ["Liquidity", "Liquidez"],
+  ["of gross assets", "de los activos brutos"],
+  ["Road To FREE", "Camino a la libertad"],
+  ["Next Milestone", "Siguiente hito"],
+  ["Reward", "Recompensa"],
+  ["Build wealth.", "Construye patrimonio."],
+  ["Buy freedom.", "Compra libertad."],
+  ["Your capital. Your strategy. Your freedom.", "Tu capital. Tu estrategia. Tu libertad."],
+  ["Build The Shield", "Construye el escudo"],
+  ["Debt Attack", "Ataque a la deuda"],
+  ["Investor Mode", "Modo inversor"],
+  ["Turn Cashflow Green", "Pon el flujo de caja en verde"],
+  ["Keep The Machine Running", "Mantén la máquina en marcha"],
+  ["What are we doing now?", "¿Qué estamos haciendo ahora?"],
+  ["Remove from focus", "Quitar del foco"],
+  ["Set as focus", "Establecer como foco"],
+  ["How does the queue work?", "¿Cómo funciona la cola?"],
+  ["Monthly Plan", "Plan mensual"],
+  ["Extra Cash", "Efectivo extra"],
+  ["Rolling cashflow", "Flujo de caja móvil"],
+  ["Rolling savings rate", "Tasa de ahorro móvil"],
+  ["LIVE", "EN VIVO"],
+  ["Live", "En vivo"],
+  ["Preview", "Vista previa"],
+  ["Source", "Origen"],
+  ["Required", "Requerido"],
+  ["Allocated", "Asignado"],
+  ["No active mission", "Sin misión activa"],
+  ["Needs attention", "Necesita atención"],
+  ["Building", "Construyendo"],
+  ["Strong month", "Mes fuerte"],
+  ["Excellent month", "Mes excelente"],
+  ["Recovery", "Recuperación"],
+  ["Solid month", "Mes sólido"],
+  ["January", "Enero"], ["February", "Febrero"], ["March", "Marzo"], ["April", "Abril"],
+  ["May", "Mayo"], ["June", "Junio"], ["July", "Julio"], ["August", "Agosto"],
+  ["September", "Septiembre"], ["October", "Octubre"], ["November", "Noviembre"], ["December", "Diciembre"],
+]);
+
+const spanishWordPairs: Array<{ en: string; es: string }> = [
+  { en: "no", es: "sin" },
+  { en: "add", es: "añadir" },
+  { en: "edit", es: "editar" },
+  { en: "delete", es: "eliminar" },
+  { en: "save", es: "guardar" },
+  { en: "choose", es: "elegir" },
+  { en: "expense", es: "gasto" },
+  { en: "expenses", es: "gastos" },
+  { en: "income", es: "ingresos" },
+  { en: "goal", es: "objetivo" },
+  { en: "goals", es: "objetivos" },
+  { en: "month", es: "mes" },
+  { en: "monthly", es: "mensual" },
+  { en: "amount", es: "importe" },
+  { en: "name", es: "nombre" },
+  { en: "date", es: "fecha" },
+  { en: "source", es: "origen" },
+  { en: "funds", es: "fondos" },
+  { en: "portfolio", es: "cartera" },
+  { en: "portfolios", es: "carteras" },
+  { en: "wealth", es: "patrimonio" },
+  { en: "value", es: "valor" },
+  { en: "liabilities", es: "pasivos" },
+  { en: "cash", es: "efectivo" },
+  { en: "assets", es: "activos" },
+  { en: "debt", es: "deuda" },
+  { en: "freedom", es: "libertad" },
+  { en: "score", es: "puntuación" },
+  { en: "settings", es: "ajustes" },
+  { en: "language", es: "idioma" },
+  { en: "transactions", es: "transacciones" },
+  { en: "rule", es: "regla" },
+  { en: "rules", es: "reglas" },
+  { en: "category", es: "categoría" },
+  { en: "account", es: "cuenta" },
+  { en: "today", es: "hoy" },
+  { en: "yesterday", es: "ayer" },
+  { en: "close", es: "cerrar" },
+  { en: "open", es: "abrir" },
+  { en: "history", es: "historial" },
+  { en: "current", es: "actual" },
+  { en: "active", es: "activo" },
+  { en: "level", es: "nivel" },
+  { en: "road", es: "camino" },
+  { en: "review", es: "revisión" },
+  { en: "deadline", es: "fecha límite" },
+  { en: "remaining", es: "restante" },
+  { en: "living", es: "vida" },
+  { en: "fixed", es: "fijos" },
+  { en: "investments", es: "inversiones" },
+  { en: "reserve", es: "reserva" },
+  { en: "funded", es: "financiado" },
+  { en: "completed", es: "completado" },
+  { en: "progress", es: "progreso" },
+  { en: "priority", es: "prioridad" },
+  { en: "payment", es: "pago" },
+  { en: "balance", es: "saldo" },
+  { en: "required", es: "requerido" },
+  { en: "allocated", es: "asignado" },
+  { en: "months", es: "meses" },
+  { en: "average", es: "promedio" },
+  { en: "available", es: "disponible" },
+  { en: "total", es: "total" },
+  { en: "reserved", es: "reservado" },
+  { en: "spent", es: "gastado" },
+];
+
 const fallbackWordPairs: Array<{ pl: string; en: string; de: string }> = [
   { pl: "brak", en: "no", de: "kein" },
   { pl: "dodaj", en: "add", de: "hinzufügen" },
@@ -1692,10 +1985,21 @@ function englishToGerman(value: string) {
   return result;
 }
 
+function englishToSpanish(value: string) {
+  let result = value;
+  const phrases = [...spanishPhraseMap.entries()].sort((a, b) => b[0].length - a[0].length);
+  for (const [source, target] of phrases) {
+    if (result.includes(source)) result = result.split(source).join(target);
+  }
+  for (const pair of spanishWordPairs) result = replaceInsensitive(result, pair.en, pair.es);
+  return result;
+}
+
 const exactLookup = {
   pl: new Map<string, string>(),
   en: new Map<string, string>(),
   de: new Map<string, string>(),
+  es: new Map<string, string>(),
 };
 
 for (const pair of phrasePairs) {
@@ -1707,6 +2011,10 @@ for (const pair of phrasePairs) {
   exactLookup.de.set(pair.pl, german);
   exactLookup.de.set(pair.en, german);
   exactLookup.de.set(german, german);
+  const spanish = pair.es ?? englishToSpanish(pair.en);
+  exactLookup.es.set(pair.pl, spanish);
+  exactLookup.es.set(pair.en, spanish);
+  exactLookup.es.set(spanish, spanish);
 }
 
 for (const [source, pair] of Object.entries(levelPairs)) {
@@ -1718,6 +2026,11 @@ for (const [source, pair] of Object.entries(levelPairs)) {
   exactLookup.de.set(pair.pl, pair.de);
   exactLookup.de.set(pair.en, pair.de);
   exactLookup.de.set(pair.de, pair.de);
+  exactLookup.es.set(source, pair.es);
+  exactLookup.es.set(pair.pl, pair.es);
+  exactLookup.es.set(pair.en, pair.es);
+  exactLookup.es.set(pair.de, pair.es);
+  exactLookup.es.set(pair.es, pair.es);
 }
 
 function translateExact(value: string, language: AppLanguage) {
@@ -1766,6 +2079,11 @@ function translateSegments(value: string, language: AppLanguage) {
   if (language === "de") {
     const english = translateSegments(value, "en");
     return englishToGerman(english);
+  }
+
+  if (language === "es") {
+    const english = translateSegments(value, "en");
+    return englishToSpanish(english);
   }
 
   let result = value;
@@ -1867,7 +2185,7 @@ function translateTree(root: ParentNode, language: AppLanguage) {
 
 type LanguageContextValue = {
   language: AppLanguage;
-  locale: "pl-PL" | "en-US" | "de-DE";
+  locale: "pl-PL" | "en-US" | "de-DE" | "es-ES";
   setLanguage: (language: AppLanguage) => void;
   t: (key: TranslationKey) => string;
   levelName: (name: string) => string;
@@ -1878,7 +2196,7 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<AppLanguage>(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored === "en" || stored === "de" ? stored : "pl";
+    return stored === "en" || stored === "de" || stored === "es" ? stored : "pl";
   });
 
   const setLanguage = (next: AppLanguage) => {
@@ -1927,7 +2245,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const value = useMemo<LanguageContextValue>(
     () => ({
       language,
-      locale: language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US",
+      locale: language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : language === "es" ? "es-ES" : "en-US",
       setLanguage,
       t: (key) => messages[language][key],
       levelName: (name) => translateLevelName(name, language),
@@ -1945,10 +2263,11 @@ export function useLanguage() {
 }
 
 
-export function localize(language: AppLanguage, pl: string, en: string, de?: string) {
+export function localize(language: AppLanguage, pl: string, en: string, de?: string, es?: string) {
   if (language === "pl") return pl;
   if (language === "en") return en;
-  return de ?? englishToGerman(en);
+  if (language === "de") return de ?? englishToGerman(en);
+  return es ?? englishToSpanish(en);
 }
 
 export function translateLevelName(name: string, language: AppLanguage) {

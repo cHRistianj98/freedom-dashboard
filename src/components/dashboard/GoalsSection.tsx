@@ -79,7 +79,7 @@ function DashboardGoalCard({
   onClick: () => void;
 }) {
   const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
-  const locale = language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US";
+  const locale = language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : language === "es" ? "es-ES" : "en-US";
 
   const progress = goal.targetAmount > 0
     ? Math.min((goal.currentAmount / goal.targetAmount) * 100, 100)
@@ -162,7 +162,7 @@ function DashboardGoalCard({
             ) : monthsToGoal !== null ? (
               <>
                 ~<strong className="text-slate-200">{monthsToGoal}</strong>{" "}
-                {language === "pl" ? "mies." : language === "de" ? (monthsToGoal === 1 ? "Monat" : "Monate") : monthsToGoal === 1 ? "month" : "months"}
+                {language === "pl" ? "mies." : language === "de" ? (monthsToGoal === 1 ? "Monat" : "Monate") : language === "es" ? (monthsToGoal === 1 ? "mes" : "meses") : monthsToGoal === 1 ? "month" : "months"}
               </>
             ) : (
               "—"

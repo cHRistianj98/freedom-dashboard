@@ -66,7 +66,7 @@ export function RecurringTransactionsSection({
             </h2>
 
             <span className="text-xs text-slate-500">
-              {activeCount} {language === "pl" ? polishRuleCount(activeCount) : language === "de" ? (activeCount === 1 ? "aktive Regel" : "aktive Regeln") : activeCount === 1 ? "active rule" : "active rules"}
+              {activeCount} {language === "pl" ? polishRuleCount(activeCount) : language === "de" ? (activeCount === 1 ? "aktive Regel" : "aktive Regeln") : language === "es" ? (activeCount === 1 ? "regla activa" : "reglas activas") : activeCount === 1 ? "active rule" : "active rules"}
             </span>
           </div>
         </div>

@@ -303,19 +303,19 @@ function AssetVisual({ asset, compact = false }: { asset?: Asset; compact?: bool
 }
 
 function assetDisplayName(asset: Asset, language: AppLanguage): string {
-  return asset.systemCash ? (language === "pl" ? "Środki nierozdzielone" : language === "de" ? "Nicht zugewiesene Mittel" : "Unallocated funds") : asset.name;
+  return asset.systemCash ? localize(language, "Środki nierozdzielone", "Unallocated funds", "Nicht zugewiesene Mittel", "Fondos no asignados") : asset.name;
 }
 
 function assetTypeLabel(asset: Asset, language: AppLanguage): string {
-  if (asset.systemCash) return language === "pl" ? "Clearing systemowy" : language === "de" ? "Systemausgleich" : "System clearing";
-  if (asset.fxPriced && asset.cashCurrency) return `${language === "pl" ? "Gotówka" : language === "de" ? "Bargeld" : "Cash"} · ${asset.cashCurrency}`;
-  return language === "pl" ? "Gotówka / konto" : language === "de" ? "Bargeld / Konto" : "Cash / account";
+  if (asset.systemCash) return localize(language, "Clearing systemowy", "System clearing", "Systemausgleich", "Compensación del sistema");
+  if (asset.fxPriced && asset.cashCurrency) return `${localize(language, "Gotówka", "Cash", "Bargeld", "Efectivo")} · ${asset.cashCurrency}`;
+  return localize(language, "Gotówka / konto", "Cash / account", "Bargeld / Konto", "Efectivo / cuenta");
 }
 
 function walletDisplayName(name: string | undefined, language: AppLanguage) {
-  if (!name) return language === "pl" ? "Portfel" : language === "de" ? "Portfolio" : "Portfolio";
+  if (!name) return localize(language, "Portfel", "Portfolio", "Portfolio", "Cartera");
   const normalized = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  if (normalized === "glowny" || normalized === "main") return language === "pl" ? "Główny" : language === "de" ? "Hauptkonto" : "Main";
+  if (normalized === "glowny" || normalized === "main") return localize(language, "Główny", "Main", "Hauptkonto", "Principal");
   return name;
 }
 

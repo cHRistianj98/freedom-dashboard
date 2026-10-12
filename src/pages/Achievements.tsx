@@ -49,16 +49,16 @@ const rarityClasses: Record<AchievementRarity, {
 };
 
 const rarityLabels: Record<AchievementRarity, Record<AppLanguage, string>> = {
-  common: { pl: "ZWYKŁE", en: "COMMON", de: "GEWÖHNLICH" },
-  rare: { pl: "RZADKIE", en: "RARE", de: "SELTEN" },
-  epic: { pl: "EPICKIE", en: "EPIC", de: "EPISCH" },
-  legendary: { pl: "LEGENDARNE", en: "LEGENDARY", de: "LEGENDÄR" },
+  common: { pl: "ZWYKŁE", en: "COMMON", de: "GEWÖHNLICH", es: "COMÚN" },
+  rare: { pl: "RZADKIE", en: "RARE", de: "SELTEN", es: "RARO" },
+  epic: { pl: "EPICKIE", en: "EPIC", de: "EPISCH", es: "ÉPICO" },
+  legendary: { pl: "LEGENDARNE", en: "LEGENDARY", de: "LEGENDÄR", es: "LEGENDARIO" },
 };
 
 export function Achievements(props: AchievementsProps) {
   const { language, locale } = useLanguage();
   const { formatMoney, formatCompactMoney } = useCurrency();
-  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const ui = (pl: string, en: string, de?: string, es?: string) => localize(language, pl, en, de, es);
 
   const achievements = getAchievements(props).map((item) => localizeAchievement(item, language, (value) => formatMoney(value, { maximumFractionDigits: 0 })));
   const unlocked = achievements.filter((item) => item.unlocked);
@@ -209,7 +209,7 @@ export function Achievements(props: AchievementsProps) {
 
 function AchievementCard({ achievement, language, locale, formatMoney }: { achievement: Achievement; language: AppLanguage; locale: string; formatMoney: (value: number, options?: any) => string }) {
   const style = rarityClasses[achievement.rarity];
-  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const ui = (pl: string, en: string, de?: string, es?: string) => localize(language, pl, en, de, es);
   const visual = getAchievementCardVisual(achievement);
 
   return (
@@ -259,7 +259,7 @@ function AchievementCard({ achievement, language, locale, formatMoney }: { achie
 
 function WealthMilestone({ achievement, artworkIndex, formatCompactMoney, language }: { achievement: Achievement; artworkIndex: number; formatCompactMoney: (value: number) => string; language: AppLanguage }) {
   const visual = getFreedomMilestoneVisual(artworkIndex + 1);
-  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const ui = (pl: string, en: string, de?: string, es?: string) => localize(language, pl, en, de, es);
 
   return (
     <div className={`group relative min-h-[188px] overflow-hidden rounded-2xl border transition duration-300 hover:-translate-y-1 hover:shadow-xl ${achievement.unlocked ? "border-blue-400/35 shadow-blue-950/20" : "border-slate-800 shadow-black/10"}`}>
@@ -296,7 +296,7 @@ function WealthMilestone({ achievement, artworkIndex, formatCompactMoney, langua
 }
 
 function LegendaryCard({ achievement, language }: { achievement: Achievement; language: AppLanguage }) {
-  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const ui = (pl: string, en: string, de?: string, es?: string) => localize(language, pl, en, de, es);
   return (
     <div className={`relative overflow-hidden rounded-2xl border p-6 text-center ${achievement.unlocked ? "border-amber-500/40 bg-amber-500/10" : "border-slate-800 bg-[#08111f]"}`}>
       <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl ${achievement.unlocked ? "bg-amber-500/15 text-amber-400" : "bg-slate-800 text-slate-600"}`}>{achievement.unlocked ? achievement.icon : <LockKeyhole size={26} />}</div>

@@ -35,7 +35,7 @@ export function GoalCard({ goal }: { goal: Goal }) {
       <div className="mt-5 border-t border-slate-800 pt-4 text-sm">
         {completed ? <span className="font-medium text-slate-400">✓ {ui("Cel zrealizowany", "Goal completed", "Ziel erreicht")}</span>
           : funded ? <span className="font-medium text-emerald-400">✓ {ui("Cel w pełni sfinansowany", "Goal fully funded", "Ziel vollständig finanziert")}</span>
-          : monthsRemaining !== null ? <div className="flex items-center justify-between"><span className="text-slate-500">{ui("Przy obecnym tempie", "At the current pace", "Beim aktuellen Tempo")}</span><span className="font-medium text-slate-300">~{monthsRemaining} {language === "pl" ? "mies." : language === "de" ? (monthsRemaining === 1 ? "Monat" : "Monate") : monthsRemaining === 1 ? "month" : "months"}</span></div>
+          : monthsRemaining !== null ? <div className="flex items-center justify-between"><span className="text-slate-500">{ui("Przy obecnym tempie", "At the current pace", "Beim aktuellen Tempo")}</span><span className="font-medium text-slate-300">~{monthsRemaining} {language === "pl" ? "mies." : language === "de" ? (monthsRemaining === 1 ? "Monat" : "Monate") : language === "es" ? (monthsRemaining === 1 ? "mes" : "meses") : monthsRemaining === 1 ? "month" : "months"}</span></div>
           : <span className="text-slate-500">{ui("Brak miesięcznej wpłaty", "No monthly contribution", "Kein monatlicher Beitrag")}</span>}
       </div>
     </div>

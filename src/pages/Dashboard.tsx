@@ -968,7 +968,7 @@ export function Dashboard({
                   <div className="mt-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                     <div>
                       <p className="text-lg font-black capitalize text-white">{formatMonth(latestClosedSnapshot.month, language)}</p>
-                      <p className="mt-1 text-xs text-slate-600">{ui("Zamknięty zapis stanu", "Closed snapshot")} · {latestClosedSnapshot.player.totalXp.toLocaleString(language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US")} XP</p>
+                      <p className="mt-1 text-xs text-slate-600">{ui("Zamknięty zapis stanu", "Closed snapshot")} · {latestClosedSnapshot.player.totalXp.toLocaleString(language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : language === "es" ? "es-ES" : "en-US")} XP</p>
                     </div>
                     {latestReviewVerdict && <span className={`rounded-lg border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] ${latestReviewVerdict.className}`}>{latestReviewVerdict.label}</span>}
                   </div>
@@ -2515,7 +2515,7 @@ function formatMonth(
 
   const formatted =
     new Intl.DateTimeFormat(
-      language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US",
+      language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : language === "es" ? "es-ES" : "en-US",
       {
         month: "long",
         year: "numeric",
@@ -2550,7 +2550,7 @@ function formatMonthShort(
     );
 
   return new Intl.DateTimeFormat(
-    language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US",
+    language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : language === "es" ? "es-ES" : "en-US",
     {
       month: "short",
     }

@@ -66,6 +66,30 @@ export const GOAL_TYPE_OPTIONS: GoalTypeOption[] = [
   option("OTHER", { label: "Inny cel", short: "Inny", description: "Dowolny własny cel finansowy." }, { label: "Other goal", short: "Other", description: "Any custom financial goal." }, { label: "Anderes Ziel", short: "Anderes", description: "Beliebiges eigenes Finanzziel." }, "/goals/v2/other.webp", "#64748b", { imageScale: 1.08 }),
 ];
 
+
+const spanishGoalTranslations: Record<GoalType, { label: string; shortLabel: string; description: string }> = {
+  EMERGENCY_FUND: { label: "Fondo de emergencia", shortLabel: "Emergencia", description: "Reserva de seguridad y liquidez." },
+  HOME: { label: "Casa / piso", shortLabel: "Vivienda", description: "Compra de vivienda propia o ahorro para la entrada." },
+  CAR: { label: "Coche", shortLabel: "Coche", description: "Compra o cambio de coche." },
+  TRAVEL: { label: "Viaje", shortLabel: "Viaje", description: "Un viaje, escapada o expedición importante." },
+  VACATION: { label: "Vacaciones", shortLabel: "Vacaciones", description: "Descanso sin financiarlo con el flujo de caja futuro." },
+  EDUCATION: { label: "Educación", shortLabel: "Educación", description: "Estudios, cursos, certificaciones y desarrollo de habilidades." },
+  HEALTH: { label: "Salud", shortLabel: "Salud", description: "Tratamiento, pruebas o un gasto sanitario importante." },
+  DENTAL: { label: "Tratamiento dental", shortLabel: "Dental", description: "Odontología, implantes, ortodoncia y reconstrucción." },
+  WEDDING: { label: "Boda", shortLabel: "Boda", description: "Presupuesto para ceremonia, celebración o luna de miel." },
+  CHILD: { label: "Hijo / familia", shortLabel: "Familia", description: "Preparativos, cuidados, educación o capital familiar." },
+  RENOVATION: { label: "Reforma", shortLabel: "Reforma", description: "Reforma, mobiliario o mejora de la vivienda." },
+  ELECTRONICS: { label: "Electrónica", shortLabel: "Electrónica", description: "Ordenador, teléfono, equipo audiovisual u otra compra tecnológica importante." },
+  BUSINESS: { label: "Negocio propio", shortLabel: "Negocio", description: "Capital para empresa, producto o crecimiento del negocio." },
+  INVESTMENT: { label: "Capital de inversión", shortLabel: "Inversión", description: "Construye capital dedicado a invertir." },
+  DEBT_PAYOFF: { label: "Pago de deuda", shortLabel: "Deuda", description: "Capital para amortizar anticipadamente una obligación." },
+  RETIREMENT: { label: "Jubilación / libertad", shortLabel: "Jubilación", description: "Capital a largo plazo para la independencia financiera." },
+  HOBBY: { label: "Afición / pasión", shortLabel: "Afición", description: "Equipo o proyecto relacionado con tu pasión." },
+  SECOND_PROPERTY: { label: "Segunda propiedad", shortLabel: "Propiedad", description: "Compra de terreno, vivienda u otra propiedad." },
+  LUXURY_PURCHASE: { label: "Compra grande / lujo", shortLabel: "Lujo", description: "Reloj, equipo premium u otra recompensa por tus resultados." },
+  OTHER: { label: "Otro objetivo", shortLabel: "Otro", description: "Cualquier objetivo financiero personalizado." },
+};
+
 export const GOAL_TYPE_BY_VALUE = new Map(GOAL_TYPE_OPTIONS.map((item) => [item.value, item]));
 
 export function getGoalTypeOption(type?: GoalType | null): GoalTypeOption {
@@ -78,7 +102,7 @@ export function getLocalizedGoalTypeOption(type: GoalType | null | undefined, la
 
 export function localizeGoalTypeOption(item: GoalTypeOption, language: AppLanguage) {
   if (language === "pl") return { ...item };
-  const translated = item.translations[language];
+  const translated = language === "es" ? spanishGoalTranslations[item.value] : item.translations[language];
   return {
     ...item,
     label: translated.label,

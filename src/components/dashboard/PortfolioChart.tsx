@@ -132,7 +132,9 @@ export function PortfolioChart({ portfolio }: PortfolioChartProps) {
                         ? assets.length === 1 ? "aktywo" : "aktywów"
                         : language === "de"
                           ? assets.length === 1 ? "Vermögenswert" : "Vermögenswerte"
-                          : assets.length === 1 ? "asset" : "assets"}
+                          : language === "es"
+                            ? assets.length === 1 ? "activo" : "activos"
+                            : assets.length === 1 ? "asset" : "assets"}
                     </p>
                   </div>
                   <strong className="shrink-0 text-base font-black text-white">{money(value)}</strong>

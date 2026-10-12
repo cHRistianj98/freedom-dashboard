@@ -652,7 +652,7 @@ export function Finances({
 
               <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-200/90">
                 <span className="rounded-full border border-emerald-400/15 bg-emerald-400/[0.08] px-2.5 py-1">
-                  {monthlyIncomes.length} {language === "pl" ? polishCountWord(monthlyIncomes.length, "źródło", "źródła", "źródeł") : language === "de" ? (monthlyIncomes.length === 1 ? "Quelle" : "Quellen") : monthlyIncomes.length === 1 ? "source" : "sources"}
+                  {monthlyIncomes.length} {language === "pl" ? polishCountWord(monthlyIncomes.length, "źródło", "źródła", "źródeł") : language === "de" ? (monthlyIncomes.length === 1 ? "Quelle" : "Quellen") : language === "es" ? (monthlyIncomes.length === 1 ? "fuente" : "fuentes") : monthlyIncomes.length === 1 ? "source" : "sources"}
                 </span>
                 <span className="rounded-full border border-slate-700 bg-slate-950/50 px-2.5 py-1 text-slate-300">
                   {ui("Śledzenie wpływów", "Income tracking")}
@@ -1186,7 +1186,7 @@ function TransactionVisualRow({
 }
 
 function formatTransactionDate(date: string | undefined, locale: "pl-PL" | "en-US" | "de-DE", language: AppLanguage) {
-  if (!date) return language === "pl" ? "Brak daty" : language === "de" ? "Kein Datum" : "No date";
+  if (!date) return language === "pl" ? "Brak daty" : language === "de" ? "Kein Datum" : language === "es" ? "Sin fecha" : "No date";
 
   const [year, month, day] = date.split("-");
   if (!year || !month || !day) return date;
@@ -1327,7 +1327,7 @@ function SummaryCard({
           {progress !== undefined && (
             <div className="mt-4">
               <div className="mb-1.5 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-600">
-                <span>{language === "pl" ? "Postęp" : language === "de" ? "Fortschritt" : "Progress"}</span>
+                <span>{language === "pl" ? "Postęp" : language === "de" ? "Fortschritt" : language === "es" ? "Progreso" : "Progress"}</span>
                 <span>{Math.round(progress)}%</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">

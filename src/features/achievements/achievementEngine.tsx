@@ -460,76 +460,91 @@ const achievementCopy: Record<string, Record<AppLanguage, { name: string; descri
     pl: { name: "Pierwszy kapitał", description: "Zbuduj pierwsze 10 000 PLN majątku netto." },
     en: { name: "First Capital", description: "Build your first PLN 10,000 of net worth." },
     de: { name: "Erstes Kapital", description: "Baue deine ersten 10.000 PLN Nettovermögen auf." },
+    es: { name: "Primer capital", description: "Construye tus primeros 10.000 PLN de patrimonio neto." },
   },
   "wealth-30k": {
     pl: { name: "Tarcza bezpieczeństwa", description: "Przekrocz 30 000 PLN majątku netto." },
     en: { name: "Safety Shield", description: "Exceed PLN 30,000 of net worth." },
     de: { name: "Sicherheitsschild", description: "Überschreite 30.000 PLN Nettovermögen." },
+    es: { name: "Escudo de seguridad", description: "Supera los 30.000 PLN de patrimonio neto." },
   },
   "wealth-100k": {
     pl: { name: "Klub 100K", description: "Przekrocz 100 000 PLN majątku netto." },
     en: { name: "100K Club", description: "Exceed PLN 100,000 of net worth." },
     de: { name: "100K-Club", description: "Überschreite 100.000 PLN Nettovermögen." },
+    es: { name: "Club 100K", description: "Supera los 100.000 PLN de patrimonio neto." },
   },
   "wealth-250k": {
     pl: { name: "Budowniczy", description: "Zbuduj 250 000 PLN majątku netto." },
     en: { name: "Builder", description: "Build PLN 250,000 of net worth." },
     de: { name: "Aufbauer", description: "Baue 250.000 PLN Nettovermögen auf." },
+    es: { name: "Constructor", description: "Construye 250.000 PLN de patrimonio neto." },
   },
   "wealth-500k": {
     pl: { name: "Akcelerator", description: "Przekrocz 500 000 PLN majątku netto." },
     en: { name: "Accelerator", description: "Exceed PLN 500,000 of net worth." },
     de: { name: "Beschleuniger", description: "Überschreite 500.000 PLN Nettovermögen." },
+    es: { name: "Acelerador", description: "Supera los 500.000 PLN de patrimonio neto." },
   },
   "wealth-1m": {
     pl: { name: "Milioner", description: "Osiągnij 1 000 000 PLN majątku netto." },
     en: { name: "Millionaire", description: "Reach PLN 1,000,000 of net worth." },
     de: { name: "Millionär", description: "Erreiche 1.000.000 PLN Nettovermögen." },
+    es: { name: "Millonario", description: "Alcanza 1.000.000 PLN de patrimonio neto." },
   },
   "wealth-3m": {
     pl: { name: "WOLNOŚĆ", description: "Osiągnij 3 000 000 PLN i główny cel Freedom." },
     en: { name: "FREE", description: "Reach PLN 3,000,000 and the main Freedom target." },
     de: { name: "FREIHEIT", description: "Erreiche 3.000.000 PLN und das zentrale Freedom-Ziel." },
+    es: { name: "LIBERTAD", description: "Alcanza 3.000.000 PLN y el objetivo principal de Freedom." },
   },
   "savings-50": {
     pl: { name: "Maszyna oszczędności", description: "Osiągnij minimum 50% stopy oszczędności w bieżącym miesiącu." },
     en: { name: "Savings Machine", description: "Reach at least a 50% savings rate in the current month." },
     de: { name: "Sparmaschine", description: "Erreiche im aktuellen Monat mindestens 50 % Sparquote." },
+    es: { name: "Máquina de ahorro", description: "Alcanza al menos un 50 % de tasa de ahorro este mes." },
   },
   "surplus-10k": {
     pl: { name: "Maszyna cashflow", description: "Wypracuj co najmniej 10 000 PLN miesięcznej nadwyżki." },
     en: { name: "Cashflow Machine", description: "Generate at least PLN 10,000 of monthly surplus." },
     de: { name: "Cashflow-Maschine", description: "Erziele mindestens 10.000 PLN monatlichen Überschuss." },
+    es: { name: "Máquina de flujo de caja", description: "Genera al menos 10.000 PLN de superávit mensual." },
   },
   "surplus-20k": {
     pl: { name: "Potężny miesiąc", description: "Wypracuj 20 000 PLN nadwyżki w jednym miesiącu." },
     en: { name: "Monster Month", description: "Generate PLN 20,000 of surplus in a single month." },
     de: { name: "Monster-Monat", description: "Erziele 20.000 PLN Überschuss in einem Monat." },
+    es: { name: "Mes potente", description: "Genera 20.000 PLN de superávit en un solo mes." },
   },
   "positive-3": {
     pl: { name: "Konsekwencja", description: "Zakończ 3 miesiące z dodatnimi przepływami pieniężnymi." },
     en: { name: "Consistency", description: "Finish 3 months with positive cashflow." },
     de: { name: "Konstanz", description: "Schließe 3 Monate mit positivem Cashflow ab." },
+    es: { name: "Constancia", description: "Termina 3 meses con flujo de caja positivo." },
   },
   "invested-100k": {
     pl: { name: "Inwestor", description: "Zbuduj portfel aktywów o wartości 100 000 PLN." },
     en: { name: "Investor", description: "Build an asset portfolio worth PLN 100,000." },
     de: { name: "Investor", description: "Baue ein Anlageportfolio im Wert von 100.000 PLN auf." },
+    es: { name: "Inversor", description: "Construye una cartera de activos valorada en 100.000 PLN." },
   },
   "invested-250k": {
     pl: { name: "Silnik procentu składanego", description: "Zbuduj portfel aktywów o wartości 250 000 PLN." },
     en: { name: "Compound Engine", description: "Build an asset portfolio worth PLN 250,000." },
     de: { name: "Zinseszins-Motor", description: "Baue ein Anlageportfolio im Wert von 250.000 PLN auf." },
+    es: { name: "Motor de interés compuesto", description: "Construye una cartera de activos valorada en 250.000 PLN." },
   },
   "goal-1": {
     pl: { name: "Zdobywca celów", description: "Ukończ pierwszy cel finansowy." },
     en: { name: "Goal Crusher", description: "Complete your first financial goal." },
     de: { name: "Zielknacker", description: "Schließe dein erstes finanzielles Ziel ab." },
+    es: { name: "Conquistador de objetivos", description: "Completa tu primer objetivo financiero." },
   },
   "debt-1": {
     pl: { name: "Pogromca długu", description: "Spłać pierwsze zobowiązanie." },
     en: { name: "Debt Slayer", description: "Pay off your first liability." },
     de: { name: "Schuldenbezwinger", description: "Tilge deine erste Verbindlichkeit vollständig." },
+    es: { name: "Cazador de deudas", description: "Liquida tu primer pasivo." },
   },
 };
 
@@ -546,17 +561,17 @@ export function localizeAchievement(
 
   const amount = moneyFormatter(achievement.target);
   const descriptions: Partial<Record<string, Record<AppLanguage, string>>> = {
-    "wealth-10k": { pl: `Zbuduj pierwsze ${amount} majątku netto.`, en: `Build your first ${amount} of net worth.`, de: `Baue deine ersten ${amount} Nettovermögen auf.` },
-    "wealth-30k": { pl: `Przekrocz ${amount} majątku netto.`, en: `Exceed ${amount} of net worth.`, de: `Überschreite ${amount} Nettovermögen.` },
-    "wealth-100k": { pl: `Przekrocz ${amount} majątku netto.`, en: `Exceed ${amount} of net worth.`, de: `Überschreite ${amount} Nettovermögen.` },
-    "wealth-250k": { pl: `Zbuduj ${amount} majątku netto.`, en: `Build ${amount} of net worth.`, de: `Baue ${amount} Nettovermögen auf.` },
-    "wealth-500k": { pl: `Przekrocz ${amount} majątku netto.`, en: `Exceed ${amount} of net worth.`, de: `Überschreite ${amount} Nettovermögen.` },
-    "wealth-1m": { pl: `Osiągnij ${amount} majątku netto.`, en: `Reach ${amount} of net worth.`, de: `Erreiche ${amount} Nettovermögen.` },
-    "wealth-3m": { pl: `Osiągnij ${amount} i główny cel Freedom.`, en: `Reach ${amount} and the main Freedom target.`, de: `Erreiche ${amount} und das zentrale Freedom-Ziel.` },
-    "surplus-10k": { pl: `Wypracuj co najmniej ${amount} miesięcznej nadwyżki.`, en: `Generate at least ${amount} of monthly surplus.`, de: `Erziele mindestens ${amount} monatlichen Überschuss.` },
-    "surplus-20k": { pl: `Wypracuj ${amount} nadwyżki w jednym miesiącu.`, en: `Generate ${amount} of surplus in a single month.`, de: `Erziele ${amount} Überschuss in einem Monat.` },
-    "invested-100k": { pl: `Zbuduj portfel aktywów o wartości ${amount}.`, en: `Build an asset portfolio worth ${amount}.`, de: `Baue ein Anlageportfolio im Wert von ${amount} auf.` },
-    "invested-250k": { pl: `Zbuduj portfel aktywów o wartości ${amount}.`, en: `Build an asset portfolio worth ${amount}.`, de: `Baue ein Anlageportfolio im Wert von ${amount} auf.` },
+    "wealth-10k": { pl: `Zbuduj pierwsze ${amount} majątku netto.`, en: `Build your first ${amount} of net worth.`, de: `Baue deine ersten ${amount} Nettovermögen auf.`, es: `Construye tus primeros ${amount} de patrimonio neto.` },
+    "wealth-30k": { pl: `Przekrocz ${amount} majątku netto.`, en: `Exceed ${amount} of net worth.`, de: `Überschreite ${amount} Nettovermögen.`, es: `Supera ${amount} de patrimonio neto.` },
+    "wealth-100k": { pl: `Przekrocz ${amount} majątku netto.`, en: `Exceed ${amount} of net worth.`, de: `Überschreite ${amount} Nettovermögen.`, es: `Supera ${amount} de patrimonio neto.` },
+    "wealth-250k": { pl: `Zbuduj ${amount} majątku netto.`, en: `Build ${amount} of net worth.`, de: `Baue ${amount} Nettovermögen auf.`, es: `Construye ${amount} de patrimonio neto.` },
+    "wealth-500k": { pl: `Przekrocz ${amount} majątku netto.`, en: `Exceed ${amount} of net worth.`, de: `Überschreite ${amount} Nettovermögen.`, es: `Supera ${amount} de patrimonio neto.` },
+    "wealth-1m": { pl: `Osiągnij ${amount} majątku netto.`, en: `Reach ${amount} of net worth.`, de: `Erreiche ${amount} Nettovermögen.`, es: `Alcanza ${amount} de patrimonio neto.` },
+    "wealth-3m": { pl: `Osiągnij ${amount} i główny cel Freedom.`, en: `Reach ${amount} and the main Freedom target.`, de: `Erreiche ${amount} und das zentrale Freedom-Ziel.`, es: `Alcanza ${amount} y el objetivo principal de Freedom.` },
+    "surplus-10k": { pl: `Wypracuj co najmniej ${amount} miesięcznej nadwyżki.`, en: `Generate at least ${amount} of monthly surplus.`, de: `Erziele mindestens ${amount} monatlichen Überschuss.`, es: `Genera al menos ${amount} de superávit mensual.` },
+    "surplus-20k": { pl: `Wypracuj ${amount} nadwyżki w jednym miesiącu.`, en: `Generate ${amount} of surplus in a single month.`, de: `Erziele ${amount} Überschuss in einem Monat.`, es: `Genera ${amount} de superávit en un solo mes.` },
+    "invested-100k": { pl: `Zbuduj portfel aktywów o wartości ${amount}.`, en: `Build an asset portfolio worth ${amount}.`, de: `Baue ein Anlageportfolio im Wert von ${amount} auf.`, es: `Construye una cartera de activos valorada en ${amount}.` },
+    "invested-250k": { pl: `Zbuduj portfel aktywów o wartości ${amount}.`, en: `Build an asset portfolio worth ${amount}.`, de: `Baue ein Anlageportfolio im Wert von ${amount} auf.`, es: `Construye una cartera de activos valorada en ${amount}.` },
   };
   return { ...achievement, name: copy.name, description: descriptions[achievement.id]?.[language] ?? copy.description };
 }

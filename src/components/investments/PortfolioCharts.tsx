@@ -178,7 +178,7 @@ export function HistoryChart({ snapshots, total }: { snapshots: MonthlySnapshot[
     <div className="investment-panel-heading">
       <h2><span className="investment-section-icon"><ChartNoAxesCombined size={17} /></span>{ui("Wartość portfeli w czasie", "Portfolio value over time")}</h2>
       <div className="investment-periods" aria-label={ui("Okres wykresu", "Chart period")}>
-        {["6M", "1R", "5L", "MAX"].map(item => <button type="button" key={item} aria-pressed={period === item} onClick={() => setPeriod(item)} className={period === item ? "active" : ""}>{language === "en" ? ({ "1R": "1Y", "5L": "5Y" } as Record<string, string>)[item] ?? item : item}</button>)}
+        {["6M", "1R", "5L", "MAX"].map(item => <button type="button" key={item} aria-pressed={period === item} onClick={() => setPeriod(item)} className={period === item ? "active" : ""}>{language === "en" ? ({ "1R": "1Y", "5L": "5Y" } as Record<string, string>)[item] ?? item : language === "de" ? ({ "1R": "1J", "5L": "5J" } as Record<string, string>)[item] ?? item : language === "es" ? ({ "1R": "1A", "5L": "5A" } as Record<string, string>)[item] ?? item : item}</button>)}
       </div>
     </div>
     <div className="portfolio-history-chart">

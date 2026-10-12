@@ -215,7 +215,7 @@ function formatSignedMoney(value: number, language: AppLanguage) {
 }
 
 function formatDate(value: string, language: AppLanguage) {
-  return new Intl.DateTimeFormat(language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US", {
+  return new Intl.DateTimeFormat(language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : language === "es" ? "es-ES" : "en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",

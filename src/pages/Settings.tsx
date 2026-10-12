@@ -1,6 +1,7 @@
 import { Check, Languages, RefreshCw, Settings2, WalletCards } from "lucide-react";
 import { useLanguage, type AppLanguage, localize } from "../i18n/LanguageContext";
 import { useCurrency, type DisplayCurrency } from "../i18n/CurrencyContext";
+import { FlagIcon, type FlagCode } from "../components/settings/FlagIcon";
 
 export function Settings() {
   const { language, setLanguage, t, locale } = useLanguage();
@@ -12,7 +13,7 @@ export function Settings() {
     loadingRate,
     refreshRate,
   } = useCurrency();
-  const ui = (pl: string, en: string, de?: string) => localize(language, pl, en, de);
+  const ui = (pl: string, en: string, de?: string, es?: string) => localize(language, pl, en, de, es);
 
   return (
     <main className="min-h-screen bg-[#050b16] p-8">
@@ -38,10 +39,11 @@ export function Settings() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <LanguageCard value="pl" selected={language === "pl"} title="Polski" description={t("polishDescription")} flag="🇵🇱" onSelect={setLanguage} />
-            <LanguageCard value="en" selected={language === "en"} title="English" description={t("englishDescription")} flag="🇬🇧" onSelect={setLanguage} />
-            <LanguageCard value="de" selected={language === "de"} title="Deutsch" description={t("germanDescription")} flag="🇩🇪" onSelect={setLanguage} />
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <LanguageCard value="pl" selected={language === "pl"} title="Polski" description={t("polishDescription")} flag="PL" onSelect={setLanguage} />
+            <LanguageCard value="en" selected={language === "en"} title="English" description={t("englishDescription")} flag="GB" onSelect={setLanguage} />
+            <LanguageCard value="de" selected={language === "de"} title="Deutsch" description={t("germanDescription")} flag="DE" onSelect={setLanguage} />
+            <LanguageCard value="es" selected={language === "es"} title="Español" description={t("spanishDescription")} flag="ES" onSelect={setLanguage} />
           </div>
         </div>
 
@@ -52,12 +54,13 @@ export function Settings() {
                 <WalletCards size={19} />
               </div>
               <div>
-                <h2 className="font-black text-white">{ui("Waluta widoku", "Display currency", "Anzeigewährung")}</h2>
+                <h2 className="font-black text-white">{ui("Waluta widoku", "Display currency", "Anzeigewährung", "Moneda de visualización")}</h2>
                 <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-500">
                   {ui(
                     "Zmienia sposób wyświetlania wartości w aplikacji. Dane księgowe i wartości zapisane w bazie nadal pozostają w PLN.",
                     "Changes how values are displayed across the app. Accounting data and stored values remain in PLN.",
-                    "Ändert die Anzeige der Werte in der App. Buchungsdaten und gespeicherte Werte bleiben weiterhin in PLN."
+                    "Ändert die Anzeige der Werte in der App. Buchungsdaten und gespeicherte Werte bleiben weiterhin in PLN.",
+                    "Cambia cómo se muestran los valores en la aplicación. Los datos contables y los valores guardados permanecen en PLN."
                   )}
                 </p>
               </div>
@@ -70,7 +73,7 @@ export function Settings() {
                 className="inline-flex cursor-pointer items-center gap-2 self-start rounded-xl border border-slate-700 bg-slate-950/50 px-3 py-2 text-xs font-bold text-slate-300 transition hover:border-slate-600 hover:bg-slate-900 disabled:cursor-wait disabled:opacity-60"
               >
                 <RefreshCw size={14} className={loadingRate ? "animate-spin" : ""} />
-                {ui("Odśwież kurs", "Refresh rate", "Kurs aktualisieren")}
+                {ui("Odśwież kurs", "Refresh rate", "Kurs aktualisieren", "Actualizar tipo")}
               </button>
             )}
           </div>
@@ -79,15 +82,15 @@ export function Settings() {
             <CurrencyCard
               value="PLN"
               selected={displayCurrency === "PLN"}
-              flag="🇵🇱"
+              flag="PL"
               title="PLN"
-              description={ui("Złoty polski — waluta bazowa Freedom", "Polish złoty — Freedom base currency", "Polnischer Złoty — Basiswährung von Freedom")}
+              description={ui("Złoty polski — waluta bazowa Freedom", "Polish złoty — Freedom base currency", "Polnischer Złoty — Basiswährung von Freedom", "Złoty polaco — moneda base de Freedom")}
               onSelect={setDisplayCurrency}
             />
             <CurrencyCard
               value="USD"
               selected={displayCurrency === "USD"}
-              flag="🇺🇸"
+              flag="US"
               title="USD"
               description={currencyDescription("USD", displayCurrency, currentRatePln, locale, ui)}
               onSelect={setDisplayCurrency}
@@ -95,7 +98,7 @@ export function Settings() {
             <CurrencyCard
               value="EUR"
               selected={displayCurrency === "EUR"}
-              flag="🇪🇺"
+              flag="EU"
               title="EUR"
               description={currencyDescription("EUR", displayCurrency, currentRatePln, locale, ui)}
               onSelect={setDisplayCurrency}
@@ -103,7 +106,7 @@ export function Settings() {
             <CurrencyCard
               value="CHF"
               selected={displayCurrency === "CHF"}
-              flag="🇨🇭"
+              flag="CH"
               title="CHF"
               description={currencyDescription("CHF", displayCurrency, currentRatePln, locale, ui)}
               onSelect={setDisplayCurrency}
@@ -112,7 +115,7 @@ export function Settings() {
 
           {displayCurrency !== "PLN" && rateUpdatedAt && (
             <p className="mt-3 text-[11px] text-slate-600">
-              {ui("Kurs zaktualizowany", "Rate updated", "Kurs aktualisiert")}: {new Date(rateUpdatedAt).toLocaleString(locale)}
+              {ui("Kurs zaktualizowany", "Rate updated", "Kurs aktualisiert", "Tipo actualizado")}: {new Date(rateUpdatedAt).toLocaleString(locale)}
             </p>
           )}
         </div>
@@ -126,7 +129,7 @@ function currencyDescription(
   selectedCurrency: DisplayCurrency,
   currentRatePln: number | null,
   locale: string,
-  ui: (pl: string, en: string, de?: string) => string,
+  ui: (pl: string, en: string, de?: string, es?: string) => string,
 ) {
   if (selectedCurrency === currency && currentRatePln) {
     const rate = currentRatePln.toLocaleString(locale, {
@@ -137,12 +140,12 @@ function currencyDescription(
   }
 
   const names = {
-    USD: ui("Dolar amerykański", "US dollar", "US-Dollar"),
-    EUR: ui("Euro", "Euro", "Euro"),
-    CHF: ui("Frank szwajcarski", "Swiss franc", "Schweizer Franken"),
+    USD: ui("Dolar amerykański", "US dollar", "US-Dollar", "Dólar estadounidense"),
+    EUR: ui("Euro", "Euro", "Euro", "Euro"),
+    CHF: ui("Frank szwajcarski", "Swiss franc", "Schweizer Franken", "Franco suizo"),
   } as const;
 
-  return `${names[currency]} · ${ui("kurs pobierany automatycznie", "rate loaded automatically", "Kurs wird automatisch geladen")}`;
+  return `${names[currency]} · ${ui("kurs pobierany automatycznie", "rate loaded automatically", "Kurs wird automatisch geladen", "tipo cargado automáticamente")}`;
 }
 
 function LanguageCard({
@@ -157,7 +160,7 @@ function LanguageCard({
   selected: boolean;
   title: string;
   description: string;
-  flag: string;
+  flag: FlagCode;
   onSelect: (value: AppLanguage) => void;
 }) {
   return (
@@ -170,7 +173,7 @@ function LanguageCard({
           : "border-slate-800 bg-slate-950/40 hover:border-slate-600 hover:bg-slate-900/70"
       }`}
     >
-      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-slate-950/55 text-3xl shadow-inner shadow-black/30">{flag}</span>
+      <span className="grid h-12 w-14 shrink-0 place-items-center rounded-2xl border border-white/10 bg-slate-950/55 shadow-inner shadow-black/30"><FlagIcon code={flag} className="h-7 w-10" /></span>
       <span className="min-w-0 flex-1">
         <span className="block text-base font-black text-white">{title}</span>
         <span className="mt-1 block text-xs leading-5 text-slate-500">{description}</span>
@@ -192,7 +195,7 @@ function CurrencyCard({
   selected: boolean;
   title: string;
   description: string;
-  flag: string;
+  flag: FlagCode;
   onSelect: (value: DisplayCurrency) => void;
 }) {
   return (
@@ -205,7 +208,7 @@ function CurrencyCard({
           : "border-slate-800 bg-slate-950/40 hover:border-slate-600 hover:bg-slate-900/70"
       }`}
     >
-      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-slate-950/55 text-3xl">{flag}</span>
+      <span className="grid h-12 w-14 shrink-0 place-items-center rounded-2xl border border-white/10 bg-slate-950/55"><FlagIcon code={flag} className="h-7 w-10" /></span>
       <span className="min-w-0 flex-1">
         <span className="block text-base font-black text-white">{title}</span>
         <span className="mt-1 block text-xs leading-5 text-slate-500">{description}</span>

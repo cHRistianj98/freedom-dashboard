@@ -475,7 +475,7 @@ function clamp(value: number, min: number, max: number) {
 function addMonthsToToday(months: number, language: AppLanguage) {
   const date = new Date();
   date.setMonth(date.getMonth() + months);
-  return date.toLocaleDateString(language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : "en-US", {
+  return date.toLocaleDateString(language === "pl" ? "pl-PL" : language === "de" ? "de-DE" : language === "es" ? "es-ES" : "en-US", {
     month: "long",
     year: "numeric",
   });
