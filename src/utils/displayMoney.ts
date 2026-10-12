@@ -1,16 +1,24 @@
 import type { AppLanguage } from "../i18n/LanguageContext";
-import type { DisplayCurrency } from "../i18n/CurrencyContext";
+import type { DisplayCurrency, ForeignDisplayCurrency } from "../i18n/CurrencyContext";
 
 const CURRENCY_STORAGE_KEY = "freedom.displayCurrency";
-const USD_RATE_KEY = "freedom.fx.usdPlnRate";
+
+function rateKey(currency: ForeignDisplayCurrency) {
+  return `freedom.fx.${currency.toLowerCase()}PlnRate`;
+}
 
 export function getStoredDisplayCurrency(): DisplayCurrency {
-  return window.localStorage.getItem(CURRENCY_STORAGE_KEY) === "USD" ? "USD" : "PLN";
+  const value = window.localStorage.getItem(CURRENCY_STORAGE_KEY);
+  return value === "USD" || value === "EUR" || value === "CHF" ? value : "PLN";
+}
+
+export function getStoredCurrencyPlnRate(currency: ForeignDisplayCurrency): number | null {
+  const value = Number(window.localStorage.getItem(rateKey(currency)));
+  return Number.isFinite(value) && value > 0 ? value : null;
 }
 
 export function getStoredUsdPlnRate(): number | null {
-  const value = Number(window.localStorage.getItem(USD_RATE_KEY));
-  return Number.isFinite(value) && value > 0 ? value : null;
+  return getStoredCurrencyPlnRate("USD");
 }
 
 export function localeForLanguage(language?: AppLanguage) {
@@ -25,7 +33,7 @@ export function readStoredLanguage(): AppLanguage {
 
 export function convertPlnForDisplay(plnAmount: number, currency = getStoredDisplayCurrency()) {
   if (currency === "PLN") return plnAmount;
-  const rate = getStoredUsdPlnRate();
+  const rate = getStoredCurrencyPlnRate(currency);
   return rate ? plnAmount / rate : plnAmount;
 }
 
@@ -40,8 +48,8 @@ export function formatDisplayMoney(
   } = {},
 ) {
   const selected = getStoredDisplayCurrency();
-  const rate = getStoredUsdPlnRate();
-  const effectiveCurrency: DisplayCurrency = selected === "USD" && rate ? "USD" : "PLN";
+  const rate = selected === "PLN" ? null : getStoredCurrencyPlnRate(selected);
+  const effectiveCurrency: DisplayCurrency = selected === "PLN" || rate ? selected : "PLN";
   const converted = convertPlnForDisplay(Number(plnAmount) || 0, effectiveCurrency);
   return new Intl.NumberFormat(localeForLanguage(options.language), {
     style: "currency",

@@ -7,7 +7,7 @@ export function Settings() {
   const {
     displayCurrency,
     setDisplayCurrency,
-    usdPlnRate,
+    currentRatePln,
     rateUpdatedAt,
     loadingRate,
     refreshRate,
@@ -62,7 +62,7 @@ export function Settings() {
                 </p>
               </div>
             </div>
-            {displayCurrency === "USD" && (
+            {displayCurrency !== "PLN" && (
               <button
                 type="button"
                 onClick={() => void refreshRate()}
@@ -75,7 +75,7 @@ export function Settings() {
             )}
           </div>
 
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             <CurrencyCard
               value="PLN"
               selected={displayCurrency === "PLN"}
@@ -89,20 +89,28 @@ export function Settings() {
               selected={displayCurrency === "USD"}
               flag="🇺🇸"
               title="USD"
-              description={
-                usdPlnRate
-                  ? ui(
-                      `1 USD = ${usdPlnRate.toLocaleString(locale, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} PLN`,
-                      `1 USD = ${usdPlnRate.toLocaleString(locale, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} PLN`,
-                      `1 USD = ${usdPlnRate.toLocaleString(locale, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} PLN`
-                    )
-                  : ui("Kurs zostanie pobrany automatycznie", "The rate will be loaded automatically", "Der Kurs wird automatisch geladen")
-              }
+              description={currencyDescription("USD", displayCurrency, currentRatePln, locale, ui)}
+              onSelect={setDisplayCurrency}
+            />
+            <CurrencyCard
+              value="EUR"
+              selected={displayCurrency === "EUR"}
+              flag="🇪🇺"
+              title="EUR"
+              description={currencyDescription("EUR", displayCurrency, currentRatePln, locale, ui)}
+              onSelect={setDisplayCurrency}
+            />
+            <CurrencyCard
+              value="CHF"
+              selected={displayCurrency === "CHF"}
+              flag="🇨🇭"
+              title="CHF"
+              description={currencyDescription("CHF", displayCurrency, currentRatePln, locale, ui)}
               onSelect={setDisplayCurrency}
             />
           </div>
 
-          {displayCurrency === "USD" && rateUpdatedAt && (
+          {displayCurrency !== "PLN" && rateUpdatedAt && (
             <p className="mt-3 text-[11px] text-slate-600">
               {ui("Kurs zaktualizowany", "Rate updated", "Kurs aktualisiert")}: {new Date(rateUpdatedAt).toLocaleString(locale)}
             </p>
@@ -111,6 +119,30 @@ export function Settings() {
       </section>
     </main>
   );
+}
+
+function currencyDescription(
+  currency: Exclude<DisplayCurrency, "PLN">,
+  selectedCurrency: DisplayCurrency,
+  currentRatePln: number | null,
+  locale: string,
+  ui: (pl: string, en: string, de?: string) => string,
+) {
+  if (selectedCurrency === currency && currentRatePln) {
+    const rate = currentRatePln.toLocaleString(locale, {
+      minimumFractionDigits: 4,
+      maximumFractionDigits: 4,
+    });
+    return `1 ${currency} = ${rate} PLN`;
+  }
+
+  const names = {
+    USD: ui("Dolar amerykański", "US dollar", "US-Dollar"),
+    EUR: ui("Euro", "Euro", "Euro"),
+    CHF: ui("Frank szwajcarski", "Swiss franc", "Schweizer Franken"),
+  } as const;
+
+  return `${names[currency]} · ${ui("kurs pobierany automatycznie", "rate loaded automatically", "Kurs wird automatisch geladen")}`;
 }
 
 function LanguageCard({
