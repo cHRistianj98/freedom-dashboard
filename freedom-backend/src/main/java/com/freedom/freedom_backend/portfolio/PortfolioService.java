@@ -471,8 +471,14 @@ public class PortfolioService {
 
     @Transactional(readOnly = true)
     public List<ValuationEventResponse> valuations(User user) {
+        return valuations(user, 100);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ValuationEventResponse> valuations(User user, int limit) {
+        int safeLimit = Math.max(1, Math.min(limit, 2000));
         return jdbc.query(
-                "SELECT id,asset_id,asset_name_snapshot,previous_value,new_value,delta,reason,created_at FROM asset_valuation_events WHERE user_id=? ORDER BY created_at DESC,id DESC LIMIT 100",
+                "SELECT id,asset_id,asset_name_snapshot,previous_value,new_value,delta,reason,created_at FROM asset_valuation_events WHERE user_id=? ORDER BY created_at DESC,id DESC LIMIT ?",
                 (rs, n) -> new ValuationEventResponse(
                         rs.getLong("id"),
                         (Long) rs.getObject("asset_id"),
@@ -483,7 +489,7 @@ public class PortfolioService {
                         rs.getString("reason"),
                         rs.getTimestamp("created_at").toInstant()
                 ),
-                user.getId()
+                user.getId(), safeLimit
         );
     }
 
